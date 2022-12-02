@@ -1,5 +1,6 @@
 # ----------------------------------
 # Sparked Host Custom Docker Image
+# Image: ghcr.io/sparkedhost/images:java-jre17
 # ----------------------------------
 
 FROM        openjdk:17-slim-bullseye
