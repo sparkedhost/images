@@ -1,2 +1,2 @@
-# images
-Docker images designed for use with Sparked Host LLC Apollo Panel.
+# Apollo Images
+#### Docker images designed for use with Sparked Host's Apollo Panel.
