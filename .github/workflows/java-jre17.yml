@@ -11,7 +11,7 @@ on:
       - .github/workflows/*
 jobs:
   push:
-    name: "images:java-jre17"
+    name: "java-jre17"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -29,7 +29,7 @@ jobs:
       - uses: docker/build-push-action@v2
         with:
           context: ./java
-          file: ./java-jre17/Dockerfile
+          file: ./java/java-jre17/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
