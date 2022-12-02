@@ -12,6 +12,7 @@ on:
 jobs:
   push:
     name: "images:java-jre17"
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
     steps:
