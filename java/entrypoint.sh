@@ -15,10 +15,10 @@ TIMEZONE_INUSE=$(echo ${MODIFIED_STARTUP} | grep -o "\-Duser.timezone=")
 # If Lower Xmx is enabled and above variable is empty, add the parameters to the startup command
 if [ "${LOWER_XMX}" = 1 ]; then
     SERVER_MEMORY=$(expr $SERVER_MEMORY - 1024)
-    # If 512M server, use 256M
+    # If 512MiB server, use 256MiB
     if [ "${SERVER_MEMORY}" == -512 ]; then SERVER_MEMORY=256; fi
 
-    # If 1GB server, use 512M
+    # If 1GiB server, use 512MiB
     if [ "${SERVER_MEMORY}" == 0 ]; then SERVER_MEMORY=512; fi
 fi
 
