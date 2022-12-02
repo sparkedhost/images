@@ -4,10 +4,11 @@ on:
     - cron: "0 0 1 * 1"
   push:
     branches:
-      - master
+      - main
     paths:
       - java/java-jre17/*
-      - entrypoint.sh
+      - java/entrypoint.sh
+      - .github/workflows/*
 jobs:
   push:
     name: "images:java-jre17"
