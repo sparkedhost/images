@@ -5,11 +5,11 @@
 
 ### Java images
 
-* [java-jre8](https://github.com/sparkedhost/images/blob/main/java/java-jre8/Dockerfile)
-* [java-jre11](https://github.com/sparkedhost/images/blob/main/java/java-jre8/Dockerfile)
-* [java-jre16](https://github.com/sparkedhost/images/blob/main/java/java-jre8/Dockerfile)
-* [java-jre17](https://github.com/sparkedhost/images/blob/main/java/java-jre8/Dockerfile)
-* [java-jre18](https://github.com/sparkedhost/images/blob/main/java/java-jre8/Dockerfile)
+* [`java-jre8`](https://github.com/sparkedhost/images/blob/main/java/java-jre8/Dockerfile)
+* [`java-jre11`](https://github.com/sparkedhost/images/blob/main/java/java-jre8/Dockerfile)
+* [`java-jre16`](https://github.com/sparkedhost/images/blob/main/java/java-jre8/Dockerfile)
+* [`java-jre17`](https://github.com/sparkedhost/images/blob/main/java/java-jre8/Dockerfile)
+* [`java-jre18`](https://github.com/sparkedhost/images/blob/main/java/java-jre8/Dockerfile)
 
 ## Requesting changes
 
