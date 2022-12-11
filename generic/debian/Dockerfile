@@ -1,10 +1,11 @@
 # ----------------------------------
 # Sparked Host Custom Image
-# Environment: Debian
+# Image: ghcr.io/sparkedhost/images:generic-debian
 # ----------------------------------
+
 FROM debian:bullseye-slim
 
-LABEL       author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
+LABEL author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
 
 ENV DEBIAN_FRONTEND noninteractive
 
