@@ -22,6 +22,25 @@
 * [`nodejs-18`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-18/Dockerfile)
 * [`nodejs-19`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-19/Dockerfile)
 
+### Python images
+
+* [`python-3.6`](https://github.com/sparkedhost/images/blob/main/python/python-3.6/Dockerfile)
+* [`python-3.7`](https://github.com/sparkedhost/images/blob/main/python/python-3.7/Dockerfile)
+* [`python-3.8`](https://github.com/sparkedhost/images/blob/main/python/python-3.8/Dockerfile)
+* [`python-3.9`](https://github.com/sparkedhost/images/blob/main/python/python-3.9/Dockerfile)
+* [`python-3.10`](https://github.com/sparkedhost/images/blob/main/python/python-3.10/Dockerfile)
+* [`python-3.11`](https://github.com/sparkedhost/images/blob/main/python/python-3.11/Dockerfile)
+
+### Other games images
+
+* [`games-unturned`](https://github.com/sparkedhost/images/blob/main/games/unturned/Dockerfile)
+
+### Generic images
+
+* [`generic-debian`](https://github.com/sparkedhost/images/blob/main/generic/debian/Dockerfile)
+* [`mono-generic`](https://github.com/sparkedhost/images/blob/main/mono/mono-generic/Dockerfile)
+* [`wine-generic`](https://github.com/sparkedhost/images/blob/main/wine/wine-generic/Dockerfile)
+
 ## Requesting changes
 
 Docker caches images locally on every machine they're pulled on, even old tags that aren't in use anymore.
