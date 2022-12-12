@@ -10,6 +10,7 @@
 * [`java-jre16`](https://github.com/sparkedhost/images/blob/main/java/java-jre16/Dockerfile)
 * [`java-jre17`](https://github.com/sparkedhost/images/blob/main/java/java-jre17/Dockerfile)
 * [`java-jre18`](https://github.com/sparkedhost/images/blob/main/java/java-jre18/Dockerfile)
+* [`lavalink`](https://github.com/sparkedhost/images/blob/main/java/lavalink/Dockerfile)
 
 ### Node.js images
 
