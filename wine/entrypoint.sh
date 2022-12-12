@@ -1,0 +1,15 @@
+#!/bin/bash
+cd /home/container
+
+# Wine Debug
+WINEDEBUG=-all
+
+# Make internal Docker IP address available to processes.
+export INTERNAL_IP=`ip route get 1 | awk '{print $NF;exit}'`
+
+# Replace Startup variables
+MODIFIED_STARTUP=$(echo -e ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
+echo "customer@sparkedhost:~# ${MODIFIED_STARTUP}"
+
+# Run the Server.
+eval ${MODIFIED_STARTUP}
