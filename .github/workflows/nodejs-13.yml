@@ -8,7 +8,7 @@ on:
     paths:
       - nodejs/nodejs-13/*
       - nodejs/entrypoint.sh
-      - .github/workflows/*
+      - .github/workflows/nodejs-13.yml
 jobs:
   push:
     name: "nodejs-13"

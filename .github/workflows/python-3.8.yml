@@ -8,7 +8,7 @@ on:
     paths:
       - python/python-3.8/*
       - python/entrypoint.sh
-      - .github/workflows/*
+      - .github/workflows/python-3.8.yml
 jobs:
   push:
     name: "python-3.8"

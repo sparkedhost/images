@@ -7,7 +7,7 @@ on:
       - main
     paths:
       - games/unturned/*
-      - .github/workflows/*
+      - .github/workflows/games-unturned.yml
 jobs:
   push:
     name: "games-unturned"

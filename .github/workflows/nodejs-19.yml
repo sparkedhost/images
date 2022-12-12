@@ -8,7 +8,7 @@ on:
     paths:
       - nodejs/nodejs-19/*
       - nodejs/entrypoint.sh
-      - .github/workflows/*
+      - .github/workflows/nodejs-19.yml
 jobs:
   push:
     name: "nodejs-19"

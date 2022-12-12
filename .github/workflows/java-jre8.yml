@@ -8,7 +8,7 @@ on:
     paths:
       - java/java-jre17/*
       - java/entrypoint.sh
-      - .github/workflows/*
+      - .github/workflows/java-jre8.yml
 jobs:
   push:
     name: "java-jre8"

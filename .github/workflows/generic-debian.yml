@@ -8,7 +8,7 @@ on:
     paths:
       - generic/debian/*
       - generic/entrypoint.sh
-      - .github/workflows/*
+      - .github/workflows/generic-debian.yml
 jobs:
   push:
     name: "generic-debian"
