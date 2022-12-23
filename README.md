@@ -36,6 +36,10 @@
 
 * [`games-unturned`](https://github.com/sparkedhost/images/blob/main/games/unturned/Dockerfile)
 
+### Other bot images
+
+* [`bot-bastion`](https://github.com/sparkedhost/images/blob/main/bot/bastion/Dockerfile)
+
 ### Generic images
 
 * [`generic-debian`](https://github.com/sparkedhost/images/blob/main/generic/debian/Dockerfile)
