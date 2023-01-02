@@ -22,5 +22,5 @@ RUN apt install -y ca-certificates tzdata curl net-tools iproute2 dnsutils iputi
 
 WORKDIR /home/container
 
-COPY ./entrypoint.sh /entrypoint.sh
+COPY ./network/entrypoint.sh /entrypoint.sh
 CMD ["/bin/bash", "/entrypoint.sh"]
