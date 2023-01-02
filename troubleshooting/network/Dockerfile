@@ -20,6 +20,8 @@ RUN apt update \
 
 RUN apt install -y ca-certificates tzdata curl net-tools iproute2 dnsutils iputils-ping jq
 
+RUN setcap "cap_net_raw+ep" "/bin/ping"
+
 WORKDIR /home/container
 
 COPY ./network/entrypoint.sh /entrypoint.sh
