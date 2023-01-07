@@ -1,6 +1,6 @@
 # ----------------------------------
 # Sparked Host Custom Docker Image
-# Image: ghcr.io/sparkedhost/images:lavalink
+# Image: ghcr.io/sparkedhost/images:bot-lavalink
 # ----------------------------------
 
 FROM        openjdk:13-slim
@@ -16,6 +16,6 @@ ENV  USER=container HOME=/home/container
 
 WORKDIR     /home/container
 
-COPY        ./entrypoint.sh /entrypoint.sh
+COPY        ./lavalink/entrypoint.sh /entrypoint.sh
 
 CMD         ["/bin/bash", "/entrypoint.sh"]
