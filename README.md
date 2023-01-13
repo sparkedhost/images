@@ -9,9 +9,9 @@
 * [`java-jre11`](https://github.com/sparkedhost/images/blob/main/java/java-jre11/Dockerfile)
 * [`java-jre16`](https://github.com/sparkedhost/images/blob/main/java/java-jre16/Dockerfile)[^eol]
 * [`java-jre17`](https://github.com/sparkedhost/images/blob/main/java/java-jre17/Dockerfile)
-* [`java-jre18`](https://github.com/sparkedhost/images/blob/main/java/java-jre18/Dockerfile)[^1]
-* [`anti-malware`](https://github.com/sparkedhost/images/blob/main/java/anti-malware/Dockerfile)[^2]
-* [`lavalink`](https://github.com/sparkedhost/images/blob/main/java/lavalink/Dockerfile)[^2]
+* [`java-jre18`](https://github.com/sparkedhost/images/blob/main/java/java-jre18/Dockerfile)[^java18]
+* [`anti-malware`](https://github.com/sparkedhost/images/blob/main/java/anti-malware/Dockerfile)[^antimalware]
+* [`lavalink`](https://github.com/sparkedhost/images/blob/main/java/lavalink/Dockerfile)
 
 ### Node.js images
 
@@ -60,11 +60,11 @@ open to new ideas.
 [^eol]: The software inside this image (Java, Node.js, Python...) is considered end of life, meaning official
 support from the developers has now ended and it's recommended to update.
 
-[^1]: Java 18 was released on March 22nd, 2022. Following their support lifecycle, support for this version
+[^java18]: Java 18 was released on March 22nd, 2022. Following their support lifecycle, support for this version
 ended on September 20th of the same year. Everyone using this image for Minecraft: Java Edition should
 consider downgrading to Java 17 as it's the most recent Long Term Support (LTS) release.
 
-[^2]: MCAntiMalware is an anti-malware software for Minecraft servers that detects over 900 malicious plugins.
+[^antimalware]: MCAntiMalware is an anti-malware software for Minecraft servers that detects over 900 malicious plugins.
 This image automatically downloads the latest release, runs a single scan against the working directory
 (/home/container/, where the server files are located) and exits.
 [Read more about this anti-malware here](https://github.com/OpticFusion1/MCAntiMalware).
