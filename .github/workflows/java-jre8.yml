@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - java/java-jre17/*
+      - java/java-jre8/*
       - java/entrypoint.sh
       - .github/workflows/java-jre8.yml
 jobs:
