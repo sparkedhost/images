@@ -14,7 +14,12 @@ TIMEZONE_INUSE=$(echo ${MODIFIED_STARTUP} | grep -o "\-Duser.timezone=")
 
 # If Lower Xmx is enabled, then lower the Xmx value by 20% to account for the JVM overhead.
 if [ "${LOWER_XMX}" = 1 ]; then
-    SERVER_MEMORY=$(expr $SERVER_MEMORY * 0.8)
+    SERVER_MEMORY=$(expr $SERVER_MEMORY - 1024)
+    # If 512MiB server, use 256MiB
+    if [ "${SERVER_MEMORY}" == -512 ]; then SERVER_MEMORY=256; fi
+
+    # If 1GiB server, use 512MiB
+    if [ "${SERVER_MEMORY}" == 0 ]; then SERVER_MEMORY=512; fi
 fi
 
 # Replace startup variables.
