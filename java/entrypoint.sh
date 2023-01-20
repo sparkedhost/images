@@ -12,7 +12,7 @@ export INTERNAL_IP=$(ip route get 1 | awk '{print $NF;exit}')
 JLINE_ARGS=$(echo ${MODIFIED_STARTUP} | grep -o "\-Dterminal.jline=false -Dterminal.ansi=true")
 TIMEZONE_INUSE=$(echo ${MODIFIED_STARTUP} | grep -o "\-Duser.timezone=")
 
-# If Lower Xmx is enabled, then lower the Xmx value by 20% to account for the JVM overhead.
+# If Lower Xmx is enabled and above variable is empty, add the parameters to the startup command
 if [ "${LOWER_XMX}" = 1 ]; then
     SERVER_MEMORY=$(expr $SERVER_MEMORY - 1024)
     # If 512MiB server, use 256MiB
