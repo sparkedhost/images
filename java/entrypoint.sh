@@ -34,12 +34,12 @@ fi
 # Log4j2 vulnerability workaround
 if [ ! "${LOG4J2_VULN_WORKAROUND}" = "disabled" ] && [ -n "${LOG4J2_VULN_WORKAROUND}" ]; then
     case "${LOG4J2_VULN_WORKAROUND}" in
-    "formatMsgNoLookups")
+    "Enable for 1.17+")
         MODIFIED_STARTUP=$(echo "${MODIFIED_STARTUP}" | sed -E 's/-Xmx([0-9]+)M/& -Dlog4j2.formatMsgNoLookups=true/')
         echo -e "\033[1;33mNOTE: \033[0mThe Log4j2 vulnerability workaround for 1.17 and 1.18 has been enabled. Please consider updating your server software if you haven't already."
         ;;
 
-    "log4j2_112-116.xml")
+    "Enable for 1.12 - 1.16")
         if [ ! -f "log4j2_112-116.xml" ]; then
             curl --silent -Lo log4j2_112-116.xml https://launcher.mojang.com/v1/objects/02937d122c86ce73319ef9975b58896fc1b491d1/log4j2_112-116.xml
         fi
@@ -47,7 +47,7 @@ if [ ! "${LOG4J2_VULN_WORKAROUND}" = "disabled" ] && [ -n "${LOG4J2_VULN_WORKARO
         echo -e "\033[1;33mNOTE: \033[0mThe Log4j2 vulnerability workaround for 1.12 - 1.16.5 has been enabled. Please consider updating your server software if you haven't already."
         ;;
 
-    "log4j2_17-111.xml")
+    "Enable for 1.7 - 1.11")
         if [ ! -f "log4j2_17-111.xml" ]; then
             curl --silent -Lo log4j2_17-111.xml https://launcher.mojang.com/v1/objects/4bb89a97a66f350bc9f73b3ca8509632682aea2e/log4j2_17-111.xml
         fi
