@@ -1,5 +1,7 @@
 name: Build nodejs-17
 on:
+  schedule:
+    - cron: "0 0 1 * *"
   push:
     branches:
       - main

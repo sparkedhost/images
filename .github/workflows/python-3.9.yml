@@ -1,7 +1,7 @@
 name: Build python-3.9
 on:
   schedule:
-    - cron: "0 0 1 * 1"
+    - cron: "0 0 * * 1"
   push:
     branches:
       - main
