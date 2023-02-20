@@ -59,6 +59,12 @@ if [ "${AIKAR_FLAGS}" = 1 ]; then
     echo -e "\033[1;33mNOTE: \033[0mEnabled Aikar's Flags"
 fi
 
+# Paper Legacy Plugins (https://github.com/PaperMC/Paper/pull/8108)
+if [ "${PAPER_LEGACY_PLUGINS}" = 1 ] && [ -z "${FORGE_VERSION}" ]; then
+    MODIFIED_STARTUP=$(echo "${MODIFIED_STARTUP}" | sed -E 's/-Xmx([0-9]+)[KMG]?/& -Dpaper.useLegacyPluginLoading=true/')
+    echo -e "\033[1;33mNOTE: \033[0mPaper Legacy Plugin loading is enabled."
+fi
+
 # Print startup command to console
 echo -e "\033[1;33mcustomer@sparkedhost:~\$\033[0m ${MODIFIED_STARTUP}"
 
