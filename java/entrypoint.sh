@@ -2,11 +2,11 @@
 cd /home/container
 
 # Print current Java version
-JAVA_VER=$(java -version 2>&1 | head -1 | cut -d'"' -f2 | sed '/^1\./s///')
+JAVA_VER=`java -version 2>&1 | head -1 | cut -d'"' -f2 | sed '/^1\./s///'`
 echo "Java version: ${JAVA_VER}"
 
 # Make internal Docker IP address available to processes
-export INTERNAL_IP=$(ip route get 1 | awk '{print $NF;exit}')
+export INTERNAL_IP=`ip route get 1 | awk '{print $NF;exit}'`
 
 # Check if startup command has -Dterminal.jline=false -Dterminal.ansi=true
 JLINE_ARGS=$(echo ${MODIFIED_STARTUP} | grep -o "\-Dterminal.jline=false -Dterminal.ansi=true")
@@ -27,7 +27,7 @@ MODIFIED_STARTUP=$(echo "${STARTUP}" | sed -e 's/{{/${/g' -e 's/}}/}/g' | eval e
 
 # If Forge compatibility is enabled and above variable is empty, add the parameters to the startup command
 if [ "${FORGE_COMPATIBILITY}" = 1 ] && [ -z "${JLINE_ARGS}" ] && [ -z "${FORGE_VERSION}" ]; then
-    MODIFIED_STARTUP=$(echo "${MODIFIED_STARTUP}" | sed -E 's/-Xmx([0-9]+)M/& -Dterminal.jline=false -Dterminal.ansi=true/')
+    MODIFIED_STARTUP=$(echo "${MODIFIED_STARTUP}" | sed -E 's/-Xmx([0-9]+)[KMG]?/& -Dterminal.jline=false -Dterminal.ansi=true/')
     echo -e "\033[1;33mNOTE: \033[0mForge compatibility mode is enabled."
 fi
 
@@ -58,25 +58,25 @@ if [ ! "${LOG4J2_VULN_WORKAROUND}" = "disabled" ] && [ -n "${LOG4J2_VULN_WORKARO
 fi
 
 # SIMD operations (https://github.com/sparkedhost/images/issues/4)
-if [ "${SIMD_OPERATIONS}" = 1 ]; then
-    MODIFIED_STARTUP=$(echo "${MODIFIED_STARTUP}" | sed -E 's/-Xmx([0-9]+)M/& --add-modules=jdk.incubator.vector/')
+if [ "${SIMD_OPERATIONS}" = 1 ] && [ -z "${FORGE_VERSION}" ]; then
+    MODIFIED_STARTUP=$(echo "${MODIFIED_STARTUP}" | sed -E 's/-Xmx([0-9]+)[KMG]?/& --add-modules=jdk.incubator.vector/')
     echo -e "\033[1;33mNOTE: \033[0mSIMD operations are enabled."
-fi
-
-# Timezone
-if [ ! "${TIMEZONE}" = "Default" ] && [ -z "${TIMEZONE_INUSE}" ] && [ ! -z "${TIMEZONE}" ]; then
-    MODIFIED_STARTUP=$(echo "${MODIFIED_STARTUP}" | sed -E 's/-Xmx([0-9]+)M/& -Duser.timezone=${TIMEZONE}/')
-fi
-
-# Aikar flags
-if [ "${AIKAR_FLAGS}" = 1 ]; then
-    MODIFIED_STARTUP=$(echo "${MODIFIED_STARTUP}" | sed -E 's/-Xmx([0-9]+)M/& -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Daikars.new.flags=true/')
-    echo -e "\033[1;33mNOTE: \033[0mEnabled Aikar's Flags"
 fi
 
 # Forge 1.17.1+
 if [ -n "${FORGE_VERSION}" ]; then
     MODIFIED_STARTUP="java -Xms128M -Xmx${SERVER_MEMORY}M -Dterminal.jline=false -Dterminal.ansi=true @libraries/net/minecraftforge/forge/${FORGE_VERSION}/unix_args.txt"
+fi
+
+# Timezone
+if [ ! "${TIMEZONE}" = "Default" ] && [ -z "${TIMEZONE_INUSE}" ] && [ ! -z "${TIMEZONE}" ]; then
+    MODIFIED_STARTUP=$(echo "${MODIFIED_STARTUP}" | sed -E 's/-Xmx([0-9]+)[KMG]?/& -Duser.timezone=${TIMEZONE}/')
+fi
+
+# Aikar flags
+if [ "${AIKAR_FLAGS}" = 1 ]; then
+    MODIFIED_STARTUP=$(echo "${MODIFIED_STARTUP}" | sed -E 's/-Xmx([0-9]+)[KMG]?/& -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Daikars.new.flags=true/')
+    echo -e "\033[1;33mNOTE: \033[0mEnabled Aikar's Flags"
 fi
 
 # Print startup command to console
