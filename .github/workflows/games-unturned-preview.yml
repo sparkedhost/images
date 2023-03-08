@@ -1,17 +1,16 @@
-name: Build nodejs-17
+name: Build games-unturned-preview
 on:
   schedule:
-    - cron: "0 0 1 * *"
+    - cron: "0 0 * * 1"
   push:
     branches:
       - main
     paths:
-      - nodejs/nodejs-17/*
-      - nodejs/entrypoint.sh
-      - .github/workflows/nodejs-17.yml
+      - games/unturned-preview/*
+      - .github/workflows/games-unturned-preview.yml
 jobs:
   push:
-    name: "nodejs-17"
+    name: "games-unturned-preview"
     runs-on: self-hosted
     strategy:
       fail-fast: false
@@ -28,9 +27,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v3
         with:
-          context: ./nodejs
-          file: ./nodejs/nodejs-17/Dockerfile
+          context: ./games
+          file: ./games/unturned-preview/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:nodejs-17
+            ghcr.io/sparkedhost/images:games-unturned-preview
