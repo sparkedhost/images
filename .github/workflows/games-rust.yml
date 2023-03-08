@@ -1,7 +1,5 @@
 name: Build games-rust
 on:
-  schedule:
-    - cron: "0 0 * * 1"
   push:
     branches:
       - main

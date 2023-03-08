@@ -1,7 +1,5 @@
 name: Build python-3.11
 on:
-  schedule:
-    - cron: "0 0 * * 1"
   push:
     branches:
       - main
