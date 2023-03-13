@@ -8,7 +8,7 @@ FROM        python:3.10-slim-buster
 LABEL       author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
 
 RUN apt update \
- && apt install gnupg build-essential git libtool netcat ffmpeg iproute2 curl tzdata wget -y \
+ && apt install -y gnupg build-essential git netcat ffmpeg iproute2 curl tzdata wget \
  && wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add - \
  && echo "deb http://repo.mongodb.org/apt/debian bullseye/mongodb-org/6.0 main" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list \
  && apt update \
