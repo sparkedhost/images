@@ -16,6 +16,6 @@ ENV  USER=container HOME=/home/container
 
 WORKDIR     /home/container
 
-COPY        ../java/entrypoint.sh /entrypoint.sh
+COPY        ./java/entrypoint.sh /entrypoint.sh
 
 CMD         ["/bin/bash", "/entrypoint.sh"]

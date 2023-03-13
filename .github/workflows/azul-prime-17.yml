@@ -26,7 +26,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v3
         with:
-          context: ./other
+          context: .
           file: ./other/azul-prime-17/Dockerfile
           platforms: linux/amd64
           push: true
