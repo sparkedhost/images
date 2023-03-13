@@ -3,7 +3,7 @@
 # Image: ghcr.io/sparkedhost/images:bot-modmail
 # ----------------------------------
 
-FROM        python:3.11-slim-bullseye
+FROM        python:3.9-slim-bullseye
 
 LABEL       author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
 
