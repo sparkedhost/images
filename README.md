@@ -33,13 +33,13 @@
 - [`python-3.10`](https://github.com/sparkedhost/images/blob/main/python/python-3.10/Dockerfile)
 - [`python-3.11`](https://github.com/sparkedhost/images/blob/main/python/python-3.11/Dockerfile)
 
-### Other games images
+### Game Hosting images
 
 - [`games-rust`](https://github.com/sparkedhost/images/blob/main/games/rust/Dockerfile)
 - [`games-unturned`](https://github.com/sparkedhost/images/blob/main/games/unturned/Dockerfile)
 - [`games-unturned-preview`](https://github.com/sparkedhost/images/blob/main/games/unturned-preview/Dockerfile)
 
-### Other bot images
+### Bot Hosting images
 
 - [`bot-bastion`](https://github.com/sparkedhost/images/blob/main/bot/bastion/Dockerfile)
 - [`bot-lavalink`](https://github.com/sparkedhost/images/blob/main/bot/lavalink/Dockerfile)
@@ -50,6 +50,10 @@
 - [`generic-debian`](https://github.com/sparkedhost/images/blob/main/generic/debian/Dockerfile)
 - [`mono-generic`](https://github.com/sparkedhost/images/blob/main/mono/mono-generic/Dockerfile)
 - [`wine-generic`](https://github.com/sparkedhost/images/blob/main/wine/wine-generic/Dockerfile)
+
+### Other images
+
+- [`azul-prime-17`](https://github.com/sparkedhost/images/blob/main/other/azul-prime-17/Dockerfile)
 
 ## Requesting changes
 
