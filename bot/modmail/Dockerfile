@@ -21,6 +21,6 @@ ENV  USER=container HOME=/home/container
 
 WORKDIR /home/container
 
-COPY ./bastion/entrypoint.sh /entrypoint.sh
+COPY ./modmail/entrypoint.sh /entrypoint.sh
 
 CMD ["/bin/bash", "/entrypoint.sh"]
