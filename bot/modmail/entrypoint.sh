@@ -28,4 +28,4 @@ echo -e "${YELLOW}Starting bot...${NC}"
 eval ${MODIFIED_STARTUP}
 
 # Stop MongoDB
-mongo --eval "db.getSiblingDB('admin').shutdownServer()"
+mongod --eval "db.getSiblingDB('admin').shutdownServer()"
