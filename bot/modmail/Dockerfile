@@ -7,7 +7,9 @@ FROM        python:3.10-slim-buster
 
 LABEL       author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
 
-RUN wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add - \
+RUN apt update \
+ && apt install wget -y \
+ && wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add - \
  && echo "deb http://repo.mongodb.org/apt/debian bullseye/mongodb-org/6.0 main" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list \
  && apt update \
  && apt install -y mongodb-org mongodb-org-server mongodb-org-shell mongodb-org-mongos mongodb-org-tools \
