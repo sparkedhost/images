@@ -54,6 +54,7 @@
 ### Other images
 
 - [`azul-prime-17`](https://github.com/sparkedhost/images/blob/main/other/azul-prime-17/Dockerfile)
+- [`azul-prime-19`](https://github.com/sparkedhost/images/blob/main/other/azul-prime-19/Dockerfile)
 
 ## Requesting changes
 

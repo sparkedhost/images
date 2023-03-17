@@ -1,0 +1,34 @@
+name: Build azul-prime-19
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - other/azul-prime-19/*
+      - java/entrypoint.sh
+      - .github/workflows/azul-prime-19.yml
+jobs:
+  push:
+    name: "azul-prime-19"
+    runs-on: self-hosted
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+        with:
+          version: "v0.9.1"
+          buildkitd-flags: --debug
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./other/azul-prime-19/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ghcr.io/sparkedhost/images:azul-prime-19
