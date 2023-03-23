@@ -16,6 +16,9 @@ RUN wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add -
  && npm install -g npm@latest \
  && useradd -d /home/container -m container -s /bin/bash
 
+ADD ca.crt /usr/local/share/ca-certificates/sparked-ca.crt
+RUN chmod 644 /usr/local/share/ca-certificates/sparked-ca.crt && update-ca-certificates
+
 USER container
 ENV  USER=container HOME=/home/container
 

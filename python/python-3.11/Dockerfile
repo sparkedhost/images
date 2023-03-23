@@ -12,6 +12,9 @@ RUN apt update \
  && useradd -m -d /home/container container \
  && /usr/local/bin/python -m pip install --upgrade pip
 
+ADD ca.crt /usr/local/share/ca-certificates/sparked-ca.crt
+RUN chmod 644 /usr/local/share/ca-certificates/sparked-ca.crt && update-ca-certificates
+
 USER container
 ENV  USER=container HOME=/home/container TMPDIR=/home/container/.tmp
 
