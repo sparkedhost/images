@@ -3,7 +3,7 @@
 # Image: ghcr.io/sparkedhost/images:python-3.6
 # ----------------------------------
 
-FROM        python:3.6-slim-buster
+FROM        python:3.6-slim-bullseye
 
 LABEL       author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
 
