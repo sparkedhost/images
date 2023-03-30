@@ -14,7 +14,7 @@ echo "Yarn version: ${YARN_VER}"
 GIT_VER=`git --version 2>&1 | cut -d' ' -f3 | sed '/^1\./s///'`
 echo "Git version: ${GIT_VER}"
 
-DJS_VER=`npm list --omit peer --depth 0 discord.js | grep -E '└── discord\.js@[0-9.]+$' | cut -d '@' -f2`
+DJS_VER=`npm list --omit peer --depth 0 discord.js | grep -oE '[0-9.]+$'`
 if [ -z "$DJS_VER" ]
 then
     DJS_VER="(not installed)"
