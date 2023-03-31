@@ -38,6 +38,7 @@
 - [`games-rust`](https://github.com/sparkedhost/images/blob/main/games/rust/Dockerfile)
 - [`games-unturned`](https://github.com/sparkedhost/images/blob/main/games/unturned/Dockerfile)
 - [`games-unturned-preview`](https://github.com/sparkedhost/images/blob/main/games/unturned-preview/Dockerfile)
+- [`games-liteloader-bds`](https://github.com/sparkedhost/images/blob/main/games/liteloader-bds/Dockerfile)
 
 ### Bot Hosting images
 
