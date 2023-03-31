@@ -24,7 +24,7 @@ RUN chmod 644 /usr/local/share/ca-certificates/sparked-ca.crt && update-ca-certi
 # Set user that will run the entrypoint script, and overwrite USER, HOME and PATH environment variables
 # We need to inject the path to the Java binaries in the PATH environment variable
 USER container
-ENV  USER=container HOME=/home/container    PATH="$PATH:/opt/java/bin"
+ENV  USER=container HOME=/home/container PATH="$PATH:/opt/java/bin" LANG=C.UTF-8
 
 WORKDIR     /home/container
 
