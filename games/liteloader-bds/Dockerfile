@@ -14,8 +14,7 @@ RUN apt update \
     && apt install -y unzip curl wget curl iproute2 tzdata libgdiplus wine \
     && curl -sL https://deb.nodesource.com/setup_18.x | bash - \
     && apt install -y nodejs \
-    && useradd -m -d /home/container -s /bin/bash container \
-    && ln -s /usr/bin/wine64 /usr/bin/wine
+    && useradd -m -d /home/container -s /bin/bash container 
 
 ENV     HOME=/home/container
 ENV     WINEPREFIX=/home/container/.wine
