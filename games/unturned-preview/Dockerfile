@@ -3,7 +3,7 @@
 # Image: ghcr.io/sparkedhost/images:games-unturned-preview
 # ----------------------------------
 
-FROM ubuntu:22.04
+FROM debian:bullseye-slim
 
 LABEL author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
 
@@ -11,7 +11,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt update
 RUN apt upgrade -y
-RUN apt install -y curl wget jq screen htop unzip lib32stdc++6 libc6 libgdiplus libgl1-mesa-glx libxcursor1 libxrandr2 libc6-dev
+RUN apt install -y curl wget jq unzip libc6-dev libx11-dev lib32gcc-s1
 RUN useradd -d /home/container -m container
 
 USER container
