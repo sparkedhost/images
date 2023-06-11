@@ -10,8 +10,8 @@
 - [`java-jre11`](https://github.com/sparkedhost/images/blob/main/java/java-jre11/Dockerfile)
 - [`java-jre16`](https://github.com/sparkedhost/images/blob/main/java/java-jre16/Dockerfile)[^eol]
 - [`java-jre17`](https://github.com/sparkedhost/images/blob/main/java/java-jre17/Dockerfile)
-- [`java-jre18`](https://github.com/sparkedhost/images/blob/main/java/java-jre18/Dockerfile)[^java18]
-- [`java-jre19`](https://github.com/sparkedhost/images/blob/main/java/java-jre19/Dockerfile)
+- [`java-jre18`](https://github.com/sparkedhost/images/blob/main/java/java-jre18/Dockerfile)[^eol]
+- [`java-jre19`](https://github.com/sparkedhost/images/blob/main/java/java-jre19/Dockerfile)[^eol]
 - [`java-jre20`](https://github.com/sparkedhost/images/blob/main/java/java-jre20/Dockerfile)
 - [`anti-malware`](https://github.com/sparkedhost/images/blob/main/java/anti-malware/Dockerfile)[^antimalware]
 
@@ -19,18 +19,18 @@
 
 - [`nodejs-12`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-12/Dockerfile)[^eol]
 - [`nodejs-13`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-13/Dockerfile)[^eol]
-- [`nodejs-14`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-14/Dockerfile)
+- [`nodejs-14`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-14/Dockerfile)[^eol]
 - [`nodejs-15`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-15/Dockerfile)[^eol]
 - [`nodejs-16`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-16/Dockerfile)
 - [`nodejs-17`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-17/Dockerfile)[^eol]
 - [`nodejs-18`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-18/Dockerfile)
-- [`nodejs-19`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-19/Dockerfile)
+- [`nodejs-19`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-19/Dockerfile)[^eol]
 - [`nodejs-20`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-20/Dockerfile)
 
 ### Python images
 
 - [`python-3.6`](https://github.com/sparkedhost/images/blob/main/python/python-3.6/Dockerfile)[^eol]
-- [`python-3.7`](https://github.com/sparkedhost/images/blob/main/python/python-3.7/Dockerfile)
+- [`python-3.7`](https://github.com/sparkedhost/images/blob/main/python/python-3.7/Dockerfile)[^eol]
 - [`python-3.8`](https://github.com/sparkedhost/images/blob/main/python/python-3.8/Dockerfile)
 - [`python-3.9`](https://github.com/sparkedhost/images/blob/main/python/python-3.9/Dockerfile)
 - [`python-3.10`](https://github.com/sparkedhost/images/blob/main/python/python-3.10/Dockerfile)
@@ -72,11 +72,6 @@ open to new ideas.
 [^eol]:
     The software inside this image (Java, Node.js, Python...) is considered end of life, meaning official
     support from the developers has now ended and it's recommended to update.
-
-[^java18]:
-    Java 18 was released on March 22nd, 2022. Following their support lifecycle, support for this version
-    ended on September 20th of the same year. Everyone using this image for Minecraft: Java Edition should
-    consider downgrading to Java 17 as it's the most recent Long Term Support (LTS) release.
 
 [^antimalware]:
     MCAntiMalware is an anti-malware software for Minecraft servers that detects over 900 malicious plugins.
