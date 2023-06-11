@@ -24,6 +24,7 @@
 - [`nodejs-17`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-17/Dockerfile)[^eol]
 - [`nodejs-18`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-18/Dockerfile)
 - [`nodejs-19`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-19/Dockerfile)
+- [`nodejs-20`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-20/Dockerfile)
 
 ### Python images
 
