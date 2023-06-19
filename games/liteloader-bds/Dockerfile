@@ -1,20 +1,29 @@
 # ----------------------------------
 # Sparked Host Custom Docker Image
-# Image: ghcr.io/sparkedhost/images:liteloader-bds
+# Image: ghcr.io/sparkedhost/images:games-liteloader-bds
 # ----------------------------------
 
-FROM debian:bullseye-slim
+FROM    debian:bullseye-slim
 
-LABEL author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
+LABEL   author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
 
-ENV DEBIAN_FRONTEND noninteractive
+## install required packages
+RUN     dpkg --add-architecture i386 \
+        && apt update -y \
+        && apt install -y --no-install-recommends gnupg2 numactl tzdata software-properties-common libntlm0 winbind xvfb xauth python3 libncurses5:i386 libncurses6:i386 libsdl2-2.0-0 libsdl2-2.0-0:i386
 
-RUN apt update \
-    && apt upgrade -y \
-    && apt install -y unzip curl wget curl iproute2 tzdata libgdiplus wine \
-    && curl -sL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt install -y nodejs \
-    && useradd -m -d /home/container -s /bin/bash container 
+# Install winehq-stable and with recommends
+RUN     wget -nc https://dl.winehq.org/wine-builds/winehq.key \
+        && apt-key add winehq.key \
+        && echo "deb https://dl.winehq.org/wine-builds/debian/ bullseye main" >> /etc/apt/sources.list \
+        && wget -O- -q download.opensuse.org/repositories/Emulators:/Wine:/Debian/Debian_11/Release.key | apt-key add - \
+        && echo "deb http://download.opensuse.org/repositories/Emulators:/Wine:/Debian/Debian_11 ./" | tee /etc/apt/sources.list.d/wine-obs.list \
+        && apt update \
+		&& apt install -y --install-recommends winehq-stable cabextract
+
+# Set up Winetricks
+RUN	wget -q -O /usr/sbin/winetricks https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks \
+        && chmod +x /usr/sbin/winetricks
 
 ENV     HOME=/home/container
 ENV     WINEPREFIX=/home/container/.wine
@@ -25,13 +34,9 @@ ENV     DISPLAY_HEIGHT=768
 ENV     DISPLAY_DEPTH=16
 ENV     AUTO_UPDATE=1
 ENV     XVFB=1
-ENV     WINEDEBUG=-all
 
-USER container
-ENV  USER=container HOME=/home/container
+USER    container
+WORKDIR	/home/container
 
-WORKDIR /home/container
-
-COPY ./liteloader-bds/entrypoint.sh /entrypoint.sh
-
-CMD ["/bin/bash", "/entrypoint.sh"]
+COPY     ./liteloader-bds/entrypoint.sh /entrypoint.sh
+CMD      [ "/bin/bash", "/entrypoint.sh" ]
