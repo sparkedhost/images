@@ -9,7 +9,7 @@ LABEL author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
 
 RUN apk update
 RUN apk add wget && apk add unzip bash
-RUN apk add wine && ln -s /usr/bin/wine64 /usr/bin/wine
+RUN apk add wine
 
 ENV     HOME=/home/container
 ENV     WINEPREFIX=/home/container/.wine
