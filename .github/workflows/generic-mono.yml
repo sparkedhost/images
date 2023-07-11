@@ -1,15 +1,15 @@
-name: Build mono-generic
+name: Build generic-mono
 on:
   push:
     branches:
       - main
     paths:
-      - mono/mono-generic/*
-      - mono/entrypoint.sh
-      - .github/workflows/mono-generic.yml
+      - generic/mono/*
+      - generic/entrypoint.sh
+      - .github/workflows/generic-mono.yml
 jobs:
   push:
-    name: "mono-generic"
+    name: "generic-mono"
     runs-on: self-hosted
     strategy:
       fail-fast: false
@@ -26,9 +26,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v3
         with:
-          context: ./mono
-          file: ./mono/mono-generic/Dockerfile
+          context: ./generic
+          file: ./generic/mono/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:mono-generic
+            ghcr.io/sparkedhost/images:generic-mono

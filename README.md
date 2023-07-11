@@ -53,8 +53,8 @@
 ### Generic images
 
 - [`generic-debian`](https://github.com/sparkedhost/images/blob/main/generic/debian/Dockerfile)
-- [`mono-generic`](https://github.com/sparkedhost/images/blob/main/mono/mono-generic/Dockerfile)
-- [`wine-generic`](https://github.com/sparkedhost/images/blob/main/wine/wine-generic/Dockerfile)
+- [`generic-mono`](https://github.com/sparkedhost/images/blob/main/generic/mono/Dockerfile)
+- [`generic-wine`](https://github.com/sparkedhost/images/blob/main/generic/wine/Dockerfile)
 
 ### Other images
 

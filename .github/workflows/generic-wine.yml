@@ -1,15 +1,15 @@
-name: Build wine-generic
+name: Build generic-wine
 on:
   push:
     branches:
       - main
     paths:
-      - wine/wine-generic/*
-      - wine/entrypoint.sh
-      - .github/workflows/wine-generic.yml
+      - generic/wine/*
+      - generic/entrypoint.sh
+      - .github/workflows/generic-wine.yml
 jobs:
   push:
-    name: "wine-generic"
+    name: "generic-wine"
     runs-on: self-hosted
     strategy:
       fail-fast: false
@@ -26,9 +26,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v3
         with:
-          context: ./wine
-          file: ./wine/wine-generic/Dockerfile
+          context: ./generic
+          file: ./generic/wine/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:wine-generic
+            ghcr.io/sparkedhost/images:generic-wine
