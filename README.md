@@ -43,6 +43,8 @@
 - [`games-unturned-preview`](https://github.com/sparkedhost/images/blob/main/games/unturned-preview/Dockerfile)
 - [`games-liteloader-bds`](https://github.com/sparkedhost/images/blob/main/games/liteloader-bds/Dockerfile)
 - [`games-bdsx`](https://github.com/sparkedhost/images/blob/main/games/bdsx/Dockerfile)
+- [`games-source`](https://github.com/sparkedhost/images/blob/main/games/source/Dockerfile)
+- [`games-dotnet`](https://github.com/sparkedhost/images/blob/main/games/dotnet/Dockerfile)
 
 ### Bot Hosting images
 
