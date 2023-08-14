@@ -45,6 +45,9 @@
 - [`games-bdsx`](https://github.com/sparkedhost/images/blob/main/games/bdsx/Dockerfile)
 - [`games-source`](https://github.com/sparkedhost/images/blob/main/games/source/Dockerfile)
 - [`games-dotnet`](https://github.com/sparkedhost/images/blob/main/games/dotnet/Dockerfile)
+- [`games-wine-latest`](https://github.com/sparkedhost/images/blob/main/games/wine-latest/Dockerfile)
+- [`games-wine-staging`](https://github.com/sparkedhost/images/blob/main/games/wine-staging/Dockerfile)
+- [`games-proton`](https://github.com/sparkedhost/images/blob/main/games/proton/Dockerfile)
 
 ### Bot Hosting images
 
