@@ -28,6 +28,6 @@ ENV  DISPLAY_DEPTH=16
 ENV  AUTO_UPDATE=1
 ENV  XVFB=1
 
-COPY ./wine-game-staging/entrypoint.sh /entrypoint.sh
+COPY ./wine-staging/entrypoint.sh /entrypoint.sh
 
 CMD ["/bin/bash", "/entrypoint.sh"]
