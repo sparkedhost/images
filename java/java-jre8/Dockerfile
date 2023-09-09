@@ -13,7 +13,7 @@ RUN apt-get update -y \
  && mkdir -p /opt/java
 
 # Download pre-built Temurin JRE binaries
-ADD https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u362-b09/OpenJDK8U-jre_x64_linux_hotspot_8u362b09.tar.gz /opt/java/java.tar.gz
+ADD https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u382-b05/OpenJDK8U-jre_x64_linux_hotspot_8u382b05.tar.gz /opt/java/java.tar.gz
 RUN tar -C /opt/java --strip-components=1 -xzf /opt/java/java.tar.gz \
  && rm -f /opt/java/java.tar.gz
 
