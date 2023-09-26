@@ -28,5 +28,5 @@ export INTERNAL_IP=`ip route get 1 | awk '{print $NF;exit}'`
 MODIFIED_STARTUP=$(echo -e ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
 echo "customer@sparkedhost:~# ${MODIFIED_STARTUP}"
 
-# Run the Server
+# Run the Server.
 eval ${MODIFIED_STARTUP}
