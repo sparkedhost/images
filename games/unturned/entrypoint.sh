@@ -21,9 +21,9 @@ if [ "${ROCKET_AUTOUPDATE}" == "1" ]; then
 fi
 
 if [ "${USCRIPT_AUTOUPDATE}" == "1" ]; then
-    wget https://trillionservers.com/unturned-egg/uScript.Unturned.zip
+    wget https://s3-modpacks.sparkedhost.us/uScript.Unturned.zip
     cd /home/container
-	unzip -o -q uScript.Unturned.zip -d Modules/uScript.Unturned && rm uScript.Unturned.zip
+    unzip -o -q uScript.Unturned.zip && rm uScript.Unturned.zip
 fi
 
 mkdir -p Unturned_Headless_Data/Plugins/x86_64
