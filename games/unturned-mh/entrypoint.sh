@@ -3,16 +3,6 @@ sleep 2
 
 cd /home/container
 
-if [[ "${#GSLT}" > 0 ]] ; then
-    echo "Detected Startup"
-elif grep -qFi "GSLT " Servers/unturned/Server/Commands.dat ; then
-    echo "Detected Commands.dat"
-elif grep -qs " " Servers/unturned/Config.json && ! grep -qEis '"Login_Token": ""|"Login_Token":""' Servers/unturned/Config.json ; then
-    echo "Detected Config.json GSLT"
-else
-    echo "Server is missing GSLT, Please add one on the startup page."
-fi
-
 if [ "${GAME_AUTOUPDATE}" != "0" ]; then
     ./steam/steamcmd.sh +@sSteamCmdForcePlatformBitness 64 +login anonymous +force_install_dir /home/container +app_update 1110390 +quit
 fi
