@@ -55,7 +55,7 @@ if [ "${AIKAR_FLAGS}" = 1 ]; then
 fi
 
 # Print startup command to console
-echo -e "\033[1;33mcustomer@sparkedhost:~\$\033[0m ${MODIFIED_STARTUP}"
+echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m ${MODIFIED_STARTUP}"
 
 # Run the server.
 eval ${MODIFIED_STARTUP}
