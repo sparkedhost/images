@@ -26,6 +26,36 @@ if [ "${USCRIPT_AUTOUPDATE}" == "1" ]; then
     unzip -o -q uScript.Unturned.zip && rm uScript.Unturned.zip
 fi
 
+if [ "${UPANEL}" == "Vanilla" ]; then
+    cd /home/container/Modules
+    mkdir uPanelLoader
+    cd uPanelLoader
+    wget https://upanel.one/api/data/loader/Module
+    unzip -o Module
+    rm -r Module
+    cd /home/container
+fi
+
+if [ "${UPANEL}" == "RocketMod" ]; then
+    cd /home/container/Servers/unturned/Rocket
+    wget https://upanel.one/api/data/loader/Rocket
+    unzip -o Rocket
+    cp uPanelLoader.dll /Plugins/
+    rm -r Rocket
+    rm -r uPanelLoader.dll
+    cd /home/container
+fi
+
+if [ "${UPANEL}" == "OpenMod" ]; then
+    cd /home/container/Servers/unturned/OpenMod/plugins
+    wget https://upanel.one/api/data/loader/Openmod
+    unzip -o Openmod
+    mv Libraries/* .
+    rm -r Openmod
+    rm -r Libraries
+    cd /home/container
+fi
+
 mkdir -p Unturned_Headless_Data/Plugins/x86_64
 cp -f steam/linux64/steamclient.so Unturned_Headless_Data/Plugins/x86_64/steamclient.so
 
