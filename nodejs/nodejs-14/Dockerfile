@@ -3,7 +3,7 @@
 # Image: ghcr.io/sparkedhost/images:nodejs-14
 # ----------------------------------
 
-FROM        node:14-slim
+FROM        node:14-bullseye-slim
 
 LABEL       author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
 

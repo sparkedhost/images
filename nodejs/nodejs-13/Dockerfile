@@ -3,7 +3,7 @@
 # Image: ghcr.io/sparkedhost/images:nodejs-13
 # ----------------------------------
 
-FROM        node:13-slim
+FROM        node:13-buster-slim
 
 LABEL       author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
 
