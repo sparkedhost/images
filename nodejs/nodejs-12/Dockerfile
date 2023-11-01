@@ -16,6 +16,8 @@ RUN chmod 644 /usr/local/share/ca-certificates/sparked-ca.crt && update-ca-certi
 
 RUN ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
 
+RUN npm install -g npm@latest
+
 USER container
 ENV  USER=container HOME=/home/container
 

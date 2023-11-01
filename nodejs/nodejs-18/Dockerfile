@@ -14,6 +14,8 @@ RUN apt update \
 ADD ca.crt /usr/local/share/ca-certificates/sparked-ca.crt
 RUN chmod 644 /usr/local/share/ca-certificates/sparked-ca.crt && update-ca-certificates
 
+RUN npm install -g npm@latest
+
 USER container
 ENV  USER=container HOME=/home/container
 
