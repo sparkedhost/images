@@ -5,7 +5,7 @@
 
 FROM debian:bullseye-slim
 
-LABEL author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
+LABEL author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
 RUN apt-get update -y \
  && apt-get install -y fontconfig dirmngr curl ca-certificates openssl git tar tzdata iproute2 \

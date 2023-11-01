@@ -5,7 +5,7 @@
 
 FROM        python:3.11-slim
 
-LABEL       author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
+LABEL       author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
 RUN         mkdir -p /usr/share/man/man1 \
             && apt update \

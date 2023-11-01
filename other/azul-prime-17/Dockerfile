@@ -5,7 +5,7 @@
 
 FROM        azul/prime:17
 
-LABEL       author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
+LABEL       author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
 RUN apt-get update -y \
  && apt-get install fontconfig iproute2 curl -y \
