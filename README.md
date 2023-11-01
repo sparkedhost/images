@@ -57,6 +57,10 @@
 - [`bot-modmail`](https://github.com/sparkedhost/images/blob/main/bot/modmail/Dockerfile)
 - [`bot-redbot`](https://github.com/sparkedhost/images/blob/main/bot/redbot/Dockerfile)
 
+### .NET images
+
+- [`dotnet-7`](https://github.com/sparkedhost/images/blob/main/dotnet/dotnet-7/Dockerfile)
+
 ### Generic images
 
 - [`generic-debian`](https://github.com/sparkedhost/images/blob/main/generic/debian/Dockerfile)
