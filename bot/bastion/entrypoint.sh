@@ -26,7 +26,7 @@ mongod --fork --dbpath /home/container/mongodb/ --port 27017 --logpath /home/con
 
 # Run the Server
 echo -e "${YELLOW}BastionBot starting...${NC}"
-exec env "${MODIFIED_STARTUP}"
+exec env ${MODIFIED_STARTUP}
 
 # Stop MongoDB
 mongo --eval "db.getSiblingDB('admin').shutdownServer()"

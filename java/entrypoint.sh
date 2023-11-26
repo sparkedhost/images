@@ -57,4 +57,4 @@ fi
 echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m ${MODIFIED_STARTUP}"
 
 # Run the server.
-exec env "${MODIFIED_STARTUP}"
+exec env ${MODIFIED_STARTUP}
