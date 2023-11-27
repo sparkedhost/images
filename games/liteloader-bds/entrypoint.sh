@@ -87,4 +87,4 @@ MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
 echo "customer@apollopanel:~# ${MODIFIED_STARTUP}"
 
 # Run the Server
-exec env ${MODIFIED_STARTUP}
+eval ${MODIFIED_STARTUP}
