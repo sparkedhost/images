@@ -2,7 +2,7 @@
 cd /home/container
 
 # Make internal Docker IP address available to processes.
-export INTERNAL_IP=$(ip route get 1 | awk '{print $NF;exit}')
+export INTERNAL_IP=$(ip route get 1 | awk '{print $(NF-2);exit}')
 
 # Rename SteamCMD directory
 if [ -d "./steamcmd" ]; then
