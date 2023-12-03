@@ -6,7 +6,7 @@ JAVA_VER=`java -version 2>&1 | head -1 | cut -d'"' -f2 | sed '/^1\./s///'`
 echo "Java version: ${JAVA_VER}"
 
 # Make internal Docker IP address available to processes
-export INTERNAL_IP=`ip route get 1 | awk '{print $NF;exit}'`
+export INTERNAL_IP=`ip route get 1 | awk '{print $(NF-2);exit}'`
 
 # Check if startup command has -Dterminal.jline=false -Dterminal.ansi=true
 JLINE_ARGS=$(echo ${MODIFIED_STARTUP} | grep -o "\-Dterminal.jline=false -Dterminal.ansi=true")
