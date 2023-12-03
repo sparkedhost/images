@@ -13,6 +13,7 @@
 - [`java-jre18`](https://github.com/sparkedhost/images/blob/main/java/java-jre18/Dockerfile)[^eol]
 - [`java-jre19`](https://github.com/sparkedhost/images/blob/main/java/java-jre19/Dockerfile)[^eol]
 - [`java-jre20`](https://github.com/sparkedhost/images/blob/main/java/java-jre20/Dockerfile)[^eol]
+- [`java-jre21`](https://github.com/sparkedhost/images/blob/main/java/java-jre21/Dockerfile)
 - [`anti-malware`](https://github.com/sparkedhost/images/blob/main/java/anti-malware/Dockerfile)[^antimalware]
 
 ### Node.js images

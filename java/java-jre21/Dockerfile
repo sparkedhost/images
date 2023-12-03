@@ -1,6 +1,6 @@
 # ----------------------------------
 # Sparked Host Custom Docker Image
-# Image: ghcr.io/sparkedhost/images:java-jre20
+# Image: ghcr.io/sparkedhost/images:java-jre21
 # ----------------------------------
 
 FROM        debian:bullseye-slim
@@ -13,7 +13,7 @@ RUN apt-get update -y \
  && mkdir -p /opt/java
 
 # Download pre-built Temurin JRE binaries
-ADD https://github.com/adoptium/temurin20-binaries/releases/download/jdk-20.0.2%2B9/OpenJDK20U-jre_x64_linux_hotspot_20.0.2_9.tar.gz /opt/java/java.tar.gz
+ADD https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.1%2B12/OpenJDK21U-jre_x64_linux_hotspot_21.0.1_12.tar.gz /opt/java/java.tar.gz
 RUN tar -C /opt/java --strip-components=1 -xzf /opt/java/java.tar.gz \
  && rm -f /opt/java/java.tar.gz
 
