@@ -45,7 +45,11 @@ fi
 
 # Forge 1.17.1+
 if [ -n "${FORGE_VERSION}" ]; then
-    MODIFIED_STARTUP="java -Xms128M -Xmx${SERVER_MEMORY}M -Dterminal.jline=false -Dterminal.ansi=true @libraries/net/minecraftforge/forge/${FORGE_VERSION}/unix_args.txt"
+    if [ -f "libraries/net/minecraftforge/forge/${FORGE_VERSION}/unix_args.txt" ]; then
+        MODIFIED_STARTUP="java -Xms128M -Xmx${SERVER_MEMORY}M -Dterminal.jline=false -Dterminal.ansi=true @libraries/net/minecraftforge/forge/${FORGE_VERSION}/unix_args.txt"
+    else 
+        echo -e "\033[1;33mNOTE: \033[0mReverting to default startup, unix_args.txt was not found."
+    fi
 fi
 
 # Aikar flags
