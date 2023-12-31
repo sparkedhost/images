@@ -58,6 +58,10 @@
 - [`bot-modmail`](https://github.com/sparkedhost/images/blob/main/bot/modmail/Dockerfile)
 - [`bot-redbot`](https://github.com/sparkedhost/images/blob/main/bot/redbot/Dockerfile)
 
+### PHP images
+
+- [`php-8.3`](https://github.com/sparkedhost/images/blob/main/php/php-8.3/Dockerfile)
+
 ### .NET images
 
 - [`dotnet-7`](https://github.com/sparkedhost/images/blob/main/dotnet/dotnet-7/Dockerfile)
