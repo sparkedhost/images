@@ -66,6 +66,7 @@
 ### .NET images
 
 - [`dotnet-7`](https://github.com/sparkedhost/images/blob/main/dotnet/dotnet-7/Dockerfile)
+- [`dotnet-8`](https://github.com/sparkedhost/images/blob/main/dotnet/dotnet-8/Dockerfile)
 
 ### Generic images
 
