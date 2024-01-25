@@ -2,6 +2,10 @@ sleep 1
 
 cd /home/container
 
+# Fix Steamcmd Permissions
+chmod 755 ~/steam/steamcmd.sh
+chmod 755 ~/steam/linux32/steamcmd
+
 if [ "${AUTO_UPDATE}" == "1" ]; then 
     if [ -d "./steamcmd" ]; then
     ./steamcmd/steamcmd.sh +@sSteamCmdForcePlatformBitness 64 +force_install_dir /home/container +login anonymous +app_update ${SRCDS_APPID} $( [[ -z ${SRCDS_BETAID} ]] || printf %s "-beta ${SRCDS_BETAID}" ) $( [[ -z ${SRCDS_BETAPASS} ]] || printf %s "-betapassword ${SRCDS_BETAPASS}" ) $( [[ -z ${VALIDATE} ]] || printf %s "validate" ) +quit
