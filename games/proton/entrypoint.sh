@@ -2,9 +2,11 @@ sleep 1
 
 if [ -f "/usr/local/bin/proton" ]; then
     if [ ! -z ${SRCDS_APPID} ]; then
-	    mkdir -p /home/container/.steam/steam/steamapps/compatdata/${SRCDS_APPID}
+	mkdir -p /home/container/.steam/steam/steamapps/compatdata/${SRCDS_APPID}
         export STEAM_COMPAT_CLIENT_INSTALL_PATH="/home/container/.steam/steam"
         export STEAM_COMPAT_DATA_PATH="/home/container/.steam/steam/steamapps/compatdata/${SRCDS_APPID}"
+        export WINETRICKS="/usr/sbin/winetricks"
+        export STEAM_DIR="/home/container/.steam/steam/"
     else
         echo -e "----------------------------------------------------------------------------------"
         echo -e "WARNING!!! Proton needs variable SRCDS_APPID, else it will not work. Please add it"
