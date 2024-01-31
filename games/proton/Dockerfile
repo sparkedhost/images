@@ -11,9 +11,8 @@ LABEL author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
 
 RUN  dpkg --add-architecture i386 \
      && apt update \
-     && apt install -y --no-install-recommends wget gnupg2 software-properties-common libntlm0 winbind xvfb xauth libncurses5-dev:i386 libncurses6 dbus libgdiplus lib32gcc-s1 \
-     && apt install -y alsa-tools libpulse0 pulseaudio libpulse-dev libasound2 libao-common gnutls-bin gnupg locales cabextract curl python3 python3-pip python3-setuptools \
-     && useradd -d /home/container -m container \
+     && apt -y upgrade \
+     && apt install -y --no-install-recommends alsa-tools cabextract curl dbus ffmpeg git gnupg gnupg2 gnutls-bin iproute2 locales numactl mesa-utils net-tools netcat-openbsd pulseaudio python3 python3-pip python3-setuptools python3-venv software-properties-common tar tini virt-what wget winbind xauth xvfb lib32gcc-s1 libao-common libasound2 libsdl1.2debian libsdl1.2debian:i386 libsdl2-2.0-0 libsdl2-2.0-0:i386 libgdiplus libncurses5-dev:i386 libncurses6 libntlm0 libpulse-dev libpulse0 \ 
      && curl -sLOJ "$(curl -s https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest | grep browser_download_url | cut -d\" -f4 | egrep .tar.gz)" \
      && tar -xzf GE-Proton*.tar.gz -C /usr/local/bin/ --strip-components=1 \
      && rm GE-Proton*.* \
