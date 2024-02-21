@@ -40,9 +40,8 @@ if [ "${UPANEL}" == "RocketMod" ]; then
     cd /home/container/Servers/unturned/Rocket
     wget https://upanel.one/api/data/loader/Rocket
     unzip -o Rocket
-    cp uPanelLoader.dll /Plugins/
+    mv uPanelLoader.dll Plugins
     rm -r Rocket
-    rm -r uPanelLoader.dll
     cd /home/container
 fi
 
