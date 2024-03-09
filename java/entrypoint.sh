@@ -8,6 +8,9 @@ echo "Java version: ${JAVA_VER}"
 # Make internal Docker IP address available to processes
 export INTERNAL_IP=`ip route get 1 | awk '{print $(NF-2);exit}'`
 
+# Replace startup variables.
+MODIFIED_STARTUP=$(echo "${STARTUP}" | sed -e 's/{{/${/g' -e 's/}}/}/g' | eval echo "$(cat -)")
+
 # Check if startup command has -Dterminal.jline=false -Dterminal.ansi=true
 JLINE_ARGS=$(echo ${MODIFIED_STARTUP} | grep -o "\-Dterminal.jline=false -Dterminal.ansi=true")
 TIMEZONE_INUSE=$(echo ${MODIFIED_STARTUP} | grep -o "\-Duser.timezone=")
@@ -21,9 +24,6 @@ if [ "${LOWER_XMX}" = 1 ]; then
     # If 1GiB server, use 512MiB
     if [ "${SERVER_MEMORY}" == 0 ]; then SERVER_MEMORY=512; fi
 fi
-
-# Replace startup variables.
-MODIFIED_STARTUP=$(echo "${STARTUP}" | sed -e 's/{{/${/g' -e 's/}}/}/g' | eval echo "$(cat -)")
 
 # If Forge compatibility is enabled and above variable is empty, add the parameters to the startup command
 if [ "${FORGE_COMPATIBILITY}" = 1 ] && [ -z "${JLINE_ARGS}" ] && [ -z "${FORGE_VERSION}" ]; then
@@ -62,4 +62,4 @@ fi
 echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m ${MODIFIED_STARTUP}"
 
 # Run the server.
-eval ${MODIFIED_STARTUP}
+exec env ${MODIFIED_STARTUP}
