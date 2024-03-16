@@ -7,6 +7,8 @@ on:
       - python/python-3.7/*
       - python/entrypoint.sh
       - .github/workflows/python-3.7.yml
+  workflow_dispatch:
+
 jobs:
   push:
     name: "python-3.7"
