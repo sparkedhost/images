@@ -10,7 +10,7 @@ on:
 jobs:
   push:
     name: "php-8.3"
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
     steps:
