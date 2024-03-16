@@ -7,6 +7,7 @@ on:
       - python/python-3.11/*
       - python/entrypoint.sh
       - .github/workflows/python-3.11.yml
+  workflow_dispatch:
 jobs:
   push:
     name: "python-3.11"
