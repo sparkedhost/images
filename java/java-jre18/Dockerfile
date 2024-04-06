@@ -3,7 +3,7 @@
 # Image: ghcr.io/sparkedhost/images:java-jre18
 # ----------------------------------
 
-FROM        debian:bullseye-slim
+FROM        debian:bookworm-slim
 
 LABEL       author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
 

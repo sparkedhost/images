@@ -3,7 +3,7 @@
 # Image: ghcr.io/sparkedhost/images:java-jre17
 # ----------------------------------
 
-FROM        debian:bullseye-slim
+FROM        debian:bookworm-slim
 
 LABEL       author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
 
@@ -13,7 +13,7 @@ RUN apt-get update -y \
  && mkdir -p /opt/java
 
 # Download pre-built Temurin JRE binaries
-ADD https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.7%2B7/OpenJDK17U-jdk_x64_linux_hotspot_17.0.7_7.tar.gz /opt/java/java.tar.gz
+ADD https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.9%2B9/OpenJDK17U-jre_x64_linux_hotspot_17.0.9_9.tar.gz /opt/java/java.tar.gz
 RUN tar -C /opt/java --strip-components=1 -xzf /opt/java/java.tar.gz \
  && rm -f /opt/java/java.tar.gz
 

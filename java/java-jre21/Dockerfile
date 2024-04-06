@@ -3,7 +3,7 @@
 # Image: ghcr.io/sparkedhost/images:java-jre21
 # ----------------------------------
 
-FROM        debian:bullseye-slim
+FROM        debian:bookworm-slim
 
 LABEL       author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
 
@@ -13,7 +13,7 @@ RUN apt-get update -y \
  && mkdir -p /opt/java
 
 # Download pre-built Temurin JRE binaries
-ADD https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.1%2B12/OpenJDK21U-jre_x64_linux_hotspot_21.0.1_12.tar.gz /opt/java/java.tar.gz
+ADD https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.2%2B13/OpenJDK21U-jre_x64_linux_hotspot_21.0.2_13.tar.gz /opt/java/java.tar.gz
 RUN tar -C /opt/java --strip-components=1 -xzf /opt/java/java.tar.gz \
  && rm -f /opt/java/java.tar.gz
 
