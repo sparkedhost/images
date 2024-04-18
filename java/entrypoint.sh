@@ -47,7 +47,7 @@ fi
 
 # If Lower Xmx is enabled, then replace Xmx with MaxRAMPercentage
 if [ "${LOWER_XMX}" = 1 ]; then
-    MODIFIED_STARTUP="${MODIFIED_STARTUP//-Xmx\{\{SERVER_MEMORY\}\}M/-XX:MaxRAMPercentage=80.0}"
+    STARTUP="${STARTUP//-Xmx\{\{SERVER_MEMORY\}\}M/-XX:MaxRAMPercentage=80.0}"
     echo -e "\033[1;33mNOTE: \033[0mEnabled Lower Maximum RAM"
 fi
 
