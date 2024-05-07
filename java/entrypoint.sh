@@ -50,7 +50,7 @@ fi
 
 # If Lower Xmx is enabled, then replace Xmx with MaxRAMPercentage
 if [ "${LOWER_XMX}" = 1 ]; then
-    MODIFIED_STARTUP="${MODIFIED_STARTUP//-Xmx([0-9]+)[KMG]/-XX:MaxRAMPercentage=80.0}"
+    MODIFIED_STARTUP=$(echo "$MODIFIED_STARTUP" | sed 's/-Xmx\([0-9]*\)[KMG]/-XX:MaxRAMPercentage=80.0/g')
     echo -e "\033[1;33mNOTE: \033[0mEnabled Lower Maximum RAM"
 fi
 
