@@ -1,14 +1,14 @@
 #!/bin/bash
 cd /home/container
 
-# Check if NODE_OPTIONS is already set
-if [[ -z "$NODE_OPTIONS" ]]; then
-  # If not set, set it to --use-openssl-ca
-  export NODE_OPTIONS="--use-openssl-ca"
-else
-  # If already set, append --use-openssl-ca
-  export NODE_OPTIONS="$NODE_OPTIONS --use-openssl-ca"
-fi
+# # Check if NODE_OPTIONS is already set
+# if [[ -z "$NODE_OPTIONS" ]]; then
+#   # If not set, set it to --use-openssl-ca
+#   export NODE_OPTIONS="--use-openssl-ca"
+# else
+#   # If already set, append --use-openssl-ca
+#   export NODE_OPTIONS="$NODE_OPTIONS --use-openssl-ca"
+# fi
 
 # Output Current Software Versions
 NODE_VER=`node -v 2>&1 | head -1 | cut -d'"' -f2 | sed '/^1\./s///'`
