@@ -54,6 +54,84 @@ if [ "${LOWER_XMX}" = 1 ]; then
     echo -e "\033[1;33mNOTE: \033[0mEnabled Lower Maximum RAM"
 fi
 
+# If Auto Update is enabled and Update API URL is set, then update the server
+if [ "${AUTO_UPDATE_JAR}" = 1 ] && [ -n "${UPDATE_API_URL}" ]; then
+    echo -e "\033[1;33mNOTE: \033[0mAuto Update is enabled"
+
+    # Identify the latest version
+    # Check if libraries/net/minecraftforge/forge exists
+    if [ -d "libraries/net/minecraftforge/forge" ] && [ -z "${HASH}" ]; then
+        # get first folder in libraries/net/minecraftforge/forge
+        FORGE_VERSION=$(ls libraries/net/minecraftforge/forge | head -n 1)
+
+        # Check if unix_args.txt exists in libraries/net/minecraftforge/forge/${FORGE_VERSION}
+        if [ -f "libraries/net/minecraftforge/forge/${FORGE_VERSION}/unix_args.txt" ]; then
+            HASH=$(sha256sum libraries/net/minecraftforge/forge/${FORGE_VERSION}/unix_args.txt | awk '{print $1}')
+        fi
+    fi
+
+    # Check if libraries/net/neoforged/neoforge folder exists
+    if [ -d "libraries/net/neoforged/neoforge" ] && [ -z "${HASH}" ]; then
+        # get first folder in libraries/net/neoforged/neoforge
+        NEOFORGE_VERSION=$(ls libraries/net/neoforged/neoforge | head -n 1)
+
+        # Check if unix_args.txt exists in libraries/net/neoforged/neoforge/${FORGE_VERSION}
+        if [ -f "libraries/net/neoforged/neoforge/${NEOFORGE_VERSION}/unix_args.txt" ]; then
+            HASH=$(sha256sum libraries/net/neoforged/neoforge/${NEOFORGE_VERSION}/unix_args.txt | awk '{print $1}')
+        fi
+    fi
+
+    # Hash server jar file
+    if [ -z "${HASH}" ]; then
+        HASH=$(sha256sum $SERVER_JARFILE | awk '{print $1}')
+    fi
+
+    # Check if hash is set
+    if [ -n "${HASH}" ]; then
+        API_RESPONSE=$(curl -s "${UPDATE_API_URL}/api/v1/build/${HASH}")
+
+        # Check if .success is true
+        if [ "$(echo $API_RESPONSE | jq -r '.success')" = "true" ]; then
+            # Check if .build.id is .latest.id
+            if [ "$(echo $API_RESPONSE | jq -r '.build.id')" != "$(echo $API_RESPONSE | jq -r '.latest.id')" ]; then
+                echo -e "\033[1;33mNOTE: \033[0mNew version available. Updating server jar..."
+
+                JAR_URL=$(echo $API_RESPONSE | jq -r '.latest.jarUrl')
+                JAR_LOCATION=$(echo $API_RESPONSE | jq -r '.latest.jarLocation')
+                ZIP_URL=$(echo $API_RESPONSE | jq -r '.latest.zipUrl')
+
+                if [ "$JAR_LOCATION" = "null" ]; then
+                    JAR_LOCATION=$SERVER_JARFILE
+                fi
+
+                if [ "$JAR_URL" != "null" ]; then
+                    echo -e "\033[1;33mNOTE: \033[0mDownloading server jar from $JAR_URL"
+                    curl -s -o $JAR_LOCATION $JAR_URL
+                    echo -e "\033[1;33mNOTE: \033[0mServer jar has been downloaded"
+                fi
+
+                if [ "$ZIP_URL" != "null" ]; then
+                    echo -e "\033[1;33mNOTE: \033[0mDownloading server zip from $ZIP_URL"
+                    curl -s -o server_update_files.zip $ZIP_URL
+                    echo -e "\033[1;33mNOTE: \033[0mServer zip has been downloaded"
+
+                    echo -e "\033[1;33mNOTE: \033[0mExtracting server zip"
+                    unzip -o server_update_files.zip
+                    echo -e "\033[1;33mNOTE: \033[0mServer zip has been extracted"
+                fi
+
+                echo -e "\033[1;33mNOTE: \033[0mServer jar has been updated"
+            else
+                echo -e "\033[1;33mNOTE: \033[0mServer jar is up to date"
+            fi
+        else
+            echo -e "\033[1;33mNOTE: \033[0mInstallation could not be verified. Skipping update check."
+        fi
+    else
+        echo -e "\033[1;33mNOTE: \033[0mInstalled version could not be identified. Skipping update check."
+    fi
+fi
+
 # Print startup command to console
 echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m ${MODIFIED_STARTUP}"
 
