@@ -104,6 +104,11 @@ if [ "${AUTO_UPDATE_JAR}" = 1 ] && [ -n "${UPDATE_API_URL}" ]; then
                     JAR_LOCATION=$SERVER_JARFILE
                 fi
 
+                # If libraries exist, remove them
+                if [ -d "libraries" ]; then
+                    rm -rf libraries
+                fi
+
                 if [ "$JAR_URL" != "null" ]; then
                     echo -e "\033[1;33mNOTE: \033[0mDownloading server jar from $JAR_URL"
                     curl -s -o $JAR_LOCATION $JAR_URL
@@ -120,9 +125,9 @@ if [ "${AUTO_UPDATE_JAR}" = 1 ] && [ -n "${UPDATE_API_URL}" ]; then
                     echo -e "\033[1;33mNOTE: \033[0mServer zip has been extracted"
                 fi
 
-                echo -e "\033[1;33mNOTE: \033[0mServer jar has been updated"
+                echo -e "\033[1;33mNOTE: \033[0mServer has been updated"
             else
-                echo -e "\033[1;33mNOTE: \033[0mServer jar is up to date"
+                echo -e "\033[1;33mNOTE: \033[0mServer is up to date"
             fi
         else
             echo -e "\033[1;33mNOTE: \033[0mInstallation could not be verified. Skipping update check."
