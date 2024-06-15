@@ -8,7 +8,7 @@ FROM        debian:bookworm-slim
 LABEL       author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
 
 RUN apt-get update -y \
- && apt-get install fontconfig iproute2 curl ca-certificates tar -y \
+ && apt-get install fontconfig iproute2 curl ca-certificates unzip tar jq -y \
  && useradd -d /home/container -m container \
  && mkdir -p /opt/java
 
