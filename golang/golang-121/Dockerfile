@@ -5,7 +5,7 @@
 
 FROM golang:1.21
 
-LABEL       author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
+LABEL       author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
 USER container
 ENV  USER=container HOME=/home/container LANG=C.UTF-8
