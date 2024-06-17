@@ -5,7 +5,7 @@
 
 FROM        node:18-bullseye
 
-LABEL       author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
+LABEL       author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
 ## install mongo
 RUN wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add - \

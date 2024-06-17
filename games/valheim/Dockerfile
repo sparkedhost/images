@@ -6,7 +6,7 @@
 
 FROM debian:bullseye-slim
 
-LABEL author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
+LABEL author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
 ENV DEBIAN_FRONTEND noninteractive
 

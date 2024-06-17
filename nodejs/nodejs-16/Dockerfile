@@ -5,7 +5,7 @@
 
 FROM        node:16-slim
 
-LABEL       author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
+LABEL       author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
 RUN apt update \
  && apt -y install git gcc g++ ca-certificates dnsutils curl iproute2 ffmpeg procps python3 build-essential libcairo2-dev libpango1.0-dev libgif-dev librsvg2-dev libjpeg62-turbo-dev libc6 fonts-noto libtool libnss3 \
@@ -13,6 +13,8 @@ RUN apt update \
 
 ADD ca.crt /usr/local/share/ca-certificates/sparked-ca.crt
 RUN chmod 644 /usr/local/share/ca-certificates/sparked-ca.crt && update-ca-certificates
+
+RUN npm install -g npm@latest
 
 USER container
 ENV  USER=container HOME=/home/container

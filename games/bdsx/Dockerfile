@@ -5,7 +5,7 @@
 
 FROM    alpine:latest
 
-LABEL   author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
+LABEL   author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
 RUN     apk add --no-cache --update nodejs npm wine freetype git bash \
         && adduser -D -h /home/container container

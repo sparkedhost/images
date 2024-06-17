@@ -5,7 +5,7 @@
 
 FROM        python:3.12-slim-bookworm
 
-LABEL       author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
+LABEL       author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
 RUN apt update \
  && apt -y install git gcc g++ ca-certificates dnsutils curl iproute2 ffmpeg procps libpq-dev python3-dev zlib1g zlib1g-dev pkg-config \

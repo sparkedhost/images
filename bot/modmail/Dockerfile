@@ -5,7 +5,7 @@
 
 FROM        python:3.9-slim-bullseye
 
-LABEL       author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
+LABEL       author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
 RUN apt update \
  && apt install -y gnupg build-essential git netcat ffmpeg iproute2 curl tzdata wget \

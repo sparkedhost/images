@@ -5,7 +5,7 @@
 
 FROM alpine:latest
 
-LABEL author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
+LABEL author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
 RUN apk update
 RUN apk add wget && apk add unzip bash

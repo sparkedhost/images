@@ -5,8 +5,6 @@
 
 FROM php:8.3-alpine
 
-LABEL org.opencontainers.image.authors="sysadmin@sparkedhost.com"
-
 RUN apk add --no-cache --update bash composer \
   && adduser --disabled-password --home /home/container container
 

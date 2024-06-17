@@ -4,7 +4,7 @@
 # ----------------------------------
 FROM registry.gitlab.steamos.cloud/steamrt/sniper/platform 
 
-LABEL author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
+LABEL author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
 ENV DEBIAN_FRONTEND noninteractive
 USER container

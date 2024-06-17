@@ -5,7 +5,7 @@
 
 FROM debian:bullseye-slim
 
-LABEL author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
+LABEL author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
 ## install required packages
 RUN dpkg --add-architecture i386 \
