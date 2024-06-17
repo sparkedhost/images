@@ -1,6 +1,15 @@
 #!/bin/bash
 cd /home/container
 
+# # Check if NODE_OPTIONS is already set
+# if [[ -z "$NODE_OPTIONS" ]]; then
+#   # If not set, set it to --use-openssl-ca
+#   export NODE_OPTIONS="--use-openssl-ca"
+# else
+#   # If already set, append --use-openssl-ca
+#   export NODE_OPTIONS="$NODE_OPTIONS --use-openssl-ca"
+# fi
+
 # Output Current Software Versions
 NODE_VER=`node -v 2>&1 | head -1 | cut -d'"' -f2 | sed '/^1\./s///'`
 echo "NodeJS version: ${NODE_VER}"
@@ -22,7 +31,7 @@ fi
 echo "Discord.js version: ${DJS_VER}"
 
 # Make internal Docker IP address available to processes.
-export INTERNAL_IP=`ip route get 1 | awk '{print $NF;exit}'`
+export INTERNAL_IP=`ip route get 1 | awk '{print $(NF-2);exit}'`
 
 # Disable NPM update notifications (https://github.com/sparkedhost/images/issues/28)
 echo "update-notifier=false" > ~/.npmrc

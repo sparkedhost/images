@@ -2,9 +2,11 @@ sleep 1
 
 if [ -f "/usr/local/bin/proton" ]; then
     if [ ! -z ${SRCDS_APPID} ]; then
-	    mkdir -p /home/container/.steam/steam/steamapps/compatdata/${SRCDS_APPID}
+	mkdir -p /home/container/.steam/steam/steamapps/compatdata/${SRCDS_APPID}
         export STEAM_COMPAT_CLIENT_INSTALL_PATH="/home/container/.steam/steam"
         export STEAM_COMPAT_DATA_PATH="/home/container/.steam/steam/steamapps/compatdata/${SRCDS_APPID}"
+        export WINETRICKS="/usr/sbin/winetricks"
+        export STEAM_DIR="/home/container/.steam/steam/"
     else
         echo -e "----------------------------------------------------------------------------------"
         echo -e "WARNING!!! Proton needs variable SRCDS_APPID, else it will not work. Please add it"
@@ -26,4 +28,4 @@ MODIFIED_STARTUP=$(eval echo $(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g
 
 echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m ${MODIFIED_STARTUP}"
 
-${MODIFIED_STARTUP}
+eval ${MODIFIED_STARTUP}

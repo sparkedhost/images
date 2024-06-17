@@ -3,17 +3,17 @@
 # Image: ghcr.io/sparkedhost/images:java-jre20
 # ----------------------------------
 
-FROM        debian:bullseye-slim
+FROM        debian:bookworm-slim
 
 LABEL       author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
 RUN apt-get update -y \
- && apt-get install fontconfig iproute2 curl ca-certificates tar -y \
+ && apt-get install fontconfig iproute2 curl ca-certificates unzip tar jq -y \
  && useradd -d /home/container -m container \
  && mkdir -p /opt/java
 
 # Download pre-built Temurin JRE binaries
-ADD https://github.com/adoptium/temurin20-binaries/releases/download/jdk-20.0.1%2B9/OpenJDK20U-jre_x64_linux_hotspot_20.0.1_9.tar.gz /opt/java/java.tar.gz
+ADD https://github.com/adoptium/temurin20-binaries/releases/download/jdk-20.0.2%2B9/OpenJDK20U-jre_x64_linux_hotspot_20.0.2_9.tar.gz /opt/java/java.tar.gz
 RUN tar -C /opt/java --strip-components=1 -xzf /opt/java/java.tar.gz \
  && rm -f /opt/java/java.tar.gz
 

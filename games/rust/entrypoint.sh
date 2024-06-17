@@ -2,7 +2,7 @@
 cd /home/container
 
 # Make internal Docker IP address available to processes.
-export INTERNAL_IP=$(ip route get 1 | awk '{print $NF;exit}')
+export INTERNAL_IP=$(ip route get 1 | awk '{print $(NF-2);exit}')
 
 # Rename SteamCMD directory
 if [ -d "./steamcmd" ]; then
@@ -10,7 +10,7 @@ if [ -d "./steamcmd" ]; then
 fi
 
 # Updating Rust Server
-./steam/steamcmd.sh +@sSteamCmdForcePlatformBitness 64 +force_install_dir /home/container +login anonymous +app_update 258550 +quit
+./steam/steamcmd.sh +@sSteamCmdForcePlatformBitness 64 +force_install_dir /home/container +login anonymous +app_update ${SRCDS_APPID} +quit
 
 # Replace Startup Variables
 MODIFIED_STARTUP=$(eval echo $(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g'))

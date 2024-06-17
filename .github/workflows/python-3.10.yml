@@ -7,10 +7,11 @@ on:
       - python/python-3.10/*
       - python/entrypoint.sh
       - .github/workflows/python-3.10.yml
+  workflow_dispatch:
 jobs:
   push:
     name: "python-3.10"
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
     steps:

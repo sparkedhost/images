@@ -12,7 +12,8 @@
 - [`java-jre17`](https://github.com/sparkedhost/images/blob/main/java/java-jre17/Dockerfile)
 - [`java-jre18`](https://github.com/sparkedhost/images/blob/main/java/java-jre18/Dockerfile)[^eol]
 - [`java-jre19`](https://github.com/sparkedhost/images/blob/main/java/java-jre19/Dockerfile)[^eol]
-- [`java-jre20`](https://github.com/sparkedhost/images/blob/main/java/java-jre20/Dockerfile)
+- [`java-jre20`](https://github.com/sparkedhost/images/blob/main/java/java-jre20/Dockerfile)[^eol]
+- [`java-jre21`](https://github.com/sparkedhost/images/blob/main/java/java-jre21/Dockerfile)
 - [`anti-malware`](https://github.com/sparkedhost/images/blob/main/java/anti-malware/Dockerfile)[^antimalware]
 
 ### Node.js images
@@ -21,11 +22,13 @@
 - [`nodejs-13`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-13/Dockerfile)[^eol]
 - [`nodejs-14`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-14/Dockerfile)[^eol]
 - [`nodejs-15`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-15/Dockerfile)[^eol]
-- [`nodejs-16`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-16/Dockerfile)
+- [`nodejs-16`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-16/Dockerfile)[^eol]
 - [`nodejs-17`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-17/Dockerfile)[^eol]
 - [`nodejs-18`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-18/Dockerfile)
 - [`nodejs-19`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-19/Dockerfile)[^eol]
 - [`nodejs-20`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-20/Dockerfile)
+- [`nodejs-21`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-21/Dockerfile)
+- [`nodejs-22`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-22/Dockerfile)
 
 ### Python images
 
@@ -57,6 +60,16 @@
 - [`bot-modmail`](https://github.com/sparkedhost/images/blob/main/bot/modmail/Dockerfile)
 - [`bot-redbot`](https://github.com/sparkedhost/images/blob/main/bot/redbot/Dockerfile)
 
+### PHP images
+
+- [`php-8.3`](https://github.com/sparkedhost/images/blob/main/php/php-8.3/Dockerfile)
+
+### .NET images
+
+- [`dotnet-3.1`](https://github.com/sparkedhost/images/blob/main/dotnet/dotnet-3.1/Dockerfile)
+- [`dotnet-7`](https://github.com/sparkedhost/images/blob/main/dotnet/dotnet-7/Dockerfile)
+- [`dotnet-8`](https://github.com/sparkedhost/images/blob/main/dotnet/dotnet-8/Dockerfile)
+
 ### Generic images
 
 - [`generic-debian`](https://github.com/sparkedhost/images/blob/main/generic/debian/Dockerfile)
@@ -67,6 +80,7 @@
 
 - [`azul-prime-17`](https://github.com/sparkedhost/images/blob/main/other/azul-prime-17/Dockerfile)
 - [`azul-prime-19`](https://github.com/sparkedhost/images/blob/main/other/azul-prime-19/Dockerfile)
+- [`golang-121`](https://github.com/sparkedhost/images/blob/main/golang/golang-121/Dockerfile)
 
 ## Requesting changes
 

@@ -9,7 +9,7 @@ on:
 jobs:
   push:
     name: "games-source"
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
     steps:

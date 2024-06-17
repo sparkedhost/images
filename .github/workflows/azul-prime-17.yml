@@ -10,7 +10,7 @@ on:
 jobs:
   push:
     name: "azul-prime-17"
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
     steps:

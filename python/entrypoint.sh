@@ -12,7 +12,10 @@ GIT_VER=`git --version 2>&1 | cut -d' ' -f3 | sed '/^1\./s///'`
 echo "Git version: ${GIT_VER}"
 
 # Make internal Docker IP address available to processes
-export INTERNAL_IP=`ip route get 1 | awk '{print $NF;exit}'`
+export INTERNAL_IP=`ip route get 1 | awk '{print $(NF-2);exit}'`
+
+# Suppress PIP update notifications
+export PIP_DISABLE_PIP_VERSION_CHECK=1
 
 # Replace Startup Variables.
 MODIFIED_STARTUP=$(echo -e ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')

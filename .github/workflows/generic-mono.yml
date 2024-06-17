@@ -10,7 +10,7 @@ on:
 jobs:
   push:
     name: "generic-mono"
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
     steps:
