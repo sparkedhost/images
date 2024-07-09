@@ -43,7 +43,6 @@
 
 - [`games-rust`](https://github.com/sparkedhost/images/blob/main/games/rust/Dockerfile)
 - [`games-unturned`](https://github.com/sparkedhost/images/blob/main/games/unturned/Dockerfile)
-- [`games-unturned-preview`](https://github.com/sparkedhost/images/blob/main/games/unturned-preview/Dockerfile)
 - [`games-liteloader-bds`](https://github.com/sparkedhost/images/blob/main/games/liteloader-bds/Dockerfile)
 - [`games-bdsx`](https://github.com/sparkedhost/images/blob/main/games/bdsx/Dockerfile)
 - [`games-source`](https://github.com/sparkedhost/images/blob/main/games/source/Dockerfile)
@@ -52,6 +51,8 @@
 - [`games-wine-staging`](https://github.com/sparkedhost/images/blob/main/games/wine-staging/Dockerfile)
 - [`games-proton`](https://github.com/sparkedhost/images/blob/main/games/proton/Dockerfile)
 - [`games-valheim`](https://github.com/sparkedhost/images/blob/main/games/valheim/Dockerfile)
+- [`games-beammp`](https://github.com/sparkedhost/images/blob/main/games/beammp/Dockerfile)
+- [`games-cs2`](https://github.com/sparkedhost/images/blob/main/games/cs2/Dockerfile)
 
 ### Bot Hosting images
 
