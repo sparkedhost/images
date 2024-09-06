@@ -53,6 +53,7 @@
 - [`games-valheim`](https://github.com/sparkedhost/images/blob/main/games/valheim/Dockerfile)
 - [`games-beammp`](https://github.com/sparkedhost/images/blob/main/games/beammp/Dockerfile)
 - [`games-cs2`](https://github.com/sparkedhost/images/blob/main/games/cs2/Dockerfile)
+- [`games-core-keeper`](https://github.com/sparkedhost/images/blob/main/games/core-keeper/Dockerfile)
 
 ### Bot Hosting images
 
