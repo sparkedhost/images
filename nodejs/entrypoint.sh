@@ -33,8 +33,8 @@ echo "Discord.js version: ${DJS_VER}"
 # Make internal Docker IP address available to processes.
 export INTERNAL_IP=`ip route get 1 | awk '{print $(NF-2);exit}'`
 
-# Disable NPM update notifications (https://github.com/sparkedhost/images/issues/28)
-echo "update-notifier=false" > ~/.npmrc
+# Disable NPM update notifications (https://github.com/sparkedhost/images/issues/28), but don't overwrite the file if it exists
+[ ! -f ".npmrc" ] && echo "update-notifier=false" > ~/.npmrc
 
 # Replace Startup Variables
 MODIFIED_STARTUP=$(echo -e ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
