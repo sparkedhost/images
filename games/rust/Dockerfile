@@ -3,7 +3,7 @@
 # Image: ghcr.io/sparkedhost/images:games-rust
 # ----------------------------------
 
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 
 LABEL author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
