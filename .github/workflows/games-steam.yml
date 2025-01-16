@@ -1,0 +1,33 @@
+name: Build games-steam
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - games/steam/*
+      - .github/workflows/steam.yml
+jobs:
+  push:
+    name: "games-steam"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+        with:
+          version: "v0.9.1"
+          buildkitd-flags: --debug
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v3
+        with:
+          context: ./games
+          file: ./games/steam/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ghcr.io/sparkedhost/images:steam
