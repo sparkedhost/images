@@ -1,4 +1,4 @@
-name: Build azul-prime-17
+name: Build graalvm-22
 on:
   push:
     branches:
@@ -26,7 +26,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v3
         with:
-          context: .
+          context: ./java
           file: ./java/graalvm/graalvm-22/Dockerfile
           platforms: linux/amd64
           push: true
