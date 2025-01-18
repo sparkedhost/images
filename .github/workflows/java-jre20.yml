@@ -4,7 +4,7 @@ on:
     branches:
       - main
     paths:
-      - java/java-jre20/*
+      - java/temurin/java-jre20/*
       - java/entrypoint.sh
       - .github/workflows/java-jre20.yml
 jobs:
@@ -27,7 +27,7 @@ jobs:
       - uses: docker/build-push-action@v3
         with:
           context: ./java
-          file: ./java/java-jre20/Dockerfile
+          file: ./java/temurin/java-jre20/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |

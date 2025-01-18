@@ -1,9 +1,9 @@
 # ----------------------------------
 # Sparked Host Custom Docker Image
-# Image: ghcr.io/sparkedhost/images:azul-prime-19
+# Image: ghcr.io/sparkedhost/images:azul-prime-17
 # ----------------------------------
 
-FROM        azul/prime:19
+FROM        azul/prime:17
 
 LABEL       author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
@@ -16,6 +16,6 @@ ENV  USER=container HOME=/home/container
 
 WORKDIR     /home/container
 
-COPY        ./java/entrypoint.sh /entrypoint.sh
+COPY        ./entrypoint.sh /entrypoint.sh
 
 CMD         ["/bin/bash", "/entrypoint.sh"]

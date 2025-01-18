@@ -4,7 +4,7 @@ on:
     branches:
       - main
     paths:
-      - java/java-jre19/*
+      - java/temurin/java-jre19/*
       - java/entrypoint.sh
       - .github/workflows/java-jre19.yml
 jobs:
@@ -27,7 +27,7 @@ jobs:
       - uses: docker/build-push-action@v3
         with:
           context: ./java
-          file: ./java/java-jre19/Dockerfile
+          file: ./java/temurin/java-jre19/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
