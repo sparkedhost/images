@@ -17,10 +17,6 @@ ADD https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.18
 RUN tar -C /opt/java --strip-components=1 -xzf /opt/java/java.tar.gz \
  && rm -f /opt/java/java.tar.gz
 
-# Add Sparked certificate authority
-ADD ca.crt /usr/local/share/ca-certificates/sparked-ca.crt
-RUN chmod 644 /usr/local/share/ca-certificates/sparked-ca.crt && update-ca-certificates
-
 # Set user that will run the entrypoint script, and overwrite USER, HOME and PATH environment variables
 # We need to inject the path to the Java binaries in the PATH environment variable
 USER container
