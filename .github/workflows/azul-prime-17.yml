@@ -4,7 +4,7 @@ on:
     branches:
       - main
     paths:
-      - other/azul-prime-17/*
+      - java/azul-prime/azul-prime-17/*
       - java/entrypoint.sh
       - .github/workflows/azul-prime-17.yml
 jobs:
@@ -27,7 +27,7 @@ jobs:
       - uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./other/azul-prime-17/Dockerfile
+          file: ./java/azul-prime/azul-prime-17/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |

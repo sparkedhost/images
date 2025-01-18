@@ -1,15 +1,15 @@
-name: Build java-jre22
+name: Build azul-prime-17
 on:
   push:
     branches:
       - main
     paths:
-      - java/temurin/java-jre22/*
+      - java/graalvm/graalvm-21/*
       - java/entrypoint.sh
-      - .github/workflows/java-jre22.yml
+      - .github/workflows/graalvm-21.yml
 jobs:
   push:
-    name: "java-jre22"
+    name: "graalvm-21"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -26,9 +26,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v3
         with:
-          context: ./java
-          file: ./java/temurin/java-jre22/Dockerfile
+          context: .
+          file: ./java/graalvm/graalvm-21/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:java-jre22
+            ghcr.io/sparkedhost/images:graalvm-21

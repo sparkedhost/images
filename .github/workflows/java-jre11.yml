@@ -4,7 +4,7 @@ on:
     branches:
       - main
     paths:
-      - java/java-jre11/*
+      - java/temurin/java-jre11/*
       - java/entrypoint.sh
       - .github/workflows/java-jre11.yml
 jobs:
@@ -27,7 +27,7 @@ jobs:
       - uses: docker/build-push-action@v3
         with:
           context: ./java
-          file: ./java/java-jre11/Dockerfile
+          file: ./java/temurin/java-jre11/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
