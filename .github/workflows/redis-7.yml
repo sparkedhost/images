@@ -4,7 +4,7 @@ on:
     branches:
       - main
     paths:
-      - database/redis/redis-6/*
+      - databases/redis/redis-6/*
       - databases/redis/entrypoint.sh
       - .github/workflows/redis-6.yml
 jobs:
