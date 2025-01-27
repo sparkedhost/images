@@ -10,7 +10,7 @@ LABEL author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt update \
- && apt -y install -y iproute2 \
+ && apt install iproute2 -y \
  && useradd -m -d /home/container container \
 
 USER container
