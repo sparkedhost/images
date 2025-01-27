@@ -11,11 +11,11 @@ ENV     DEBIAN_FRONTEND noninteractive
 
 RUN apt update \
  && apt install iproute2 -y \
- && useradd -m -d /home/container container \
+ &&  useradd -d /home/container -m container -s /bin/bash \
 
 
 USER container
-ENV USER=container HOME=/home/container LANG=C.UTF-8
+ENV  USER=container HOME=/home/container
 
 WORKDIR     /home/container
 
