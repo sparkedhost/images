@@ -1,12 +1,12 @@
-name: Build redis-6
+name: Build redis-7
 on:
   push:
     branches:
       - main
     paths:
-      - databases/redis/redis-6/*
+      - databases/redis/redis-7/*
       - databases/redis/entrypoint.sh
-      - .github/workflows/redis-6.yml
+      - .github/workflows/redis-7.yml
 jobs:
   push:
     name: "redis-6"
@@ -27,8 +27,8 @@ jobs:
       - uses: docker/build-push-action@v3
         with:
           context: ./databases/redis
-          file: ./databases/redis/redis-6/Dockerfile
+          file: ./databases/redis/redis-7/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:redis-6
+            ghcr.io/sparkedhost/images:redis-7
