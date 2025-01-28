@@ -1,6 +1,6 @@
 # ----------------------------------
 # Sparked Host Custom Docker Image
-# Image: ghcr.io/sparkedhost/images:golang-121
+# Image: ghcr.io/sparkedhost/images:redis-5
 # ----------------------------------
 
 FROM redis:5-bullseye

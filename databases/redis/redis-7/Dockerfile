@@ -1,6 +1,6 @@
 # ----------------------------------
 # Sparked Host Custom Docker Image
-# Image: ghcr.io/sparkedhost/images:golang-121
+# Image: ghcr.io/sparkedhost/images:redis-7
 # ----------------------------------
 
 FROM redis:7-bookworm
