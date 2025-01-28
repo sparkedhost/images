@@ -1,4 +1,4 @@
-mariadb: Build mariadb-10.9
+name: Build mariadb-10.9
 on:
   push:
     branches:
