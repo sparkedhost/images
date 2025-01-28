@@ -9,7 +9,7 @@ on:
       - .github/workflows/mariadb-10.9.yml
 jobs:
   push:
-    mariadb: "mariadb-10.9"
+    name: "mariadb-10.9"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
