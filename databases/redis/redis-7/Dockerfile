@@ -11,7 +11,7 @@ ENV     DEBIAN_FRONTEND noninteractive
 
 RUN apt update \
  && apt install iproute2 -y \
- &&  useradd -d /home/container -m container -s /bin/bash \
+ && useradd -d /home/container -m container -s /bin/bash
 
 
 USER container
