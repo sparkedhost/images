@@ -3,7 +3,7 @@
 # Image: ghcr.io/sparkedhost/images:mariadb-11.7
 # ----------------------------------
 
-FROM mariadb:11.7
+FROM mariadb:11.7-noble-rc
 
 LABEL author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
