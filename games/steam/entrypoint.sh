@@ -32,7 +32,7 @@ if [ "${AUTO_UPDATE}" == "1" ]; then
         unzip -o "${ZIP_FILE}"
     fi
 else
-    echo -e "Not updating game server as auto update is off. Starting Server"
+    echo -e "Not updating server as auto update is off. Starting Server"
 fi
 
 chmod +x ./${SERVER_BINARY}
