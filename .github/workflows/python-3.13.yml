@@ -29,7 +29,7 @@ jobs:
       - uses: docker/build-push-action@v3
         with:
           context: ./python
-          file: ./python/python-3.12/Dockerfile
+          file: ./python/python-3.13/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
