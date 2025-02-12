@@ -62,13 +62,13 @@ generate_caddyfile() {
     }
 
     php_fastcgi 127.0.0.1:9999 {
-            env PHP_VALUE "upload_max_filesize = 10G \n post_max_size=10G"
+        env PHP_VALUE "upload_max_filesize = 10G \n post_max_size=10G"
     }
 
     @htaccess {
         path_regexp htaccess /\.ht
     }
- 
+}
 EOF
 }
 
