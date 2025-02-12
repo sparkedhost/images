@@ -26,7 +26,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v3
         with:
-          context: ./databases/mariadb
+          context: ./databases/mariadb/mariadb-11.7
           file: ./databases/mariadb/mariadb-11.7/Dockerfile
           platforms: linux/amd64
           push: true
