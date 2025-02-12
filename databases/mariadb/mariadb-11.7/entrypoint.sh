@@ -87,14 +87,14 @@ generate_caddyfile
 # fi
 
 
-if [ ! -d "$MARIADB_DATADIR/mysql" ]; then
-  echo "Initializing MariaDB..."
-  $MARIADB_INSTALLDB_EXECUTABLE \
-    --socket="$MARIADB_SOCKET" \
-    --datadir="$MARIADB_DATADIR" \
-    --tmpdir="$MARIADB_TMPDIR" \
-    --lc-messages-dir="$MARIADB_LC_MESSAGES_DIR"
-fi
+# if [ ! -d "$MARIADB_DATADIR/mysql" ]; then
+#   echo "Initializing MariaDB..."
+#   $MARIADB_INSTALLDB_EXECUTABLE \
+#     --socket="$MARIADB_SOCKET" \
+#     --datadir="$MARIADB_DATADIR" \
+#     --tmpdir="$MARIADB_TMPDIR" \
+#     --lc-messages-dir="$MARIADB_LC_MESSAGES_DIR"
+# fi
 
 
 # Start supervisord
