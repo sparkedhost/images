@@ -28,13 +28,13 @@ fi
 mkdir -p /home/container/run/mysqld
 mkdir -p /home/container/run/php
 mkdir -p /home/container/run/php/log
+mkdir -p /home/container/run/php/sessions
 mkdir -p $MARIADB_LOG_DIR
 mkdir -p $MARIADB_DATADIR
 mkdir -p /home/container/mysql/lc/
 mkdir -p /home/container/etc
 mkdir -p /home/container/etc/php-fpm
 mkdir -p /home/container/etc/caddy/
-mkdir -p /usr/share/mysql
 
 # Generate Caddyfile
 generate_caddyfile() {
