@@ -19,7 +19,9 @@ RUN apt update \
     && apt update 
 
 RUN apt update \
-    && apt install php8.3 php8.3-cli php8.3-gd php8.3-mysql php8.3-pdo php8.3-mbstring php8.3-tokenizer php8.3-bcmath php8.3-xml php8.3-fpm php8.3-curl php8.3-zip curl socat wget -y 
+    && apt install php8.3 php8.3-cli php8.3-gd php8.3-mysql php8.3-pdo php8.3-mbstring php8.3-tokenizer php8.3-bcmath php8.3-xml php8.3-fpm php8.3-curl php8.3-zip curl socat wget supervisor -y \
+    && phpenmod -v 8.3 mysqli gd pdo_mysql mbstring tokenizer bcmath xml curl zip 
+
 
 RUN mkdir -p /var/www \
     && cd /var/www/ \
@@ -30,6 +32,19 @@ RUN mkdir -p /var/www \
     && chown -R www-data:www-data /var/www \
     && systemctl disable php8.3-fpm
     
+RUN curl -L https://github.com/caddyserver/caddy/releases/download/v2.9.1/caddy_2.9.1_linux_amd64.tar.gz -o /tmp/caddy.tar.gz \
+    && cd /tmp \
+    && tar -xzf caddy.tar.gz caddy --strip-components=0 \
+    && mv caddy /usr/bin/caddy \
+    && chmod +x /usr/bin/caddy \
+    && rm caddy.tar.gz
+
+RUN phpenmod -v 8.3 mysqli pdo_mysql
+
+COPY template/etc/php-fpm.conf /etc/php/8.3/fpm/php-fpm.conf
+COPY template/etc/supervisord.conf /supervisord.conf
+
+
 USER container
 ENV USER=container HOME=/home/container LANG=C.UTF-8
 
