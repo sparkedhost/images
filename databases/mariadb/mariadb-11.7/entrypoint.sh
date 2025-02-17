@@ -120,3 +120,7 @@ handle_shutdown() {
   echo "Received shutdown signal. Stopping services..."
   /usr/bin/supervisorctl shutdown
   exit 0
+}
+
+# Start supervisord
+/usr/bin/supervisord -c /supervisord.conf
