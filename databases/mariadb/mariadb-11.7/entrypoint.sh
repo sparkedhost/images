@@ -95,9 +95,9 @@ configure_phpmyadmin() {
 configure_phpmyadmin
 
 handle_shutdown() {
-  echo "Received shutdown signal. Stopping services..."
-  /usr/bin/supervisorctl shutdown
-  exit 0
+  echo "Received shutdown signal. Stopping services..."
+  /usr/bin/supervisorctl -c /supervisord.conf shutdown
+  exit 0
 }
 
 trap handle_shutdown SIGINT SIGTERM
