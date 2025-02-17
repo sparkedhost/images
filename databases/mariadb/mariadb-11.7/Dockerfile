@@ -21,10 +21,10 @@ RUN apt update \
 
 RUN mkdir -p /var/www \
     && cd /var/www/ \
-    && wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.zip \
-    && unzip phpMyAdmin-5.2.1-all-languages.zip \
-    && rm phpMyAdmin-5.2.1-all-languages.zip \
-    && mv phpMyAdmin-5.2.1-all-languages /var/www/phpmyadmin \
+    && wget https://files.phpmyadmin.net/phpMyAdmin/5.2.2/phpMyAdmin-5.2.2-all-languages.zip \
+    && unzip phpMyAdmin-5.2.2-all-languages.zip \
+    && rm phpMyAdmin-5.2.2-all-languages.zip \
+    && mv phpMyAdmin-5.2.2-all-languages /var/www/phpmyadmin \
     && cd /var/www/phpmyadmin \
     && chown -R www-data:www-data /var/www
     
