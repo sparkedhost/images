@@ -35,6 +35,7 @@ mkdir -p /home/container/mysql/lc/
 mkdir -p /home/container/etc
 mkdir -p /home/container/etc/php-fpm
 mkdir -p /home/container/etc/caddy/
+mkdir -p /home/container/etc/pma/
 
 # Generate Caddyfile
 generate_caddyfile() {
@@ -74,6 +75,23 @@ EOF
 
 generate_caddyfile
 
+## Configure PHPMyAdmin
+configure_phpmyadmin() {
+  echo "Configuring phpMyAdmin..."
+
+  # Copy the modified config file to the persistent storage location
+  cp /var/www/phpmyadmin/config.inc.php.template /home/container/etc/pma/pma.conf
+
+  # Set the phpMyAdmin host to 127.0.0.1:$SERVER_PORT
+  sed -i "s|\$cfg['Servers'][\$i]['host'] = '127.0.0.1';|\$cfg['Servers'][\$i]['host'] = '127.0.0.1:${SERVER_PORT}';|g" /home/container/etc/pma.conf
+
+
+  echo "phpMyAdmin configured."
+}
+
+# Configure phpMyAdmin
+configure_phpmyadmin
+
 # if ! mysqladmin -u root --socket="$MARIADB_SOCKET" ping > /dev/null 2>&1; then
 #   echo "Error: MariaDB failed to start within $TIMEOUT seconds."
 #   exit 1
@@ -96,7 +114,9 @@ generate_caddyfile
 #     --lc-messages-dir="$MARIADB_LC_MESSAGES_DIR"
 # fi
 
+trap handle_shutdown SIGINT SIGTERM
 
-# Start supervisord
-/usr/bin/supervisord -c /supervisord.conf
-echo "MariaDB stopped."
+handle_shutdown() {
+  echo "Received shutdown signal. Stopping services..."
+  /usr/bin/supervisorctl shutdown
+  exit 0

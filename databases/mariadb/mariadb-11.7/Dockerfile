@@ -38,7 +38,9 @@ RUN curl -L https://github.com/caddyserver/caddy/releases/download/v2.9.1/caddy_
 COPY template/etc/php-fpm.conf /etc/php/8.3/fpm/php-fpm.conf
 COPY template/etc/supervisord.conf /supervisord.conf
 COPY template/etc/php.ini /etc/php/8.3/fpm/php.ini
-COPY template/etc/pma.conf /var/www/phpmyadmin/config.inc.php
+COPY template/etc/pma.conf /var/www/phpmyadmin/config.inc.php.template
+
+RUN ln -s /home/container/etc/pma/pma.conf /var/www/phpmyadmin/config.inc.php 
 
 
 USER container
