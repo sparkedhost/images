@@ -36,6 +36,7 @@ mkdir -p /home/container/etc
 mkdir -p /home/container/etc/php-fpm
 mkdir -p /home/container/etc/caddy/
 mkdir -p /home/container/etc/pma/
+mkdir -p /tmp/pma/
 
 # Generate Caddyfile
 generate_caddyfile() {
@@ -86,41 +87,20 @@ configure_phpmyadmin() {
   # sed -i "s|\$cfg['Servers'][\$i]['host'] = '127.0.0.1';|\$cfg['Servers'][\$i]['host'] = '127.0.0.1';|g" /home/container/etc/pma/pma.conf
   sed -i "s|\$cfg\['Servers'\]\[\$i\]\['port'\] = ''|\$cfg['Servers'][\$i]['port'] = '${SERVER_PORT}'|g" /home/container/etc/pma/pma.conf
 
-  echo "phpMyAdmin configured."
+  BLOWFISH_SECRET=$(openssl rand -base64 22)
+  sed -i "s|\$cfg\['blowfish_secret'\] = ''|\$cfg['blowfish_secret'] = '${BLOWFISH_SECRET}'|g" /home/container/etc/pma/pma.conf
 }
 
 # Configure phpMyAdmin
 configure_phpmyadmin
-
-# if ! mysqladmin -u root --socket="$MARIADB_SOCKET" ping > /dev/null 2>&1; then
-#   echo "Error: MariaDB failed to start within $TIMEOUT seconds."
-#   exit 1
-# fi
-
-# Optional: Perform database upgrade
-# sleep 5
-# if $MARIADB_UPGRADE_EXECUTABLE --check-if-upgrade-is-needed; then
-#     echo "Upgrading MariaDB..."
-#     $MARIADB_UPGRADE_EXECUTABLE -u container
-# fi
-
-
-# if [ ! -d "$MARIADB_DATADIR/mysql" ]; then
-#   echo "Initializing MariaDB..."
-#   $MARIADB_INSTALLDB_EXECUTABLE \
-#     --socket="$MARIADB_SOCKET" \
-#     --datadir="$MARIADB_DATADIR" \
-#     --tmpdir="$MARIADB_TMPDIR" \
-#     --lc-messages-dir="$MARIADB_LC_MESSAGES_DIR"
-# fi
-
-trap handle_shutdown SIGINT SIGTERM
 
 handle_shutdown() {
   echo "Received shutdown signal. Stopping services..."
   /usr/bin/supervisorctl shutdown
   exit 0
 }
+
+trap handle_shutdown SIGINT SIGTERM
 
 # Start supervisord
 /usr/bin/supervisord -c /supervisord.conf
