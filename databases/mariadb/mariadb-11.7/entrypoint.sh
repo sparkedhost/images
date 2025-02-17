@@ -83,7 +83,7 @@ configure_phpmyadmin() {
   cp /var/www/phpmyadmin/config.inc.php.template /home/container/etc/pma/pma.conf
 
   # Set the phpMyAdmin host to 127.0.0.1:$SERVER_PORT
-  sed -i "s|\$cfg['Servers'][\$i]['host'] = '127.0.0.1';|\$cfg['Servers'][\$i]['host'] = '127.0.0.1:${SERVER_PORT}';|g" /home/container/etc/pma.conf
+  sed -i "s|\$cfg['Servers'][\$i]['host'] = '127.0.0.1';|\$cfg['Servers'][\$i]['host'] = '127.0.0.1:${SERVER_PORT}';|g" /home/container/etc/pma/pma.conf
 
 
   echo "phpMyAdmin configured."
