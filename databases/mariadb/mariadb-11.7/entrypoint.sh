@@ -95,12 +95,16 @@ configure_phpmyadmin() {
 configure_phpmyadmin
 
 handle_shutdown() {
-  echo "Received shutdown signal. Stopping services..."
-  /usr/bin/supervisorctl shutdown
-  exit 0
+  echo "Received shutdown signal. Stopping services..."
+  /usr/bin/supervisorctl shutdown
+  exit 0
 }
 
 trap handle_shutdown SIGINT SIGTERM
 
-# Start supervisord
-/usr/bin/supervisord -c /supervisord.conf
+# Start supervisord in the background
+/usr/bin/supervisord -c /supervisord.conf &
+
+# Wait to keep the script running and catch signals
+wait
+
