@@ -35,10 +35,10 @@ RUN curl -L https://github.com/caddyserver/caddy/releases/download/v2.9.1/caddy_
     && chmod +x /usr/bin/caddy \
     && rm caddy.tar.gz
 
-COPY template/etc/php-fpm.conf /etc/php/8.3/fpm/php-fpm.conf
-COPY template/etc/supervisord.conf /supervisord.conf
-COPY template/etc/php.ini /etc/php/8.3/fpm/php.ini
-COPY template/etc/pma.conf /var/www/phpmyadmin/config.inc.php.template
+ADD template/etc/php-fpm.conf /etc/php/8.3/fpm/php-fpm.conf
+ADD template/etc/supervisord.conf /supervisord.conf
+ADD template/etc/php.ini /etc/php/8.3/fpm/php.ini
+ADD template/etc/pma.conf /var/www/phpmyadmin/config.inc.php.template
 
 RUN ln -s /home/container/etc/pma/pma.conf /var/www/phpmyadmin/config.inc.php 
 
@@ -48,6 +48,6 @@ ENV USER=container HOME=/home/container LANG=C.UTF-8
 
 WORKDIR     /home/container
 
-COPY        ./entrypoint.sh /entrypoint.sh
+COPY     ./entrypoint.sh /entrypoint.sh
 
 CMD         ["/bin/bash", "/entrypoint.sh"]
