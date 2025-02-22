@@ -1,5 +1,6 @@
 name: Build generic-wine
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

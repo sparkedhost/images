@@ -1,5 +1,6 @@
 name: Build games-bdsx
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

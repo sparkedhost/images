@@ -1,5 +1,6 @@
 name: Build games-beammp
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

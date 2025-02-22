@@ -1,5 +1,6 @@
 name: Build mariadb-10.8
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

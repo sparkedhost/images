@@ -1,5 +1,6 @@
 name: Build golang-121
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

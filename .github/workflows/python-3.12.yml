@@ -1,5 +1,6 @@
 name: Build python-3.12
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -7,7 +8,6 @@ on:
       - python/python-3.12/*
       - python/entrypoint.sh
       - .github/workflows/python-3.12.yml
-  workflow_dispatch:
 
 jobs:
   push:

@@ -1,5 +1,6 @@
 name: Build games-liteloader-bds
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

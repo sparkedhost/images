@@ -1,5 +1,6 @@
 name: Build games-valheim
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

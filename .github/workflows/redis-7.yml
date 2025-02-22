@@ -1,5 +1,6 @@
 name: Build redis-7
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

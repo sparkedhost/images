@@ -1,5 +1,6 @@
 name: Build nodejs-12
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

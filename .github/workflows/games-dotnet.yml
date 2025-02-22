@@ -1,5 +1,6 @@
 name: Build games-dotnet
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

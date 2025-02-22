@@ -1,5 +1,6 @@
 name: Build nodejs-15
 on:
+  workflow_dispatch:
   push:
     branches:
       - main

@@ -1,5 +1,6 @@
 name: Build graalvm-20
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
