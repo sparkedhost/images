@@ -1,19 +1,23 @@
-name: Build java-jre21
+name: Build MongoDB Images
 on:
   workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - java/temurin/java-jre21/*
-      - java/entrypoint.sh
-      - .github/workflows/java-jre21.yml
+      - databases/mongodb/**/*
+      - databases/mongodb/entrypoint.sh
+      - .github/workflows/mongodb.yml
 jobs:
   push:
-    name: "java-jre21"
+    name: "MongoDB ${{ matrix.version }}"
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      matrix:
+        version:
+          - 6
+          - 7
+          - 8
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
@@ -27,9 +31,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v3
         with:
-          context: ./java
-          file: ./java/temurin/java-jre21/Dockerfile
+          context: ./databases/mongodb
+          file: ./databases/mongodb/mongodb-${{ matrix.version }}/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:java-jre21
+            ghcr.io/sparkedhost/images:mongodb-${{ matrix.version }}

@@ -1,19 +1,35 @@
-name: Build graalvm-21
+name: Build Node.js Images
+
 on:
   workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - java/graalvm/graalvm-21/*
-      - java/entrypoint.sh
-      - .github/workflows/graalvm-21.yml
+      - "nodejs/**/*"
+      - nodejs/entrypoint.sh
+      - ".github/workflows/nodejs.yml"
+
 jobs:
-  push:
-    name: "graalvm-21"
+  build:
+    name: "Node.js ${{ matrix.version }}"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      matrix:
+        version:
+          - 12
+          - 13
+          - 14
+          - 15
+          - 16
+          - 17
+          - 18
+          - 19
+          - 20
+          - 21
+          - 22
+
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
@@ -27,9 +43,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v3
         with:
-          context: ./java
-          file: ./java/graalvm/graalvm-21/Dockerfile
+          context: ./nodejs
+          file: ./nodejs/nodejs-${{ matrix.version }}/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:graalvm-21
+            ghcr.io/sparkedhost/images:nodejs-${{ matrix.version }}

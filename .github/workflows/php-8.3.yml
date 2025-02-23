@@ -12,8 +12,6 @@ jobs:
   push:
     name: "php-8.3"
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
