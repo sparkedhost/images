@@ -1,19 +1,26 @@
-name: Build mariadb-11.4
+name: Build Azul Prime images
+
 on:
   workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - databases/mariadb/mariadb-11.4/*
-      - databases/mariadb/entrypoint.sh
-      - .github/workflows/mariadb-11.4.yml
+      - "java/azul-prime/**/*"
+      - "java/entrypoint.sh"
+      - ".github/workflows/azul-prime.yml"
+
 jobs:
-  push:
-    name: "mariadb-11.4"
+  build:
+    name: "Azul Prime ${{ matrix.version }}"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      matrix:
+        version:
+          - "17"
+          - "19"
+
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
@@ -27,9 +34,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v3
         with:
-          context: ./databases/mariadb
-          file: ./databases/mariadb/mariadb-11.4/Dockerfile
+          context: ./java
+          file: ./java/azul-prime/azul-prime-${{ matrix.version }}/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:mariadb-11.4
+            ghcr.io/sparkedhost/images:azul-prime-${{ matrix.version }}

@@ -20,13 +20,10 @@ RUN           ln -s /home/container/.config/Red-DiscordBot/ /usr/local/share/Red
 
 RUN           useradd -m -d /home/container -s /bin/bash container
 
-ADD           ca.crt /usr/local/share/ca-certificates/sparked-ca.crt
-RUN           chmod 644 /usr/local/share/ca-certificates/sparked-ca.crt && update-ca-certificates
-
 USER          container
 ENV           USER=container HOME=/home/container
 
 WORKDIR       /home/container
 
-COPY          ./redbot/entrypoint.sh /entrypoint.sh
+COPY          ./entrypoint.sh /entrypoint.sh
 CMD           ["/bin/bash", "/entrypoint.sh"]
