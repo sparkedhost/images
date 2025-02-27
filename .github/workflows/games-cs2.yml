@@ -29,4 +29,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:games-cs2
+            ghcr.io/sparkedhost/images-testing:games-cs2

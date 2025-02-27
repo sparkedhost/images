@@ -48,4 +48,4 @@ jobs:
           file: ./databases/mariadb/mariadb-${{ matrix.version }}/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ghcr.io/sparkedhost/images:mariadb-${{ matrix.version }}
+          tags: ghcr.io/sparkedhost/images-testing:mariadb-${{ matrix.version }}

@@ -37,4 +37,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:postgres-${{ matrix.version }}
+            ghcr.io/sparkedhost/images-testing:postgres-${{ matrix.version }}

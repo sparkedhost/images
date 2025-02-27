@@ -48,4 +48,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:nodejs-${{ matrix.version }}
+            ghcr.io/sparkedhost/images-testing:nodejs-${{ matrix.version }}

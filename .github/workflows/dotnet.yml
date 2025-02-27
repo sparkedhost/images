@@ -37,4 +37,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:dotnet-${{ matrix.dotnet_version }}
+            ghcr.io/sparkedhost/images-testing:dotnet-${{ matrix.dotnet_version }}

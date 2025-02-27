@@ -37,4 +37,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:graalvm-${{ matrix.version }}
+            ghcr.io/sparkedhost/images-testing:graalvm-${{ matrix.version }}

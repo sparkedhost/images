@@ -46,4 +46,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:java-jre${{ matrix.java_version }}
+            ghcr.io/sparkedhost/images-testing:java-jre${{ matrix.java_version }}

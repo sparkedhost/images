@@ -29,4 +29,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:bot-redbot
+            ghcr.io/sparkedhost/images-testing:bot-redbot

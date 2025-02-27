@@ -36,4 +36,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:mongodb-${{ matrix.version }}
+            ghcr.io/sparkedhost/images-testing:mongodb-${{ matrix.version }}
