@@ -1,19 +1,36 @@
-name: Build mariadb-10.6
+name: Build MariaDB
 on:
   workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - databases/mariadb/mariadb-10.6/*
+      - databases/mariadb/**/*
       - databases/mariadb/entrypoint.sh
-      - .github/workflows/mariadb-10.6.yml
+      - .github/workflows/mariadb.yml
+
 jobs:
   push:
-    name: "mariadb-10.6"
+    name: "MariaDB ${{ matrix.version }}"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      matrix:
+        version:
+          - 10.4
+          - 10.5
+          - 10.6
+          - 10.7
+          - 10.8
+          - 10.10
+          - 11.0
+          - 11.1
+          - 11.2
+          - 11.3
+          - 11.4
+          - 11.5
+          - 11.6
+          - 11.7
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
@@ -28,8 +45,7 @@ jobs:
       - uses: docker/build-push-action@v3
         with:
           context: ./databases/mariadb
-          file: ./databases/mariadb/mariadb-10.6/Dockerfile
+          file: ./databases/mariadb/mariadb-${{ matrix.version }}/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: |
-            ghcr.io/sparkedhost/images:mariadb-10.6
+          tags: ghcr.io/sparkedhost/images-testing:mariadb-${{ matrix.version }}

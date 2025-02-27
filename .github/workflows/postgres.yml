@@ -1,19 +1,24 @@
-name: Build java-jre22
+name: Build PostgreSQL Images
 on:
   workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - java/temurin/java-jre22/*
-      - java/entrypoint.sh
-      - .github/workflows/java-jre22.yml
+      - databases/postgres/**/*
+      - databases/postgres/entrypoint.sh
+      - .github/workflows/postgres.yml
 jobs:
-  push:
-    name: "java-jre22"
+  build:
+    name: "PostgreSQL ${{ matrix.version }}"
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      matrix:
+        version:
+          - 14
+          - 15
+          - 16
+          - 17
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
@@ -27,9 +32,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v3
         with:
-          context: ./java
-          file: ./java/temurin/java-jre22/Dockerfile
+          context: ./databases/postgres
+          file: ./databases/postgres/postgres-${{ matrix.version }}/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:java-jre22
+            ghcr.io/sparkedhost/images-testing:postgres-${{ matrix.version }}

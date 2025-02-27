@@ -1,19 +1,29 @@
-name: Build java-jre21
+name: Build Python
 on:
   workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - java/temurin/java-jre21/*
-      - java/entrypoint.sh
-      - .github/workflows/java-jre21.yml
+      - python/**/*
+      - python/entrypoint.sh
+      - .github/workflows/python.yml
+
 jobs:
-  push:
-    name: "java-jre21"
+  build:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      matrix:
+        version:
+          - 3.6
+          - 3.7
+          - 3.8
+          - 3.9
+          - 3.10
+          - 3.11
+          - 3.12
+          - 3.13
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
@@ -27,9 +37,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v3
         with:
-          context: ./java
-          file: ./java/temurin/java-jre21/Dockerfile
+          context: ./python
+          file: ./python/python-${{ matrix.version }}/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: |
-            ghcr.io/sparkedhost/images:java-jre21
+          tags: ghcr.io/sparkedhost/images-testing:python-${{ matrix.version }}

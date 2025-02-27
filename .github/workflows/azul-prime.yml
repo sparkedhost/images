@@ -1,19 +1,26 @@
-name: Build graalvm-21
+name: Build Azul Prime images
+
 on:
   workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - java/graalvm/graalvm-21/*
-      - java/entrypoint.sh
-      - .github/workflows/graalvm-21.yml
+      - "java/azul-prime/**/*"
+      - "java/entrypoint.sh"
+      - ".github/workflows/azul-prime.yml"
+
 jobs:
-  push:
-    name: "graalvm-21"
+  build:
+    name: "Azul Prime ${{ matrix.version }}"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      matrix:
+        version:
+          - "17"
+          - "19"
+
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
@@ -28,8 +35,8 @@ jobs:
       - uses: docker/build-push-action@v3
         with:
           context: ./java
-          file: ./java/graalvm/graalvm-21/Dockerfile
+          file: ./java/azul-prime/azul-prime-${{ matrix.version }}/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:graalvm-21
+            ghcr.io/sparkedhost/images-testing:azul-prime-${{ matrix.version }}

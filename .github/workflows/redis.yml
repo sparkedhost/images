@@ -1,19 +1,23 @@
-name: Build nodejs-15
+name: Build redis images
 on:
   workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - nodejs/nodejs-15/*
-      - nodejs/entrypoint.sh
-      - .github/workflows/nodejs-15.yml
+      - databases/redis/**/*
+      - databases/redis/entrypoint.sh
+      - .github/workflows/redis.yml
 jobs:
   push:
-    name: "nodejs-15"
+    name: "Redis Images"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      matrix:
+        version:
+          - 6
+          - 7
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
@@ -27,9 +31,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v3
         with:
-          context: ./nodejs
-          file: ./nodejs/nodejs-15/Dockerfile
+          context: ./databases/redis
+          file: ./databases/redis/redis-${{ matrix.version }}/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:nodejs-15
+            ghcr.io/sparkedhost/images-testing:redis-${{ matrix.version }}

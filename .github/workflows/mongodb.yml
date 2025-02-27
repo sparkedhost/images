@@ -1,19 +1,23 @@
-name: Build nodejs-18
+name: Build MongoDB Images
 on:
   workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - nodejs/nodejs-18/*
-      - nodejs/entrypoint.sh
-      - .github/workflows/nodejs-18.yml
+      - databases/mongodb/**/*
+      - databases/mongodb/entrypoint.sh
+      - .github/workflows/mongodb.yml
 jobs:
   push:
-    name: "nodejs-18"
+    name: "MongoDB ${{ matrix.version }}"
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      matrix:
+        version:
+          - 6
+          - 7
+          - 8
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
@@ -27,9 +31,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v3
         with:
-          context: ./nodejs
-          file: ./nodejs/nodejs-18/Dockerfile
+          context: ./databases/mongodb
+          file: ./databases/mongodb/mongodb-${{ matrix.version }}/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:nodejs-18
+            ghcr.io/sparkedhost/images-testing:mongodb-${{ matrix.version }}

@@ -12,8 +12,6 @@ jobs:
   push:
     name: "generic-debian"
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
@@ -32,4 +30,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images:generic-debian
+            ghcr.io/sparkedhost/images-testing:generic-debian
