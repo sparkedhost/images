@@ -30,4 +30,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images-testing:php-8.3
+            ghcr.io/sparkedhost/images:php-8.3

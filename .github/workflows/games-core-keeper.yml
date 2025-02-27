@@ -29,4 +29,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images-testing:games-core-keeper
+            ghcr.io/sparkedhost/images:games-core-keeper

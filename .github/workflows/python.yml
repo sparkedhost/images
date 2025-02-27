@@ -20,7 +20,7 @@ jobs:
           - 3.7
           - 3.8
           - 3.9
-          - 3.10
+          - "3.10"
           - 3.11
           - 3.12
           - 3.13
@@ -41,4 +41,4 @@ jobs:
           file: ./python/python-${{ matrix.version }}/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ghcr.io/sparkedhost/images-testing:python-${{ matrix.version }}
+          tags: ghcr.io/sparkedhost/images:python-${{ matrix.version }}

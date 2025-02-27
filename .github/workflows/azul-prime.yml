@@ -18,8 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - "17"
-          - "19"
+          - 17
+          - 19
 
     steps:
       - uses: actions/checkout@v3
@@ -39,4 +39,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images-testing:azul-prime-${{ matrix.version }}
+            ghcr.io/sparkedhost/images:azul-prime-${{ matrix.version }}

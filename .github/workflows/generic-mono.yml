@@ -30,4 +30,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/sparkedhost/images-testing:generic-mono
+            ghcr.io/sparkedhost/images:generic-mono
