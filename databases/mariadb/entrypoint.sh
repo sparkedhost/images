@@ -96,6 +96,9 @@ configure_phpmyadmin
 
 handle_shutdown() {
   echo "Received shutdown signal. Stopping services..."
+  /usr/bin/supervisorctl -c /supervisord.conf stop mariadb
+  /usr/bin/supervisorctl -c /supervisord.conf stop php-fpm
+  /usr/bin/supervisorctl -c /supervisord.conf stop caddy
   /usr/bin/supervisorctl -c /supervisord.conf shutdown
   exit 0
 }
