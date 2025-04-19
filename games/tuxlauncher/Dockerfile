@@ -17,7 +17,7 @@ RUN dpkg --add-architecture i386 \
            && curl -sSL -o /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key \
            && curl -sSL -o /etc/apt/sources.list.d/winehq-bookworm.sources https://dl.winehq.org/wine-builds/debian/dists/bookworm/winehq-bookworm.sources \
            && apt update -y \
-           && apt install -y --no-install-recommends winehq-devel \
+           && apt install -y --no-install-recommends winehq-staging \
            && rm -rf /var/lib/apt/lists/*
 
 # Create the container user before trying to use it
