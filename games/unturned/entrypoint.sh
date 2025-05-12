@@ -4,7 +4,7 @@ sleep 1
 cd /home/container
 
 if [ "${GAME_AUTOUPDATE}" == "1" ]; then
-    ./steam/steamcmd.sh +@sSteamCmdForcePlatformBitness 64 +force_install_dir /home/container +login anonymous +app_update ${SRCDS_APPID} +quit
+    ./steam/steamcmd.sh +@sSteamCmdForcePlatformBitness 64 +force_install_dir /home/container +login anonymous +app_update ${SRCDS_APPID} $( [[ -z ${SRCDS_BETAID} ]] || printf %s "-beta ${SRCDS_BETAID}" ) +quit
 else
     echo -e "Not updating game server as auto update is off. Starting Server"
 fi
