@@ -13,7 +13,7 @@
      && mkdir -p /opt/java
     
     # Download pre-built Temurin JRE binaries
-    ADD https://github.com/graalvm/graalvm-ce-builds/releases/download/jdk-23.0.1/graalvm-community-jdk-23.0.1_linux-x64_bin.tar.gz /opt/java/java.tar.gz
+    ADD https://github.com/graalvm/graalvm-ce-builds/releases/download/jdk-24.0.1/graalvm-community-jdk-24.0.1_linux-x64_bin.tar.gz /opt/java/java.tar.gz
     RUN tar -C /opt/java --strip-components=1 -xzf /opt/java/java.tar.gz \
      && rm -f /opt/java/java.tar.gz
     
