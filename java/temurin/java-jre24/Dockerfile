@@ -13,7 +13,7 @@ RUN apt-get update -y \
  && mkdir -p /opt/java
 
 # Download pre-built Temurin JRE binaries
-ADD https://github.com/adoptium/temurin24-binaries/releases/download/jdk-24.0.1%2B9/OpenJDK24U-debugimage_x64_linux_hotspot_24.0.1_9.tar.gz /opt/java/java.tar.gz
+ADD https://github.com/adoptium/temurin24-binaries/releases/download/jdk-24.0.1%2B9/OpenJDK24U-jre_x64_linux_hotspot_24.0.1_9.tar.gz /opt/java/java.tar.gz
 RUN tar -C /opt/java --strip-components=1 -xzf /opt/java/java.tar.gz \
  && rm -f /opt/java/java.tar.gz
 
