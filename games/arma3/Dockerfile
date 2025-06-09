@@ -12,7 +12,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN  dpkg --add-architecture i386 \
      && apt-get update \
      && apt-get upgrade -y \
-     && apt-get install -y curl locales gettext-base ca-certificates libssl-dev lib32gcc-s1 libsdl2-2.0-0 libsdl2-2.0-0:i386 libstdc++6 libstdc++6:i386 lib32stdc++6 libnss-wrapper libnss-wrapper:i386 libtbb2 libtbb2:i386
+     && apt-get install -y curl locales gettext-base ca-certificates libssl-dev lib32gcc-s1 libsdl2-2.0-0 libsdl2-2.0-0:i386 libstdc++6 libstdc++6:i386 lib32stdc++6 libnss-wrapper libnss-wrapper:i386 libtbb2 libtbb2:i386 wget unzip
 
 
 ENV         USER=container HOME=/home/container
