@@ -59,6 +59,8 @@
 - [`games-core-keeper`](https://github.com/sparkedhost/images/blob/main/games/core-keeper/Dockerfile)
 - [`games-tuxlauncher`](https://github.com/sparkedhost/images/blob/main/games/tuxlauncher/Dockerfile)
 - [`games-steam`](https://github.com/sparkedhost/images/blob/main/games/steam/Dockerfile)
+- [`games-arma3`](https://github.com/sparkedhost/images/blob/main/games/arma3/Dockerfile)
+- [`games-steam`](https://github.com/sparkedhost/images/blob/main/games/altv/Dockerfile)
 
 ### Bot Hosting images
 
