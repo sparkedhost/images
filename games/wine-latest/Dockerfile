@@ -15,7 +15,7 @@ RUN  dpkg --add-architecture i386 \
      && wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key \
      && wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/bullseye/winehq-bullseye.sources \
      && apt update \
-     && apt install --install-recommends winehq-stable cabextract wine-binfmt -y \
+     && apt install --install-recommends winehq-stable cabextract -y \
      && wget -q -O /usr/sbin/winetricks https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks \
      && chmod +x /usr/sbin/winetricks
 ENV  HOME=/home/container
