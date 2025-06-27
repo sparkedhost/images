@@ -6,17 +6,17 @@
 
 ### Java images
 
-- [`java-jre8`](https://github.com/sparkedhost/images/blob/main/java/java-jre8/Dockerfile)
-- [`java-jre11`](https://github.com/sparkedhost/images/blob/main/java/java-jre11/Dockerfile)
-- [`java-jre16`](https://github.com/sparkedhost/images/blob/main/java/java-jre16/Dockerfile)[^eol]
-- [`java-jre17`](https://github.com/sparkedhost/images/blob/main/java/java-jre17/Dockerfile)
-- [`java-jre18`](https://github.com/sparkedhost/images/blob/main/java/java-jre18/Dockerfile)[^eol]
-- [`java-jre19`](https://github.com/sparkedhost/images/blob/main/java/java-jre19/Dockerfile)[^eol]
-- [`java-jre20`](https://github.com/sparkedhost/images/blob/main/java/java-jre20/Dockerfile)[^eol]
-- [`java-jre21`](https://github.com/sparkedhost/images/blob/main/java/java-jre21/Dockerfile)
-- [`java-jre22`](https://github.com/sparkedhost/images/blob/main/java/java-jre22/Dockerfile)[^eol]
-- [`java-jre23`](https://github.com/sparkedhost/images/blob/main/java/java-jre23/Dockerfile)[^eol]
-- [`java-jre24`](https://github.com/sparkedhost/images/blob/main/java/java-jre24/Dockerfile)
+- [`java-jre8`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre8/Dockerfile)
+- [`java-jre11`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre11/Dockerfile)
+- [`java-jre16`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre16/Dockerfile)[^eol]
+- [`java-jre17`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre17/Dockerfile)
+- [`java-jre18`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre18/Dockerfile)[^eol]
+- [`java-jre19`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre19/Dockerfile)[^eol]
+- [`java-jre20`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre20/Dockerfile)[^eol]
+- [`java-jre21`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre21/Dockerfile)
+- [`java-jre22`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre22/Dockerfile)[^eol]
+- [`java-jre23`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre23/Dockerfile)[^eol]
+- [`java-jre24`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre24/Dockerfile)
 - [`anti-malware`](https://github.com/sparkedhost/images/blob/main/java/anti-malware/Dockerfile)[^antimalware]
 
 ### Node.js images
