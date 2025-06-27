@@ -15,6 +15,8 @@
 - [`java-jre20`](https://github.com/sparkedhost/images/blob/main/java/java-jre20/Dockerfile)[^eol]
 - [`java-jre21`](https://github.com/sparkedhost/images/blob/main/java/java-jre21/Dockerfile)
 - [`java-jre22`](https://github.com/sparkedhost/images/blob/main/java/java-jre22/Dockerfile)[^eol]
+- [`java-jre23`](https://github.com/sparkedhost/images/blob/main/java/java-jre23/Dockerfile)[^eol]
+- [`java-jre24`](https://github.com/sparkedhost/images/blob/main/java/java-jre24/Dockerfile)
 - [`anti-malware`](https://github.com/sparkedhost/images/blob/main/java/anti-malware/Dockerfile)[^antimalware]
 
 ### Node.js images
@@ -60,7 +62,11 @@
 - [`games-tuxlauncher`](https://github.com/sparkedhost/images/blob/main/games/tuxlauncher/Dockerfile)
 - [`games-steam`](https://github.com/sparkedhost/images/blob/main/games/steam/Dockerfile)
 - [`games-arma3`](https://github.com/sparkedhost/images/blob/main/games/arma3/Dockerfile)
-- [`games-steam`](https://github.com/sparkedhost/images/blob/main/games/altv/Dockerfile)
+- [`games-steam`](https://github.com/sparkedhost/images/blob/main/games/steam/Dockerfile)
+- [`games-altv`](https://github.com/sparkedhost/images/blob/main/games/altv/Dockerfile)
+- [`games-dayz`](https://github.com/sparkedhost/images/blob/main/games/dayz/Dockerfile)
+- [`games-mono`](https://github.com/sparkedhost/images/blob/main/games/mono/Dockerfile)
+- [`games-mta`](https://github.com/sparkedhost/images/blob/main/games/mta/Dockerfile)
 
 ### Bot Hosting images
 
