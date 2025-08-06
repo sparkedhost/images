@@ -1,9 +1,9 @@
 # ----------------------------------
 # Sparked Host Custom Docker Image
-# Image: ghcr.io/sparkedhost/images:golang-121
+# Image: ghcr.io/sparkedhost/images:golang-124
 # ----------------------------------
 
-FROM golang:1.21
+FROM golang:1.24
 
 LABEL       author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
