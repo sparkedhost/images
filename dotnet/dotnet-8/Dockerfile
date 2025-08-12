@@ -21,9 +21,10 @@ COPY        --chown=container:container ./../entrypoint.sh /entrypoint.sh
 
 RUN         chmod +x /entrypoint.sh
 USER        container
-ENV         USER=container HOME=/home/container
+ENV         USER=container HOME=/home/container DOTNET_ROOT=/usr/share/
 
 WORKDIR     /home/container
 
 COPY        ./entrypoint.sh /entrypoint.sh
+
 CMD         ["/bin/bash", "/entrypoint.sh"]
