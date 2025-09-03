@@ -3,7 +3,7 @@
 # Image: ghcr.io/sparkedhost/images:python-3.9
 # ----------------------------------
 
-FROM        python:3.9-slim-bullseye
+FROM        python:3.9-slim-trixie
 
 LABEL       author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 

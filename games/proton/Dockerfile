@@ -5,7 +5,7 @@
 # ----------------------------------
 
 
-FROM debian:bullseye-slim
+FROM debian:trixie-slim
 
 LABEL author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 

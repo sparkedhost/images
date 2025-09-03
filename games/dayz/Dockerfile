@@ -3,7 +3,7 @@
 # Image: ghcr.io/sparkedhost/images:games-dayz
 # ----------------------------------
 
-FROM debian:bullseye-slim
+FROM debian:trixie-slim
 
 LABEL author="DevOps Team at Sparked Host" maintainer="sysadmin@sparkedhost.com"
 

@@ -3,7 +3,7 @@
 # Image: ghcr.io/sparkedhost/images:games-liteloader-bds
 # ----------------------------------
 
-FROM    debian:bullseye-slim
+FROM    debian:trixie-slim
 
 LABEL   author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
@@ -15,7 +15,7 @@ RUN     dpkg --add-architecture i386 \
 # Install winehq-stable and with recommends
 RUN     wget -nc https://dl.winehq.org/wine-builds/winehq.key \
         && apt-key add winehq.key \
-        && echo "deb https://dl.winehq.org/wine-builds/debian/ bullseye main" >> /etc/apt/sources.list \
+        && echo "deb https://dl.winehq.org/wine-builds/debian/ trixie main" >> /etc/apt/sources.list \
         && wget -O- -q download.opensuse.org/repositories/Emulators:/Wine:/Debian/Debian_11/Release.key | apt-key add - \
         && echo "deb http://download.opensuse.org/repositories/Emulators:/Wine:/Debian/Debian_11 ./" | tee /etc/apt/sources.list.d/wine-obs.list \
         && apt update \
