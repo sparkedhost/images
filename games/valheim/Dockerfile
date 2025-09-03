@@ -4,7 +4,7 @@
 # ----------------------------------
 
 
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 
 LABEL author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
