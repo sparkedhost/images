@@ -4,7 +4,7 @@
 # ----------------------------------
 
 
-FROM debian:trixie-slim
+FROM debian:bookworm-slim
 
 LABEL author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 

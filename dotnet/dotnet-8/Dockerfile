@@ -3,7 +3,7 @@
 # Image: ghcr.io/sparkedhost/images:dotnet-8
 # ----------------------------------
 
-FROM        debian:trixie-slim
+FROM        debian:bullseye-slim
 
 LABEL       author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
