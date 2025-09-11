@@ -3,6 +3,11 @@ sleep 1
 
 cd /home/container
 
+# Fixing Steam updating.
+if [ -d "./steamcmd" ]; then
+    mv steamcmd steam
+fi
+
 if [ "${GAME_AUTOUPDATE}" == "1" ]; then
     ./steam/steamcmd.sh +@sSteamCmdForcePlatformBitness 64 +force_install_dir /home/container +login anonymous +app_update ${SRCDS_APPID} $( [[ -z ${SRCDS_BETAID} ]] || printf %s "-beta ${SRCDS_BETAID}" ) +quit
 else
