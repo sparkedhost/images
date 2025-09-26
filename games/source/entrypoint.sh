@@ -2,7 +2,7 @@ sleep 1
 
 cd /home/container
 
-if [ "${AUTO_UPDATE}" == "1" ] && [ -n "${SRCDS_BETAID}" ]; then 
+if [ "${AUTO_UPDATE}" == "1" ] && [ -n "${SRCDS_APPID}" ]; then 
     if [ -d "./steamcmd" ]; then
     ./steamcmd/steamcmd.sh +@sSteamCmdForcePlatformBitness 64 +force_install_dir /home/container +login anonymous +app_update ${SRCDS_APPID} -beta ${SRCDS_BETAID} $( [[ -z ${SRCDS_BETAPASS} ]] || printf %s "-betapassword ${SRCDS_BETAPASS}" ) $( [[ -z ${VALIDATE} ]] || printf %s "validate" ) +quit
     fi
