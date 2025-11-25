@@ -32,7 +32,8 @@
 - [`nodejs-20`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-20/Dockerfile)
 - [`nodejs-21`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-21/Dockerfile)[^eol]
 - [`nodejs-22`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-22/Dockerfile)
-
+- [`nodejs-23`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-23/Dockerfile)
+- [`nodejs-24`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-24/Dockerfile)
 ### Python images
 
 - [`python-3.6`](https://github.com/sparkedhost/images/blob/main/python/python-3.6/Dockerfile)[^eol]
@@ -43,6 +44,7 @@
 - [`python-3.11`](https://github.com/sparkedhost/images/blob/main/python/python-3.11/Dockerfile)
 - [`python-3.12`](https://github.com/sparkedhost/images/blob/main/python/python-3.12/Dockerfile)
 - [`python-3.13`](https://github.com/sparkedhost/images/blob/main/python/python-3.13/Dockerfile)
+- [`python-3.14`](https://github.com/sparkedhost/images/blob/main/python/python-3.14/Dockerfile)
 
 ### Game Hosting images
 
@@ -87,6 +89,7 @@
 - [`dotnet-7`](https://github.com/sparkedhost/images/blob/main/dotnet/dotnet-7/Dockerfile)[^eol]
 - [`dotnet-8`](https://github.com/sparkedhost/images/blob/main/dotnet/dotnet-8/Dockerfile)
 - [`dotnet-9`](https://github.com/sparkedhost/images/blob/main/dotnet/dotnet-9/Dockerfile)
+- [`dotnet-10`](https://github.com/sparkedhost/images/blob/main/dotnet/dotnet-9/Dockerfile)
 
 ### Generic images
 
