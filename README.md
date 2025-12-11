@@ -70,6 +70,7 @@
 - [`games-mono`](https://github.com/sparkedhost/images/blob/main/games/mono/Dockerfile)
 - [`games-mta`](https://github.com/sparkedhost/images/blob/main/games/mta/Dockerfile)
 - [`games-fivem`](https://github.com/sparkedhost/images/blob/main/games/fivem/Dockerfile)
+- [`games-fivem`](https://github.com/sparkedhost/images/blob/main/games/project-zomboid/Dockerfile)
 
 
 ### Bot Hosting images
