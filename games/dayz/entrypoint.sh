@@ -1,3 +1,28 @@
+add_to_dayzsa() {
+    local atempts max_attempts response
+    attempts=0
+    max_attempts=3
+    while [ $attempts -lt $max_attempts ]; do
+        response=$(curl -s "https://dayzsalauncher.com/api/v1/query/$SERVER_IP:$QUERY_PORT")
+        echo "DayZ SA Launcher registration attempt $((attempts + 1))"
+
+        if echo "$response" | grep -q '"status":0'; then
+            echo "✅ Server successfully registered with DayZ SA Launcher."
+            return 0
+        elif echo "$response" | grep -q '"error":"Timeout has occurred"'; then
+            echo "⚠️ Timeout error, will retry..."
+        else
+            echo "⚠️ Unexpected response, will retry..."
+        fi
+
+        attempts=$((attempts + 1))
+        sleep 10
+    done
+
+    echo "❌ Failed to register server with DayZ SA Launcher after $max_attempts attempts."
+    return 1
+}
+
 sleep 1
 
 cd /home/container
@@ -46,4 +71,20 @@ MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
 
 echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m ${MODIFIED_STARTUP}"
 
+(
+# Sleep to allow initialization without disturbing the log file
+sleep 30
+latest_rpt=$(ls -t serverprofile/*.RPT | head -1 )
+while true; do
+    
+    if grep -q "Initializing spawners" "$latest_rpt"; then
+        echo "Server started, attempting to register with DayZ SA Launcher."
+        add_to_dayzsa &
+        break
+    else
+        echo "Waiting for server to start up before adding to DayzSA Launcher"
+        sleep 20
+    fi
+done
+) &
 eval ${MODIFIED_STARTUP}
