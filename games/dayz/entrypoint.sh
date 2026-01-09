@@ -71,20 +71,22 @@ MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
 
 echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m ${MODIFIED_STARTUP}"
 
-(
-# Sleep to allow initialization without disturbing the log file
-sleep 30
-latest_rpt=$(ls -t serverprofile/*.RPT | head -1 )
-while true; do
-    
-    if grep -q "Initializing spawners" "$latest_rpt"; then
-        echo "Server started, attempting to register with DayZ SA Launcher."
-        add_to_dayzsa &
-        break
-    else
-        echo "Waiting for server to start up before adding to DayzSA Launcher"
-        sleep 20
-    fi
-done
-) &
+if [ "${DAYZSA_AUTO_ADD}" = "1" ]; then
+    (
+    # Sleep to allow initialization without disturbing the log file
+    sleep 30
+    latest_rpt=$(ls -t serverprofile/*.RPT | head -1 )
+    while true; do
+        
+        if grep -q "Initializing spawners" "$latest_rpt"; then
+            echo "Server started, attempting to register with DayZ SA Launcher."
+            add_to_dayzsa &
+            break
+        else
+            echo "Waiting for server to start up before adding to DayzSA Launcher"
+            sleep 20
+        fi
+    done
+    ) &
+fi
 eval ${MODIFIED_STARTUP}
