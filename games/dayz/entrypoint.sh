@@ -47,6 +47,26 @@ RemoveDuplicates() { #[Input: str - Output: printf of new str]
     fi
 }
 
+rotate_log() {
+    local log_path max_rotations base old new
+    log_path="$1"
+    max_rotations=5
+
+    base="${log_path%.log}"
+
+    # Rotate older logs
+    for ((i=max_rotations-1; i>=1; i--)); do
+        old="${base}.${i}.log"
+        new="${base}.$((i + 1)).log"
+        [[ -f "$old" ]] && cp -f "$old" "$new"
+    done
+
+    # Rotate current log
+    [[ -f "$log_path" ]] && cp -f "$log_path" "${base}.1.log"
+
+    rm -f "$log_path"
+}
+
 sleep 1
 
 cd /home/container
@@ -82,6 +102,8 @@ fi
 
 # Add logFile if not present
 grep -q '^logFile' serverDZ.cfg || sed -i '/passwordAdmin = /a logFile = "server_console.log";' serverDZ.cfg
+# Rotate the log so it doesn't bloat up
+rotate_log "serverprofile/server_console.log" 
 
 ## Server update and startup
 if [ "${AUTO_UPDATE}" == "1" ]; then
