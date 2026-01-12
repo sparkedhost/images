@@ -1,3 +1,7 @@
+ZIP_FILE="game${SRCDS_APPID}.zip"
+REMOTE_URL="https://modpack-cdn.sparkedhost.us/games/game${SRCDS_APPID}.zip"
+MOD_FILE=modlist.html
+
 add_to_dayzsa() {
     local atempts max_attempts response
     attempts=0
@@ -23,13 +27,63 @@ add_to_dayzsa() {
     return 1
 }
 
+# Takes a directory (string) as input, and recursively makes all files & folders lowercase.
+ModsLowercase() {
+    echo -e "Making mod $1 files/folders lowercase..."
+    for SRC in `find ./$1 -depth`
+    do
+        DST=`dirname "${SRC}"`/`basename "${SRC}" | tr '[A-Z]' '[a-z]'`
+        if [ "${SRC}" != "${DST}" ]
+        then
+            [ ! -e "${DST}" ] && mv -T "${SRC}" "${DST}"
+        fi
+    done
+}
+
+# Removes duplicate items from a semicolon delimited string
+RemoveDuplicates() { #[Input: str - Output: printf of new str]
+    if [[ -n $1 ]]; then # If nothing to compare, skip to prevent extra semicolon being returned
+        echo $1 | sed -e 's/;/\n/g' | sort -u | xargs printf '%s;'
+    fi
+}
+
 sleep 1
 
 cd /home/container
 
-ZIP_FILE="game${SRCDS_APPID}.zip"
-REMOTE_URL="https://modpack-cdn.sparkedhost.us/games/game${SRCDS_APPID}.zip"
+## Mods
+if [[ -n ${MODS} ]] && [[ ${MODS} != *\; ]]; then # 
+    MODS="${MODS};"
+fi
 
+if [[ -f ${MOD_FILE} ]] && [[ -n "$(cat ${MOD_FILE} | grep 'Created by DayZ Launcher')" ]]; then
+    MODS+=$(cat ${MOD_FILE} | grep 'id=' | cut -d'=' -f3 | cut -d'"' -f1 | xargs printf '@%s;')
+fi
+
+MODS=$(RemoveDuplicates ${MODS}) # Remove duplicate mods from CLIENT_MODS, if present
+
+if [[ -n ${SERVERMODS} ]] && [[ ${SERVERMODS} != *\; ]]; then
+    allMods="${SERVERMODS};"
+else
+    allMods=${SERVERMODS}
+fi
+allMods+=$MODS # Add all client-side mods to the master mod list
+allMods=$(RemoveDuplicates ${allMods}) # Remove duplicate mods from allMods, if present
+allMods=$(echo $allMods | sed -e 's/;/ /g')
+
+# Make mods lowercase, if specified
+if [[ ${MODS_LOWERCASE} == "1" ]]; then
+    for modDir in $allMods; do
+        [[ -d $modDir ]] && ModsLowercase $modDir
+    done
+fi
+
+## Config
+
+# Add logFile if not present
+grep -q '^logFile' serverDZ.cfg || sed -i '/passwordAdmin = /a logFile = "server_console.log";' serverDZ.cfg
+
+## Server update and startup
 if [ "${AUTO_UPDATE}" == "1" ]; then
     if [ -f "${ZIP_FILE}" ]; then
         REMOTE_MODIFIED=$(curl -sI "${REMOTE_URL}" | grep -i "Last-Modified" | sed 's/Last-Modified: //I' | xargs)
