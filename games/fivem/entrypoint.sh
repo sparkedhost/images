@@ -144,10 +144,10 @@ fix_configuration(){
     if [[ -z "$SERVER_CONFIG_FILE" ]]; then
         echo "server.cfg not found in $TXADMIN_SERVER_PATH. Skipping port fix."
     else
-        sed -i -E "s|(endpoint_add_tcp\s+\"0\.0\.0\.0:)[0-9]+\"|\1${SERVER_PORT}\"|g" "$cfg_file"
-        sed -i -E "s|(endpoint_add_udp\s+\"0\.0\.0\.0:)[0-9]+\"|\1${SERVER_PORT}\"|g" "$cfg_file"
+        sed -i -E "s|(endpoint_add_tcp\s+\"0\.0\.0\.0:)[0-9]+\"|\1${SERVER_PORT}\"|g" "$SERVER_CONFIG_FILE"
+        sed -i -E "s|(endpoint_add_udp\s+\"0\.0\.0\.0:)[0-9]+\"|\1${SERVER_PORT}\"|g" "$SERVER_CONFIG_FILE"
 
-        echo "✔ Updated endpoints in: $cfg_file with port $SERVER_PORT"
+        echo "✔ Updated endpoints in: $SERVER_CONFIG_FILE with port $SERVER_PORT"
     fi
 }
 
