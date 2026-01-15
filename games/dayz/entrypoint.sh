@@ -166,7 +166,6 @@ check_mod_update(){
     local last_local_timestamp last_remote_timestamp remote_modified remote_url mod_id=$1
     [[ $MOD_AUTO_UPDATE == "0" ]] && return 0
     echo -e "[MOD_INSTALLATION]: Checking for mod update for $mod_id"
-    remote_url="${REMOTE_MOD_BASE_URL}${mod_id}.zip"
     last_remote_timestamp=$(curl -sL https://steamcommunity.com/sharedfiles/filedetails/changelog/$mod_id | grep '<p id=' | head -1 | cut -d'"' -f2)
 
     last_local_timestamp=$(find "@${mod_id}" -mindepth 1 -print -quit 2>/dev/null | xargs stat -c%Y)
