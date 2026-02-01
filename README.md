@@ -6,6 +6,8 @@
 
 ### Java images
 
+#### Temurin (OpenJDK)
+
 - [`java-jre8`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre8/Dockerfile)
 - [`java-jre11`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre11/Dockerfile)
 - [`java-jre16`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre16/Dockerfile)[^eol]
@@ -16,7 +18,26 @@
 - [`java-jre21`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre21/Dockerfile)
 - [`java-jre22`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre22/Dockerfile)[^eol]
 - [`java-jre23`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre23/Dockerfile)[^eol]
-- [`java-jre24`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre24/Dockerfile)
+- [`java-jre24`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre24/Dockerfile)[^eol]
+- [`java-jre25`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre25/Dockerfile)
+
+#### GraalVM Community Edition
+
+- [`graalvm-19`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-19/Dockerfile)[^eol]
+- [`graalvm-20`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-20/Dockerfile)[^eol]
+- [`graalvm-21`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-21/Dockerfile)[^eol]
+- [`graalvm-22`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-22/Dockerfile)[^eol]
+- [`graalvm-23`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-23/Dockerfile)[^eol]
+- [`graalvm-24`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-24/Dockerfile)[^eol]
+- [`graalvm-25`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-25/Dockerfile)
+
+#### Azul Prime 
+
+- [`azul-prime-17`](https://github.com/sparkedhost/images/blob/main/java/azul-prime/azul-prime-17/Dockerfile)
+- [`azul-prime-19`](https://github.com/sparkedhost/images/blob/main/java/azul-prime/azul-prime-19/Dockerfile)[^eol]
+
+#### Other
+
 - [`anti-malware`](https://github.com/sparkedhost/images/blob/main/java/anti-malware/Dockerfile)[^antimalware]
 
 ### Node.js images
@@ -27,19 +48,20 @@
 - [`nodejs-15`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-15/Dockerfile)[^eol]
 - [`nodejs-16`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-16/Dockerfile)[^eol]
 - [`nodejs-17`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-17/Dockerfile)[^eol]
-- [`nodejs-18`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-18/Dockerfile)
+- [`nodejs-18`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-18/Dockerfile)[^eol]
 - [`nodejs-19`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-19/Dockerfile)[^eol]
 - [`nodejs-20`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-20/Dockerfile)
 - [`nodejs-21`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-21/Dockerfile)[^eol]
 - [`nodejs-22`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-22/Dockerfile)
-- [`nodejs-23`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-23/Dockerfile)
+- [`nodejs-23`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-23/Dockerfile)[^eol]
 - [`nodejs-24`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-24/Dockerfile)
+
 ### Python images
 
 - [`python-3.6`](https://github.com/sparkedhost/images/blob/main/python/python-3.6/Dockerfile)[^eol]
 - [`python-3.7`](https://github.com/sparkedhost/images/blob/main/python/python-3.7/Dockerfile)[^eol]
 - [`python-3.8`](https://github.com/sparkedhost/images/blob/main/python/python-3.8/Dockerfile)[^eol]
-- [`python-3.9`](https://github.com/sparkedhost/images/blob/main/python/python-3.9/Dockerfile)
+- [`python-3.9`](https://github.com/sparkedhost/images/blob/main/python/python-3.9/Dockerfile)[^eol]
 - [`python-3.10`](https://github.com/sparkedhost/images/blob/main/python/python-3.10/Dockerfile)
 - [`python-3.11`](https://github.com/sparkedhost/images/blob/main/python/python-3.11/Dockerfile)
 - [`python-3.12`](https://github.com/sparkedhost/images/blob/main/python/python-3.12/Dockerfile)
@@ -70,7 +92,7 @@
 - [`games-mono`](https://github.com/sparkedhost/images/blob/main/games/mono/Dockerfile)
 - [`games-mta`](https://github.com/sparkedhost/images/blob/main/games/mta/Dockerfile)
 - [`games-fivem`](https://github.com/sparkedhost/images/blob/main/games/fivem/Dockerfile)
-- [`games-fivem`](https://github.com/sparkedhost/images/blob/main/games/project-zomboid/Dockerfile)
+- [`games-project-zomboid`](https://github.com/sparkedhost/images/blob/main/games/project-zomboid/Dockerfile)
 
 
 ### Bot Hosting images
@@ -90,19 +112,18 @@
 - [`dotnet-7`](https://github.com/sparkedhost/images/blob/main/dotnet/dotnet-7/Dockerfile)[^eol]
 - [`dotnet-8`](https://github.com/sparkedhost/images/blob/main/dotnet/dotnet-8/Dockerfile)
 - [`dotnet-9`](https://github.com/sparkedhost/images/blob/main/dotnet/dotnet-9/Dockerfile)
-- [`dotnet-10`](https://github.com/sparkedhost/images/blob/main/dotnet/dotnet-9/Dockerfile)
+- [`dotnet-10`](https://github.com/sparkedhost/images/blob/main/dotnet/dotnet-10/Dockerfile)
+
+### Golang
+
+- [`golang-121`](https://github.com/sparkedhost/images/blob/main/golang/golang-121/Dockerfile)
+- [`golang-124`](https://github.com/sparkedhost/images/blob/main/golang/golang-124/Dockerfile)
 
 ### Generic images
 
 - [`generic-debian`](https://github.com/sparkedhost/images/blob/main/generic/debian/Dockerfile)
 - [`generic-mono`](https://github.com/sparkedhost/images/blob/main/generic/mono/Dockerfile)
 - [`generic-wine`](https://github.com/sparkedhost/images/blob/main/generic/wine/Dockerfile)
-
-### Other images
-
-- [`azul-prime-17`](https://github.com/sparkedhost/images/blob/main/other/azul-prime-17/Dockerfile)
-- [`azul-prime-19`](https://github.com/sparkedhost/images/blob/main/other/azul-prime-19/Dockerfile)[^eol]
-- [`golang-121`](https://github.com/sparkedhost/images/blob/main/golang/golang-121/Dockerfile)
 
 ## Requesting changes
 
