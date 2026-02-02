@@ -3,33 +3,9 @@ REMOTE_URL="https://modpack-cdn.sparkedhost.us/games/game${SRCDS_APPID}.zip"
 MOD_FILE=modlist.html
 SERVER_HOME=/home/container
 STEAMCMD_DIR=$SERVER_HOME/steamcmd
-GAME_ID=221100 
 STEAMCMD_ATTEMPTS=${STEAMCMD_ATTEMPTS:-3} # Default to 3 attempts
 
-add_to_dayzsa() {
-    local atempts max_attempts response
-    attempts=0
-    max_attempts=3
-    while [ $attempts -lt $max_attempts ]; do
-        response=$(curl -s "https://dayzsalauncher.com/api/v1/query/$SERVER_IP:$QUERY_PORT")
-        echo "DayZ SA Launcher registration attempt $((attempts + 1))"
-
-        if echo "$response" | grep -q '"status":0'; then
-            echo "✅ Server successfully registered with DayZ SA Launcher."
-            return 0
-        elif echo "$response" | grep -q '"error":"Timeout has occurred"'; then
-            echo "⚠️ Timeout error, will retry..."
-        else
-            echo "⚠️ Unexpected response, will retry..."
-        fi
-
-        attempts=$((attempts + 1))
-        sleep 10
-    done
-
-    echo "❌ Failed to register server with DayZ SA Launcher after $max_attempts attempts."
-    return 1
-}
+source /spark_utils.sh
 
 RunSteamCMD() { #[Input: int server=0 mod=1; int id]
     local steamcmd_log steamcmd_dir game_id workshop_dir updateAttempt  steamcmdExitCode 
@@ -39,7 +15,6 @@ RunSteamCMD() { #[Input: int server=0 mod=1; int id]
     if [[ -f "${steamcmd_log}" ]]; then
         rm -f "${steamcmd_log:?}"
     fi
-    echo im here
     updateAttempt=0
     while (( $updateAttempt < $STEAMCMD_ATTEMPTS )); do # Loop for specified number of attempts
         # Increment attempt counter
@@ -89,7 +64,7 @@ RunSteamCMD() { #[Input: int server=0 mod=1; int id]
                 echo -e "You have run out of your allotted disk space."
                 echo -e "Please contact your administrator/host for potential storage upgrades."
                 exit 1
-            elif [[ -n $(grep -i "0x606" "${steamcmd_log}") ]]; then # Disk write failure
+            elif [[ -n $(grep -i "0x606" "${modifiedStartup_log}") ]]; then # Disk write failure
                 echo -e "[UPDATE]: Unable to complete download - Disk write failure"
                 echo -e "This is normally caused by directory permissions issues,but could be a more serious hardware issue."
                 echo -e "(Please contact your administrator/host if this issue persists)"
@@ -125,7 +100,7 @@ RunSteamCMD() { #[Input: int server=0 mod=1; int id]
                 sleep 3
             else # Mod
                 echo -e "Final attempt made! Unable to complete mod download/update. Skipping..."
-                echo -e "(You may try again later, or manually upload this mod to your server via SFTP)"
+                echo -e "(You may try again later, or manually upload this mod to your server via SFTP)"c
                 sleep 3
             fi
         fi
@@ -211,69 +186,10 @@ install_update_mods() { #[Input: str list of mods]
     done
 }
 
-rotate_log() {
-    local log_path max_rotations base old new
-    log_path="$1"
-    max_rotations=5
-
-    base="${log_path%.log}"
-
-    # Rotate older logs
-    for ((i=max_rotations-1; i>=1; i--)); do
-        old="${base}.${i}.log"
-        new="${base}.$((i + 1)).log"
-        [[ -f "$old" ]] && cp -f "$old" "$new"
-    done
-
-    # Rotate current log
-    [[ -f "$log_path" ]] && cp -f "$log_path" "${base}.1.log"
-
-    rm -f "$log_path"
-}
-
 sleep 1
 
 [[ ! -d $SERVER_HOME/steamcmd ]] && install_steamcmd
 cd /home/container
-
-## Mods
-if [[ -n ${MODS} ]] && [[ ${MODS} != *\; ]]; then # 
-    MODS="${MODS};"
-fi
-
-if [[ -f ${MOD_FILE} ]] && [[ -n "$(cat ${MOD_FILE} | grep 'Created by DayZ Launcher')" ]]; then
-    MODS+=$(cat ${MOD_FILE} | grep 'id=' | cut -d'=' -f3 | cut -d'"' -f1 | xargs printf '@%s;')
-fi
-
-MODS=$(RemoveDuplicates ${MODS}) # Remove duplicate mods from CLIENT_MODS, if present
-
-if [[ -n ${SERVERMODS} ]] && [[ ${SERVERMODS} != *\; ]]; then
-    allMods="${SERVERMODS};"
-else
-    allMods=${SERVERMODS}
-fi
-
-allMods+=$MODS # Add all client-side mods to the master mod list
-allMods=$(RemoveDuplicates ${allMods}) # Remove duplicate mods from allMods, if present
-allMods=$(echo $allMods | sed -e 's/;/ /g')
-
-install_update_mods "$allMods"
-
-# Make mods lowercase, if specified
-if [[ ${MODS_LOWERCASE} == "1" ]]; then
-    for modDir in $allMods; do
-        [[ -d $modDir ]] && ModsLowercase $modDir
-    done
-fi
-
-## Config
-
-# Add logFile if not present
-grep -q '^logFile' serverDZ.cfg || sed -i '/passwordAdmin = /a logFile = "server_console.log";' serverDZ.cfg
-grep -q '^steamQueryPort' serverDZ.cfg || sed -i '/passwordAdmin = /a steamQueryPort = '"${STEAM_QUERY_PORT}"';' serverDZ.cfg
-
-# Rotate the log so it doesn't bloat up
-rotate_log "serverprofile/server_console.log" 
 
 ## Server update and startup
 if [ "${AUTO_UPDATE}" == "1" ]; then
@@ -306,33 +222,4 @@ else
 fi
 
 chmod +x ./${SERVER_BINARY}
-
-# Setup NSS Wrapper for use ($NSS_WRAPPER_PASSWD and $NSS_WRAPPER_GROUP have been set by the Dockerfile)
-export USER_ID=$(id -u)
-export GROUP_ID=$(id -g)
-envsubst < /passwd.template > ${NSS_WRAPPER_PASSWD}
-export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libnss_wrapper.so
-
-MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
-
-echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m ${MODIFIED_STARTUP}"
-
-if [ "${DAYZSA_AUTO_ADD}" = "1" ]; then
-    (
-    # Sleep to allow initialization without disturbing the log file
-    sleep 30
-    latest_rpt=$(ls -t serverprofile/*.RPT | head -1 )
-    while true; do
-        
-        if grep -q "Initializing spawners" "$latest_rpt"; then
-            echo "Server started, attempting to register with DayZ SA Launcher."
-            add_to_dayzsa &
-            break
-        else
-            echo "Waiting for server to start up before adding to DayzSA Launcher"
-            sleep 20
-        fi
-    done
-    ) &
-fi
-eval ${MODIFIED_STARTUP}
+startup_game
