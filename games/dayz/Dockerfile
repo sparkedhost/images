@@ -39,5 +39,6 @@ WORKDIR     /home/container
 STOPSIGNAL  SIGINT
 
 COPY ./dayz/entrypoint.sh /entrypoint.sh
+COPY ./dayz/spark_utils.sh /spark_utils.sh
 ENTRYPOINT  ["/usr/bin/tini", "-g", "--"]
 CMD ["/bin/bash", "/entrypoint.sh"]
