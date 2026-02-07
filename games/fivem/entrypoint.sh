@@ -151,9 +151,152 @@ fix_configuration(){
     fi
 }
 
+check_license() {
+    if [[ -z "$FIVEM_LICENSE" || ${#FIVEM_LICENSE} -ne 32 || "$FIVEM_LICENSE" != cfx* ]]; then
+        echo "Incorrect license key format, please change it in the Startup tab on the panel."
+        exit 0
+    fi
+}
+
+prevent_malware() {
+  if [ -f server.cfg ] && [ -s server.cfg ]; then
+    mkdir -p resources/prevent_malware
+
+    # Build the bad thread names array for JS
+    local extra_threads=""
+    if [[ -n "$BAD_THREAD_NAMES" ]]; then
+      extra_threads=", $BAD_THREAD_NAMES"
+    fi
+
+    cat << EOF > ./resources/prevent_malware/prevent_malware.js
+setImmediate(() => {
+  const badThreadNames = ["miaus", "miauss", "miausss", "miaussss"${extra_threads}];
+
+  globalThis.GlobalState = globalThis.GlobalState || {};
+  for (const name of badThreadNames) {
+    globalThis.GlobalState[name] = "RocketNodePrevention";
+  }
+  console.log("Prevented malware from starting");
+
+  const fix = () => {
+    for (const name of badThreadNames) {
+      globalThis.GlobalState[name] = "RocketNodePrevention";
+    }
+    setTimeout(fix, 1000);
+  };
+
+  setTimeout(fix, 1000);
+});
+EOF
+
+    cat << 'EOF' > ./resources/prevent_malware/fxmanifest.lua
+fx_version 'cerulean'
+game 'gta5'
+
+author 'RocketNode'
+description 'Prevent malware'
+version '1.0.0'
+
+server_script {
+    'prevent_malware.js'
+}
+EOF
+
+    if ! grep -q 'ensure prevent_malware' server.cfg; then
+      sed -i '1i\ensure prevent_malware' server.cfg
+    fi
+  fi
+}
+
+malware_scan() {
+  [[ $ENABLE_MALWARE_SCANNER == 0 ]] && return 0
+  local dirs=()
+  local known_malware_found=0 potential_malware_found=0
+  local system_resources_count potential_patterns malware_count=0
+  [[ -d alpine ]] && dirs+=("alpine")
+  [[ -d resources ]] && dirs+=("resources")
+  
+  if [[ ${#dirs[@]} -eq 0 ]]; then
+    return 0 
+  fi
+
+  # There should only be 2 system resources, chat and monitor
+  system_resources_count=$(find alpine/opt/cfx-server/citizen/system_resources -mindepth 1 -maxdepth 1 -type d | wc -l)
+  echo "[Malware Scanner] Found ${system_resources_count} system resources"
+
+  third_folder=$(find alpine/opt/cfx-server/citizen/system_resources -mindepth 1 -maxdepth 1 -type d \
+  -printf '%f\n' | grep -Ev '^(chat|monitor)$'
+  )
+
+  # If we have a third system resource this means we are infected
+  if [[ -d alpine/opt/cfx-server/citizen/system_resources/${third_folder} ]]; then
+    if grep -RIPln --include='*.js' --exclude-dir=monitor '\\u[0-9a-fA-F]{4}([^\n]*\\u[0-9a-fA-F]{4}){14,}' alpine/opt/cfx-server/citizen/system_resources/${third_folder} >/dev/null 2>/dev/null; then
+      echo "[Malware Scanner] Found malware in alpine/opt/cfx-server/citizen/system_resources/${third_folder}"
+      known_malware_found=1
+      malware_count=$((malware_count + 1))
+    fi
+  fi
+
+  # Known patterns, very crude method but there's plenty of normal resources with obfuscated javascript unfortunately so detection is difficult
+  echo "[Malware Scanner] Checking for known malware patterns"
+
+  known_patterns=('Function("a","var b,ahA,ahB,ahC,__' 'const _xo="\\u0072\\u0064\\u0075\\u0' "sub(87565):gsub('%.%+', '')" )
+  for pattern in "${known_patterns[@]}"; do
+    if grep -RlF --include='*.js' --include='*.lua' "$pattern" ${dirs[@]} >/dev/null 2>/dev/null; then
+      malware_count=$((malware_count + 1))
+      echo "[Malware Scanner] $malware_count Malware Found"
+      echo "[Malware Scanner] Please wait while log files are generated for support."
+      grep -RlF --include='*.js' --include='*.lua' "$pattern" ${dirs[@]} 2>/dev/null >> rocketnode_malware_scan.log
+      echo "[Malware Scanner] Log file generated."
+      known_malware_found=1
+      
+    fi
+  done
+
+  potential_patterns=('/* [' 'Buffer.from(b64' 'new Function(code)();') 
+  for pattern in "${potential_patterns[@]}"; do
+    if grep -RlF --exclude-dir='\[builders\]' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='webpack' --exclude-dir='yarn' --include='*.js' "$pattern" ${dirs[@]} >/dev/null 2>/dev/null; then
+      echo "[Malware Scanner] Please wait while log files are generated for support."
+      grep -RlF --exclude-dir='\[builders\]' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='webpack' --exclude-dir='yarn' --include='*.js' "$pattern" ${dirs[@]} 2>/dev/null >> rocketnode_malware_scan_potential.log
+      echo "[Malware Scanner] Log file generated, please contact support!"
+      potential_malware_found=1
+    fi
+  done
+  echo "[Malware Scanner] Scanning for potentially malicious files. There can be false positives here. This can take a moment..."
+
+  while IFS= read -r -d '' ttf_file; do
+    if ! file "$ttf_file" | grep -iq 'font data'; then
+      echo "[Malware Scanner] Malware detected! $ttf_file"
+      echo "$ttf_file" >> rocketnode_malware_scan_fonts.log
+      known_malware_found=1
+    fi
+  done < <(find ${dirs[@]} -type f -name '*.ttf' -size +0c -print0 2>/dev/null)
+  
+  # This can have a lot of false positives, but it can help us catch some of the infected javascript files
+  
+  if grep -RPInl -m 1 --exclude-dir='[[]builders[]]' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='webpack' --exclude-dir='yarn' --include='*.js' -P '(^|[^a-zA-Z0-9_])\b(eval\s*\(|(?<!new\s)Function\s*\()' ${dirs[@]} >/dev/null 2>/dev/null; then
+    echo "[Malware Scanner] Please wait while log files are generated for support."
+    grep -RPInl -m 1 --exclude-dir='[[]builders[]]' --exclude-dir='webpack' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='yarn' --include='*.js' -P '(^|[^a-zA-Z0-9_])\b(eval\s*\(|(?<!new\s)Function\s*\()' ${dirs[@]} > rocketnode_malware_scan_potential.log 2>/dev/null
+    echo "[Malware Scanner] Log file generated, please contact support!"
+    potential_malware_found=1
+  fi
+  
+  if [[ $known_malware_found -eq 1 ]];then 
+    echo "[Malware Scanner] $malware_count Malware found"
+    echo "[Malware Scanner] Server will not start up to prevent further damage to your files. Please contact support - https://discord.gg/rocketnode"
+    sleep 999999999
+    exit 0 
+  fi
+  if [[ $potential_malware_found -eq 1 ]];then 
+    echo "[Malware Scanner] Malware possibly found, but it could be a false positive from a normal resource. This can find a lot of false positives, so don't worry too much."
+    echo "[Malware Scanner] Waiting for 60 seconds before starting the server. You can contact support if you have worries - https://discord.gg/rocketnode"
+    sleep 60
+  fi
+}
+
 sleep 5
 cd /home/container
-
+check_license
 if [[ ${UPDATE_SERVER} == 1 ]]; then
     case $AUTO_UPDATE_CHOICE in
         both)
@@ -173,7 +316,9 @@ fix_missing_artifacts
 fix_default_resources
 fix_configuration
 add_logo 
-
+prevent_malware 
+malware_scan
+check_license
 mkdir -p logs/
 
 MODIFIED_STARTUP=$(echo "${STARTUP}" | sed -e 's/{{/${/g' -e 's/}}/}/g')
