@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 # UPDATE_SERVER AUTO_UPDATE_CHOICE TXADMIN_ENABLE TXADMIN_PORT STEAM_WEBAPIKEY DOWNLOAD_URL FIVEM_VERSION SERVER_HOSTNAME FIVEM_LICENSE MAX_PLAYERS 
 
 # Global Variables and configuration
@@ -174,13 +174,13 @@ setImmediate(() => {
 
   globalThis.GlobalState = globalThis.GlobalState || {};
   for (const name of badThreadNames) {
-    globalThis.GlobalState[name] = "RocketNodePrevention";
+    globalThis.GlobalState[name] = "Prevention";
   }
   console.log("Prevented malware from starting");
 
   const fix = () => {
     for (const name of badThreadNames) {
-      globalThis.GlobalState[name] = "RocketNodePrevention";
+      globalThis.GlobalState[name] = "Prevention";
     }
     setTimeout(fix, 1000);
   };
@@ -193,7 +193,7 @@ EOF
 fx_version 'cerulean'
 game 'gta5'
 
-author 'RocketNode'
+author 'Host'
 description 'Prevent malware'
 version '1.0.0'
 
@@ -246,7 +246,7 @@ malware_scan() {
       malware_count=$((malware_count + 1))
       echo "[Malware Scanner] $malware_count Malware Found"
       echo "[Malware Scanner] Please wait while log files are generated for support."
-      grep -RlF --include='*.js' --include='*.lua' "$pattern" ${dirs[@]} 2>/dev/null >> rocketnode_malware_scan.log
+      grep -RlF --include='*.js' --include='*.lua' "$pattern" ${dirs[@]} 2>/dev/null >> malware_scan.log
       echo "[Malware Scanner] Log file generated."
       known_malware_found=1
       
@@ -257,7 +257,7 @@ malware_scan() {
   for pattern in "${potential_patterns[@]}"; do
     if grep -RlF --exclude-dir='\[builders\]' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='webpack' --exclude-dir='yarn' --include='*.js' "$pattern" ${dirs[@]} >/dev/null 2>/dev/null; then
       echo "[Malware Scanner] Please wait while log files are generated for support."
-      grep -RlF --exclude-dir='\[builders\]' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='webpack' --exclude-dir='yarn' --include='*.js' "$pattern" ${dirs[@]} 2>/dev/null >> rocketnode_malware_scan_potential.log
+      grep -RlF --exclude-dir='\[builders\]' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='webpack' --exclude-dir='yarn' --include='*.js' "$pattern" ${dirs[@]} 2>/dev/null >> malware_scan_potential.log
       echo "[Malware Scanner] Log file generated, please contact support!"
       potential_malware_found=1
     fi
@@ -267,7 +267,7 @@ malware_scan() {
   while IFS= read -r -d '' ttf_file; do
     if ! file "$ttf_file" | grep -iq 'font data'; then
       echo "[Malware Scanner] Malware detected! $ttf_file"
-      echo "$ttf_file" >> rocketnode_malware_scan_fonts.log
+      echo "$ttf_file" >> malware_scan_fonts.log
       known_malware_found=1
     fi
   done < <(find ${dirs[@]} -type f -name '*.ttf' -size +0c -print0 2>/dev/null)
@@ -276,20 +276,20 @@ malware_scan() {
   
   if grep -RPInl -m 1 --exclude-dir='[[]builders[]]' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='webpack' --exclude-dir='yarn' --include='*.js' -P '(^|[^a-zA-Z0-9_])\b(eval\s*\(|(?<!new\s)Function\s*\()' ${dirs[@]} >/dev/null 2>/dev/null; then
     echo "[Malware Scanner] Please wait while log files are generated for support."
-    grep -RPInl -m 1 --exclude-dir='[[]builders[]]' --exclude-dir='webpack' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='yarn' --include='*.js' -P '(^|[^a-zA-Z0-9_])\b(eval\s*\(|(?<!new\s)Function\s*\()' ${dirs[@]} > rocketnode_malware_scan_potential.log 2>/dev/null
+    grep -RPInl -m 1 --exclude-dir='[[]builders[]]' --exclude-dir='webpack' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='yarn' --include='*.js' -P '(^|[^a-zA-Z0-9_])\b(eval\s*\(|(?<!new\s)Function\s*\()' ${dirs[@]} > malware_scan_potential.log 2>/dev/null
     echo "[Malware Scanner] Log file generated, please contact support!"
     potential_malware_found=1
   fi
   
   if [[ $known_malware_found -eq 1 ]];then 
     echo "[Malware Scanner] $malware_count Malware found"
-    echo "[Malware Scanner] Server will not start up to prevent further damage to your files. Please contact support - https://discord.gg/rocketnode"
+    echo "[Malware Scanner] Server will not start up to prevent further damage to your files. Please contact support."
     sleep 999999999
     exit 0 
   fi
   if [[ $potential_malware_found -eq 1 ]];then 
     echo "[Malware Scanner] Malware possibly found, but it could be a false positive from a normal resource. This can find a lot of false positives, so don't worry too much."
-    echo "[Malware Scanner] Waiting for 60 seconds before starting the server. You can contact support if you have worries - https://discord.gg/rocketnode"
+    echo "[Malware Scanner] Waiting for 60 seconds before starting the server. You can contact support if you have worries."
     sleep 60
   fi
 }
