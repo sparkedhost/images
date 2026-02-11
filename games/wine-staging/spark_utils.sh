@@ -46,7 +46,7 @@ install_bepinex() {
         return 0
     fi
 
-    wget --content-disposition "$download_url"
+    wget -O "${zip_name}" "$download_url"
     unzip -o "${zip_name}"
     cp -al "/home/container/${extracted_dir}/"* /home/container
 
