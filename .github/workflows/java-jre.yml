@@ -1,4 +1,4 @@
-name: Build Java JRE Images
+name: Build Java JRE
 
 on:
   workflow_dispatch:
@@ -7,17 +7,16 @@ on:
       - main
     paths:
       - "java/temurin/**/*"
-      - "java/entrypoint.sh"
-      - ".github/workflows/java-jre.yml"
+      - java/entrypoint.sh
+      - .github/workflows/java-jre.yml
 
 jobs:
   build:
-    name: "Java JRE ${{ matrix.java_version }}"
-    runs-on: ubuntu-latest
+    name: "Java JRE ${{ matrix.version }}"
     strategy:
       fail-fast: false
       matrix:
-        java_version:
+        version:
           - 8
           - 11
           - 16
@@ -30,23 +29,9 @@ jobs:
           - 23
           - 24
           - 25
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
-        with:
-          version: "v0.9.1"
-          buildkitd-flags: --debug
-      - uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/build-push-action@v3
-        with:
-          context: ./java
-          file: ./java/temurin/java-jre${{ matrix.java_version }}/Dockerfile
-          platforms: linux/amd64
-          push: true
-          tags: |
-            ghcr.io/sparkedhost/images:java-jre${{ matrix.java_version }}
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      context: ./java
+      file: ./java/temurin/java-jre${{ matrix.version }}/Dockerfile
+      tags: ghcr.io/sparkedhost/images:java-jre${{ matrix.version }}
+    secrets: inherit

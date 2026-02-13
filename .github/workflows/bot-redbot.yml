@@ -1,32 +1,18 @@
-name: Build But Redbot image
+name: Build Bot Redbot
+
 on:
   workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - bot/redbot/*
+      - "bot/redbot/*"
       - .github/workflows/bot-redbot.yml
+
 jobs:
-  push:
-    name: "Bot Redbot"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
-        with:
-          version: "v0.9.1"
-          buildkitd-flags: --debug
-      - uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/build-push-action@v3
-        with:
-          context: ./bot/redbot
-          file: ./bot/redbot/Dockerfile
-          platforms: linux/amd64
-          push: true
-          tags: |
-            ghcr.io/sparkedhost/images:bot-redbot
+  build:
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      context: ./bot/redbot
+      file: ./bot/redbot/Dockerfile
+      tags: ghcr.io/sparkedhost/images:bot-redbot

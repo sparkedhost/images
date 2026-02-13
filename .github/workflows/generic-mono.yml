@@ -1,33 +1,19 @@
 name: Build generic-mono
+
 on:
   workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - generic/mono/*
+      - "generic/mono/*"
       - generic/entrypoint.sh
       - .github/workflows/generic-mono.yml
+
 jobs:
-  push:
-    name: "generic-mono"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
-        with:
-          version: "v0.9.1"
-          buildkitd-flags: --debug
-      - uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/build-push-action@v3
-        with:
-          context: ./generic
-          file: ./generic/mono/Dockerfile
-          platforms: linux/amd64
-          push: true
-          tags: |
-            ghcr.io/sparkedhost/images:generic-mono
+  build:
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      context: ./generic
+      file: ./generic/mono/Dockerfile
+      tags: ghcr.io/sparkedhost/images:generic-mono
