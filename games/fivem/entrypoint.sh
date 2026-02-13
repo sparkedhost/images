@@ -152,7 +152,7 @@ fix_configuration(){
 }
 
 check_license() {
-    if [[ -z "$FIVEM_LICENSE" || ( ${#FIVEM_LICENSE} -ne 32 && ${#FIVEM_LICENSE} -ne 33 ) || "$FIVEM_LICENSE" != cfx* ]]; then
+    if [[ -z "$FIVEM_LICENSE" || ${#FIVEM_LICENSE} -lt 25 || ${#FIVEM_LICENSE} -gt 35 ]]; then
         echo "Incorrect license key format, please change it in the Startup tab on the panel."
         exit 0
     fi
