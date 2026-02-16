@@ -1,5 +1,5 @@
 sleep 1
-
+source /spark_utils.sh
 cd /home/container
 
 if [ "${AUTO_UPDATE}" == "1" ]; then 
@@ -52,6 +52,8 @@ for trick in $WINETRICKS_RUN; do
         winetricks -q $trick
 done
 
+[[ $INSTALL_BEPINEX -eq 1 ]] && install_bepinex
+game_pre_startup
 
 MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
 
