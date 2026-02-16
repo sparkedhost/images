@@ -283,7 +283,7 @@ startup_dayz(){
     mods_lowercase
     # Add logFile if not present
     grep -q '^logFile' serverDZ.cfg || sed -i '/passwordAdmin = /a logFile = "server_console.log";' serverDZ.cfg
-    grep -q '^steamQueryPort' serverDZ.cfg || sed -i '/passwordAdmin = /a steamQueryPort = '"${STEAM_QUERY_PORT}"';' serverDZ.cfg
+    grep -q '^steamQueryPort' serverDZ.cfg || sed -i '/passwordAdmin = /a steamQueryPort = '"${QUERY_PORT}"';' serverDZ.cfg
 
     # Rotate the log so it doesn't bloat up
     rotate_log "serverprofile/server_console.log" 
