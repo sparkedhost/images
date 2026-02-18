@@ -3,7 +3,7 @@
 # Image: ghcr.io/sparkedhost/images:java-jre22
 # ----------------------------------
 
-FROM        debian:bookworm-slim
+FROM        debian:trixie-slim
 
 LABEL       author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
