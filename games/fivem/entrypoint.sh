@@ -86,7 +86,8 @@ generate_download_link(){
         TARGET_VERSION=$(echo "$changelogs_page" | jq -r '.latest')
         DOWNLOAD_LINK=$(echo "$changelogs_page" | jq -r '.latest_download')
     else
-        version_link=$(echo "${release_page}" | grep -Eo '".*/*.tar.xz"' | sed 's/\"//g' | sed 's/\.\///1' | grep -i "${FIVEM_VERSION}" | grep -o =.* | tr -d '=')
+    
+        version_link=$(echo -e "${release_page}" | grep -Eo '".*/*.tar.xz"' | grep -Eo '".*/*.tar.xz"' | sed 's/\"//g' | sed 's/\.\///1' | grep -iw "${FIVEM_VERSION}" | grep -o =.* | tr -d '=')
         if [[ -z "$version_link" ]]; then
             echo "Defaulting to recommended version as the requested version was invalid."
             TARGET_VERSION=$(echo "$changelogs_page" | jq -r '.recommended')
