@@ -253,7 +253,7 @@ malware_scan() {
     fi
   done
 
-  potential_patterns=('/* [' 'Buffer.from(b64' 'new Function(code)();') 
+  potential_patterns=('/* [' 'Buffer.from(b64' 'new Function(code)();' 'fromCharCode(104,116,116,112,115' "require('vm').runInThisContext" ) 
   for pattern in "${potential_patterns[@]}"; do
     if grep -RlF --exclude-dir='\[builders\]' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='webpack' --exclude-dir='yarn' --include='*.js' "$pattern" ${dirs[@]} >/dev/null 2>/dev/null; then
       echo "[Malware Scanner] Please wait while log files are generated for support."
