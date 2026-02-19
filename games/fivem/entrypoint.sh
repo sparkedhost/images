@@ -75,9 +75,21 @@ fix_missing_artifacts(){
 }
 
 generate_download_link(){
-    local release_page changelogs_page version_link
+    local release_page changelogs_page version_link latest_version forced_version
+    local -A LATEST_VERSION_FALLBACKS=(
+        ["25988"]="25987"
+    )
     release_page=$(curl -sSL https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/)
     changelogs_page=$(curl -sSL https://changelogs-live.fivem.net/api/changelog/versions/linux/server)
+
+    if [[ "${FIVEM_VERSION}" == "latest" ]]; then
+        latest_version=$(echo "$changelogs_page" | jq -r '.latest')
+        forced_version="${LATEST_VERSION_FALLBACKS[$latest_version]}"
+        if [[ -n "$forced_version" ]]; then
+            echo "Latest reported as ${latest_version}. Forcing FIVEM_VERSION=${forced_version}."
+            FIVEM_VERSION="$forced_version"
+        fi
+    fi
 
     if [[ "${FIVEM_VERSION}" == "recommended" || -z "${FIVEM_VERSION}" ]]; then
         TARGET_VERSION=$(echo "$changelogs_page" | jq -r '.recommended')
