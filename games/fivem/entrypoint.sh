@@ -91,50 +91,42 @@ generate_download_link(){
         fi
     fi
 
-    if [[ "${FIVEM_VERSION}" == "recommended" || -z "${FIVEM_VERSION}" ]]; then
-        DOWNLOAD_LINK=$(curl -s https://artifacts.jgscripts.com/ | grep "https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/[0-9]*-[\\w]*/fx.tar.xz" -oP | head -1) # JG Scripts recommended version, trustworthy and tested
-        TARGET_VERSION=$(echo "$DOWNLOAD_LINK" | sed -nE 's#^.*/master/([^/]+)/fx\.tar\.xz$#\1#p')
-        if [[ -z "$DOWNLOAD_LINK" || -z "$TARGET_VERSION" ]]; then
-            echo "JG recommended artifact lookup failed. Falling back to changelog recommended."
-            TARGET_VERSION=$(echo "$changelogs_page" | jq -r '.recommended')
-            DOWNLOAD_LINK=$(echo "$changelogs_page" | jq -r '.recommended_download')
-        fi
-    elif [[ "${FIVEM_VERSION}" == "latest" ]]; then
-        TARGET_VERSION=$(echo "$changelogs_page" | jq -r '.latest')
-        DOWNLOAD_LINK=$(echo "$changelogs_page" | jq -r '.latest_download')
-    else
     
-        version_link=$(echo -e "${release_page}" | grep -Eo '".*/*.tar.xz"' | grep -Eo '".*/*.tar.xz"' | sed 's/\"//g' | sed 's/\.\///1' | grep -iw "${FIVEM_VERSION}" | grep -o =.* | tr -d '=')
-        if [[ -z "$version_link" ]]; then
-            echo "Defaulting to recommended version as the requested version was invalid."
+    case $FIVEM_VERSION in
+        latest)
+            TARGET_VERSION=$(echo "$changelogs_page" | jq -r '.latest')
+            DOWNLOAD_LINK=$(echo "$changelogs_page" | jq -r '.latest_download')
+        ;;
+        recommended)
             DOWNLOAD_LINK=$(curl -s https://artifacts.jgscripts.com/ | grep "https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/[0-9]*-[\\w]*/fx.tar.xz" -oP | head -1) # JG Scripts recommended version, trustworthy and tested
             TARGET_VERSION=$(echo "$DOWNLOAD_LINK" | sed -nE 's#^.*/master/([^/]+)/fx\.tar\.xz$#\1#p')
-            if [[ -z "$DOWNLOAD_LINK" || -z "$TARGET_VERSION" ]]; then
-                echo "JG recommended artifact lookup failed. Falling back to changelog recommended."
-                TARGET_VERSION=$(echo "$changelogs_page" | jq -r '.recommended')
-                DOWNLOAD_LINK=$(echo "$changelogs_page" | jq -r '.recommended_download')
-            fi
-        else
+        ;;
+        *)
+            [[ -z "${FIVEM_VERSION}" ]] && return 0
+            version_link=$(echo -e "${release_page}" | grep -Eo '".*/*.tar.xz"' | grep -Eo '".*/*.tar.xz"' | sed 's/\"//g' | sed 's/\.\///1' | grep -iw "${FIVEM_VERSION}" | grep -o =.* | tr -d '=')
             TARGET_VERSION="${version_link}"
             DOWNLOAD_LINK="https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${version_link}"
-        fi
+        
+        ;;
+    esac
+    if [[ -z "${TARGET_VERSION}" || -z "${DOWNLOAD_LINK}" ]]; then
+        echo "Download link not found, skipping update." 
+        return 0
     fi
-
-    if [[ -n "${DOWNLOAD_URL}" ]]; then
-        if curl --output /dev/null --silent --head --fail "${DOWNLOAD_URL}"; then
-            echo "Overriding download link with DOWNLOAD_URL."
-            DOWNLOAD_LINK="${DOWNLOAD_URL}"
-        else
-            echo "DOWNLOAD_URL is invalid. Exiting."
-            exit 2
-        fi
+    if curl --output /dev/null --silent --head --fail "${DOWNLOAD_URL}"; then
+        echo "Overriding download link with DOWNLOAD_URL."
+        DOWNLOAD_LINK="${DOWNLOAD_URL}"
     fi
+    
 }
 
 update_artifacts(){
     local filetype
     generate_download_link # Gives us DOWNLOAD_LINK and TARGET_VERSION globals
-
+    if [[ -z "${TARGET_VERSION}" || -z "${DOWNLOAD_LINK}" ]]; then
+        echo "Download link not found, skipping update."
+        return 0
+    fi
     echo "Current installed version: $LAST_VERSION"
     echo "Target version: $TARGET_VERSION"
 
@@ -155,7 +147,7 @@ update_artifacts(){
         tar xvf "${DOWNLOAD_LINK##*/}"
     else
         echo "Unknown filetype: $filetype. Exiting."
-        exit 2
+        return 0
     fi
 
     rm -rf "${DOWNLOAD_LINK##*/}" run.sh
