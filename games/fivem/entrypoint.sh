@@ -92,8 +92,13 @@ generate_download_link(){
     fi
 
     if [[ "${FIVEM_VERSION}" == "recommended" || -z "${FIVEM_VERSION}" ]]; then
-        TARGET_VERSION=$(echo "$changelogs_page" | jq -r '.recommended')
-        DOWNLOAD_LINK=$(echo "$changelogs_page" | jq -r '.recommended_download')
+        DOWNLOAD_LINK=$(curl -s https://artifacts.jgscripts.com/ | grep "https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/[0-9]*-[\\w]*/fx.tar.xz" -oP | head -1) # JG Scripts recommended version, trustworthy and tested
+        TARGET_VERSION=$(echo "$DOWNLOAD_LINK" | sed -nE 's#^.*/master/([^/]+)/fx\.tar\.xz$#\1#p')
+        if [[ -z "$DOWNLOAD_LINK" || -z "$TARGET_VERSION" ]]; then
+            echo "JG recommended artifact lookup failed. Falling back to changelog recommended."
+            TARGET_VERSION=$(echo "$changelogs_page" | jq -r '.recommended')
+            DOWNLOAD_LINK=$(echo "$changelogs_page" | jq -r '.recommended_download')
+        fi
     elif [[ "${FIVEM_VERSION}" == "latest" ]]; then
         TARGET_VERSION=$(echo "$changelogs_page" | jq -r '.latest')
         DOWNLOAD_LINK=$(echo "$changelogs_page" | jq -r '.latest_download')
@@ -102,8 +107,13 @@ generate_download_link(){
         version_link=$(echo -e "${release_page}" | grep -Eo '".*/*.tar.xz"' | grep -Eo '".*/*.tar.xz"' | sed 's/\"//g' | sed 's/\.\///1' | grep -iw "${FIVEM_VERSION}" | grep -o =.* | tr -d '=')
         if [[ -z "$version_link" ]]; then
             echo "Defaulting to recommended version as the requested version was invalid."
-            TARGET_VERSION=$(echo "$changelogs_page" | jq -r '.recommended')
-            DOWNLOAD_LINK=$(echo "$changelogs_page" | jq -r '.recommended_download')
+            DOWNLOAD_LINK=$(curl -s https://artifacts.jgscripts.com/ | grep "https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/[0-9]*-[\\w]*/fx.tar.xz" -oP | head -1) # JG Scripts recommended version, trustworthy and tested
+            TARGET_VERSION=$(echo "$DOWNLOAD_LINK" | sed -nE 's#^.*/master/([^/]+)/fx\.tar\.xz$#\1#p')
+            if [[ -z "$DOWNLOAD_LINK" || -z "$TARGET_VERSION" ]]; then
+                echo "JG recommended artifact lookup failed. Falling back to changelog recommended."
+                TARGET_VERSION=$(echo "$changelogs_page" | jq -r '.recommended')
+                DOWNLOAD_LINK=$(echo "$changelogs_page" | jq -r '.recommended_download')
+            fi
         else
             TARGET_VERSION="${version_link}"
             DOWNLOAD_LINK="https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${version_link}"
