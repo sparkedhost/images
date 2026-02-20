@@ -304,8 +304,8 @@ malware_scan() {
   fi
   if [[ $potential_malware_found -eq 1 ]];then 
     echo "[Malware Scanner] Malware possibly found, but it could be a false positive from a normal resource. This can find a lot of false positives, so don't worry too much."
-    echo "[Malware Scanner] Waiting for 60 seconds before starting the server. You can contact support if you have worries."
-    sleep 60
+    echo "[Malware Scanner] Waiting for 20 seconds before starting the server. You can contact support if you have worries."
+    sleep 20
   fi
 }
 
