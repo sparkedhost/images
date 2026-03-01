@@ -3,7 +3,7 @@
 # Image: ghcr.io/sparkedhost/images:bot-lavalink
 # ----------------------------------
 
-FROM        openjdk:17-slim
+FROM        eclipse-temurin:25-jdk-jammy
 
 LABEL       author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
