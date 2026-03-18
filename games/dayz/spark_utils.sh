@@ -157,7 +157,7 @@ solve_mods(){
 install_update_mods() { #[Input: str list of mods]
     local latest_update update_available mod_missing
     [[ -z $1 ]] && return
-    [[ $1 -eq 0 ]] && return
+    [[ $1 == 0 ]] && return
     echo -e "[MOD_INSTALLATION]: Checking for missing mods"
     for modID in $(echo "$1" | sed -e 's/@//g'); do
         if [[ $modID =~ ^[0-9]+$ ]]; then # Only check mods that are in ID-form
