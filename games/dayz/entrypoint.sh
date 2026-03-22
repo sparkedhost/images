@@ -8,6 +8,25 @@ source /spark_utils.sh
 
 sleep 1
 
+unzip_game_files() {
+    if [[ "${SRCDS_APPID}" == "223350" ]]; then
+        local unzip_excludes=()
+
+        [[ -f "dayzsetting.xml" ]] && unzip_excludes+=("dayzsetting.xml")
+        [[ -f "serverDZ.cfg" ]] && unzip_excludes+=("serverDZ.cfg")
+        [[ -f "ban.txt" ]] && unzip_excludes+=("ban.txt")
+        [[ -f "whitelist.txt" ]] && unzip_excludes+=("whitelist.txt")
+
+        if [[ ${#unzip_excludes[@]} -gt 0 ]]; then
+            unzip -o "${ZIP_FILE}" -x "${unzip_excludes[@]}"
+            return
+        fi
+    fi
+
+    unzip -o "${ZIP_FILE}"
+}
+
+
 [[ ! -d $SERVER_HOME/steamcmd ]] && install_steamcmd
 cd /home/container
 
@@ -27,7 +46,7 @@ if [ "${AUTO_UPDATE}" == "1" ]; then
                 rm -f "${ZIP_FILE}"
                 exit 1
             fi
-            unzip -o "${ZIP_FILE}"
+            unzip_game_files
         fi
     else
         wget -q -O "${ZIP_FILE}" "${REMOTE_URL}"
@@ -35,7 +54,7 @@ if [ "${AUTO_UPDATE}" == "1" ]; then
             rm -f "${ZIP_FILE}"
             exit 1
         fi
-        unzip -o "${ZIP_FILE}"
+            unzip_game_files
     fi
 else
     echo -e "Not updating game server as auto update is off. Starting Server"
