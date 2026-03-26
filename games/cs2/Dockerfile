@@ -7,7 +7,7 @@ FROM registry.gitlab.steamos.cloud/steamrt/sniper/platform
 LABEL author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
 RUN apt-get update && \
-	apt-get install -y --no-install-recommends libstdc++6 libgcc-s1 lib32gcc-s1 libc6-i386 
+	apt-get install -y --no-install-recommends libstdc++6 libgcc-s1 lib32gcc-s1 libc6-i386 unzip tar
 
 ENV DEBIAN_FRONTEND noninteractive
 USER container
