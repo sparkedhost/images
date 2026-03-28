@@ -9,7 +9,7 @@ VERSION_FILE="/home/container/fivem_version.txt"
 TXADMIN_INSTALLED=false
 
 if [[ -f "$VERSION_FILE" ]]; then
-    LAST_VERSION=$(cat "$VERSION_FILE")
+    LAST_VERSION=$(grep -oE '^[0-9]+' "$VERSION_FILE" | head -n 1) # Support legacy version files that contain the full version, including the uuid
 else
     LAST_VERSION=""
 fi
@@ -59,6 +59,14 @@ update_resources(){
     fi
 }
 
+# On newer fivem versions yarn and webpack are provided as system resources 
+yarn_cleanup(){
+    if [[ -n "$LAST_VERSION" && "$LAST_VERSION" -gt 27055 ]]; then
+        [[ -d "./resources/[system]/[builders]" ]] && rm -rf "./resources/[system]/[builders]"
+        [[ -n "$TXADMIN_SERVER_PATH" && -d "$TXADMIN_SERVER_PATH/resources/[system]/[builders]" ]] && rm -rf "$TXADMIN_SERVER_PATH/resources/[system]/[builders]"
+    fi
+}
+
 # If session manager does not exist, the server will not work properly. It's safe to assume the default resources were broken in some way
 fix_default_resources(){
     local session_manager_check
@@ -76,30 +84,37 @@ fix_missing_artifacts(){
 
 generate_download_link(){
     local release_page changelogs_page version_link latest_version forced_version
-    local -A LATEST_VERSION_FALLBACKS=(
+    local -A VERSION_FALLBACKS=(
         ["25988"]="25987"
+        ["27417"]="27055"
     )
+    
+    # This is really silly, but we cannot trust fivem and it seems sometimes we cannot trust jg scripts either, so we need manual overrides for when this happens
     release_page=$(curl -sSL https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/)
     changelogs_page=$(curl -sSL https://changelogs-live.fivem.net/api/changelog/versions/linux/server)
 
-    if [[ "${FIVEM_VERSION}" == "latest" ]]; then
-        latest_version=$(echo "$changelogs_page" | jq -r '.latest')
-        forced_version="${LATEST_VERSION_FALLBACKS[$latest_version]}"
-        if [[ -n "$forced_version" ]]; then
-            echo "Latest reported as ${latest_version}. Forcing FIVEM_VERSION=${forced_version}."
-            FIVEM_VERSION="$forced_version"
-        fi
-    fi
+    echo "Computing versions"
+    latest_version=$(echo "$changelogs_page" | jq -r '.latest')
+    latest_version_download_link=$(echo "$changelogs_page" | jq -r '.latest_download')
 
+    jg_recommended_download_link=$(curl -s https://artifacts.jgscripts.com/ | grep "https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/[0-9]*-[\\w]*/fx.tar.xz" -oP | head -1) # JG Scripts recommended version, trustworthy and tested
+    jg_recommended_version=$(echo "$jg_recommended_download_link" | sed -nE 's#^.*/master/([^/]+)/fx\.tar\.xz$#\1#p' | grep -oE '^[0-9]+' | head -n 1)
+
+    forced_version_latest="${VERSION_FALLBACKS[$latest_version]}"
+    forced_version_recommended="${VERSION_FALLBACKS[$jg_recommended_version]}"
+
+    [[ "${FIVEM_VERSION}" == "latest" && -n "$forced_version_latest" ]] && FIVEM_VERSION="$forced_version_latest"
+    [[ "${FIVEM_VERSION}" == "recommended" && -n "$forced_version_recommended" ]] && FIVEM_VERSION="$forced_version_recommended"
+    
     
     case $FIVEM_VERSION in
         latest)
-            TARGET_VERSION=$(echo "$changelogs_page" | jq -r '.latest')
-            DOWNLOAD_LINK=$(echo "$changelogs_page" | jq -r '.latest_download')
+            TARGET_VERSION="$latest_version"
+            DOWNLOAD_LINK="$latest_version_download_link"
         ;;
         recommended)
-            DOWNLOAD_LINK=$(curl -s https://artifacts.jgscripts.com/ | grep "https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/[0-9]*-[\\w]*/fx.tar.xz" -oP | head -1) # JG Scripts recommended version, trustworthy and tested
-            TARGET_VERSION=$(echo "$DOWNLOAD_LINK" | sed -nE 's#^.*/master/([^/]+)/fx\.tar\.xz$#\1#p')
+            DOWNLOAD_LINK="$jg_recommended_download_link"
+            TARGET_VERSION="$jg_recommended_version"
         ;;
         *)
             [[ -z "${FIVEM_VERSION}" ]] && return 0
@@ -137,7 +152,8 @@ update_artifacts(){
 
     echo "New version detected. Downloading from: ${DOWNLOAD_LINK}"
     curl -sSL "${DOWNLOAD_LINK}" -o "${DOWNLOAD_LINK##*/}"
-
+    echo "Removing old artifacts"
+    rm -rf alpine
     filetype=$(file -F ',' "${DOWNLOAD_LINK##*/}" | cut -d',' -f2 | cut -d' ' -f2)
     if [[ "$filetype" == "gzip" ]]; then
         tar xzvf "${DOWNLOAD_LINK##*/}"
@@ -329,6 +345,7 @@ fi
 
 fix_missing_artifacts
 fix_default_resources
+yarn_cleanup
 fix_configuration
 add_logo 
 prevent_malware 
