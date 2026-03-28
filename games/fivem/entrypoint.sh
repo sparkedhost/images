@@ -9,7 +9,7 @@ VERSION_FILE="/home/container/fivem_version.txt"
 TXADMIN_INSTALLED=false
 
 if [[ -f "$VERSION_FILE" ]]; then
-    LAST_VERSION=$(cat "$VERSION_FILE")
+    LAST_VERSION=$(grep -oE '^[0-9]+' "$VERSION_FILE" | head -n 1) # Support legacy version files that contain the full version, including the uuid
 else
     LAST_VERSION=""
 fi
@@ -56,6 +56,14 @@ update_resources(){
     else
         echo -e "[STARTUP]: Git clone operation failed, skipping..."
         return 1
+    fi
+}
+
+# On newer fivem versions yarn and webpack are provided as system resources
+yarn_cleanup(){
+    if [[ -n "$LAST_VERSION" && "$LAST_VERSION" -gt 27055 ]]; then
+        [[ -d "./resources/[system]/[builders]" ]] && rm -rf "./resources/[system]/[builders]"
+        [[ -n "$TXADMIN_SERVER_PATH" && -d "$TXADMIN_SERVER_PATH/resources/[system]/[builders]" ]] && rm -rf "$TXADMIN_SERVER_PATH/resources/[system]/[builders]"
     fi
 }
 
@@ -329,6 +337,7 @@ fi
 
 fix_missing_artifacts
 fix_default_resources
+yarn_cleanup
 fix_configuration
 add_logo 
 prevent_malware 
