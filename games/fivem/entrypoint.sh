@@ -119,7 +119,7 @@ generate_download_link(){
         *)
             [[ -z "${FIVEM_VERSION}" ]] && return 0
             version_link=$(echo -e "${release_page}" | grep -Eo '".*/*.tar.xz"' | grep -Eo '".*/*.tar.xz"' | sed 's/\"//g' | sed 's/\.\///1' | grep -iw "${FIVEM_VERSION}" | grep -o =.* | tr -d '=')
-            TARGET_VERSION="${version_link}"
+            TARGET_VERSION=$(echo $version_link | grep -oE '^[0-9]+' | head -n 1)
             DOWNLOAD_LINK="https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${version_link}"
         
         ;;
