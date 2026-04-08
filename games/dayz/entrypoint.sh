@@ -16,6 +16,7 @@ unzip_game_files() {
         [[ -f "serverDZ.cfg" ]] && unzip_excludes+=("serverDZ.cfg")
         [[ -f "ban.txt" ]] && unzip_excludes+=("ban.txt")
         [[ -f "whitelist.txt" ]] && unzip_excludes+=("whitelist.txt")
+        unzip_excludes+=("mpmissions")
 
         if [[ ${#unzip_excludes[@]} -gt 0 ]]; then
             unzip -o "${ZIP_FILE}" -x "${unzip_excludes[@]}"
