@@ -251,6 +251,21 @@ mods_lowercase(){
 
 
 # Dayz Utils
+ensure_beserver_conf() {
+    local beserver_conf_path
+    beserver_conf_path="battleye/beserver_x64.cfg"
+
+    if [[ ! -f "${beserver_conf_path}" ]]; then
+        mkdir -p "$(dirname "${beserver_conf_path}")"
+        # defaults are ok for this because they get replaced on startup
+        cat <<'EOF' > "${beserver_conf_path}"
+RConPort 1234
+RConPassword N7xQ2mLp9Vd4Kc8Rs1Tz6HyB
+RestrictRCon 0
+EOF
+    fi
+}
+
 add_to_dayzsa() {
     local atempts max_attempts response
     attempts=0
@@ -281,6 +296,7 @@ startup_dayz(){
     solve_mods
     install_update_mods "$allMods"
     mods_lowercase
+    ensure_beserver_conf
     # Add logFile if not present
     grep -q '^logFile' serverDZ.cfg || sed -i '/passwordAdmin = /a logFile = "server_console.log";' serverDZ.cfg
     grep -q '^steamQueryPort' serverDZ.cfg || sed -i '/passwordAdmin = /a steamQueryPort = '"${QUERY_PORT}"';' serverDZ.cfg
