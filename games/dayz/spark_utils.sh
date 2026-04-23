@@ -258,9 +258,9 @@ ensure_beserver_conf() {
     if [[ ! -f "${beserver_conf_path}" ]]; then
         mkdir -p "$(dirname "${beserver_conf_path}")"
         # defaults are ok for this because they get replaced on startup
-        cat <<'EOF' > "${beserver_conf_path}"
-RConPort 1234
-RConPassword N7xQ2mLp9Vd4Kc8Rs1Tz6HyB
+        cat <<EOF > "${beserver_conf_path}"
+RConPort $RCON_PORT
+RConPassword $RCON_PASSWORD
 RestrictRCon 0
 EOF
     fi
