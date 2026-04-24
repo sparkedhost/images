@@ -1,5 +1,10 @@
 sleep 1
 
+dst_mod_fix() {
+    [[ $SRCDS_APPID != 343050 ]] && return
+    cp -f  steamcmd/linux64/steamclient.so  bin64/lib64/steamclient.so
+}
+
 cd /home/container
 
 if [ "${AUTO_UPDATE}" == "1" ] && [ -n "${SRCDS_APPID}" ]; then 
@@ -12,6 +17,8 @@ if [ "${AUTO_UPDATE}" == "1" ] && [ -n "${SRCDS_APPID}" ]; then
 elif [ "${AUTO_UPDATE}" != "1" ]; then
     echo -e "Not updating game server as auto update was set to 0. Starting Server"
 fi
+
+dst_mod_fix
 
 MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
 
