@@ -1,5 +1,11 @@
 sleep 1
 
+MOD_FILE=modlist.html
+SERVER_HOME=/home/container
+STEAMCMD_ATTEMPTS=${STEAMCMD_ATTEMPTS:-3} # Default to 3 attempts
+
+source /spark_utils.sh
+
 cd /home/container
 
 # Make internal Docker IP address available to processes.
@@ -56,8 +62,4 @@ for trick in $WINETRICKS_RUN; do
         winetricks -q $trick
 done
 
-MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
-
-echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
-
-eval ${MODIFIED_STARTUP}
+startup_game
