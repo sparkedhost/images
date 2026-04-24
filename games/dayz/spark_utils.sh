@@ -255,7 +255,7 @@ ensure_beserver_conf() {
     local beserver_conf_path
     beserver_conf_path="battleye/beserver_x64.cfg"
 
-    if [[ ! -f "${beserver_conf_path}" ]]; then
+    if [[ ! -f "${beserver_conf_path}" ]] &&  [[ -n "${RCON_PASSWORD}" ]]; then
         mkdir -p "battleye"
         # defaults are ok for this because they get replaced on startup
         cat <<EOF > "${beserver_conf_path}"
