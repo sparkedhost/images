@@ -11,7 +11,7 @@ fi
 if [ "${METAMOD}" == "1" ]; then
 echo "Installing/Updating Metamod..."
 
-curl -sL https://mms.alliedmods.net/mmsdrop/2.0/mmsource-2.0.0-git1390-linux.tar.gz -o metamod.tar.gz
+curl -sL https://github.com/alliedmodders/metamod-source/releases/download/2.0.0.1396/mmsource-2.0.0-git1396-linux.tar.gz -o metamod.tar.gz
 tar -xzf metamod.tar.gz -C /home/container/game/csgo
 rm metamod.tar.gz
 
