@@ -256,7 +256,7 @@ ensure_beserver_conf() {
     beserver_conf_path="battleye/beserver_x64.cfg"
 
     if [[ ! -f "${beserver_conf_path}" ]]; then
-        mkdir -p "$(dirname "${beserver_conf_path}")"
+        mkdir -p "battleye"
         # defaults are ok for this because they get replaced on startup
         cat <<EOF > "${beserver_conf_path}"
 RConPort $RCON_PORT
