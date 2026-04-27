@@ -33,18 +33,91 @@ rotate_log() {
     rm -f "$log_path"
 }
 
+install_bepinex() {
+    local api_url zip_prefix extracted_dir zip_name
+    local version_file=".apollo/bepinex_version"
+    local api_response download_url version_number installed_version
+
+    case "${SRCDS_APPID}" in
+        896660)
+            # Valheim
+            api_url="https://thunderstore.io/api/experimental/package/denikson/BepInExPack_Valheim/"
+            zip_prefix="denikson-BepInExPack_Valheim"
+            extracted_dir="BepInExPack_Valheim"
+            ;;
+        1829350)
+            # V Rising
+            api_url="https://thunderstore.io/api/experimental/package/BepInEx/BepInExPack_V_Rising/"
+            zip_prefix="BepInEx-BepInExPack_V_Rising"
+            extracted_dir="BepInExPack_V_Rising"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+
+    echo "-------------------------------------------------------"
+    echo "installing BepInEx..."
+    echo "-------------------------------------------------------"
+    if ! api_response=$(curl -sfSL -H "accept: application/json" "${api_url}"); then
+            echo "Error: could not retrieve BepInEx release info from Thunderstore.io API"
+            return 1
+    fi
+
+    download_url=$(jq -r  ".latest.download_url" <<< "$api_response" )
+    version_number=$(jq -r  ".latest.version_number" <<< "$api_response" )
+    zip_name="${zip_prefix}-${version_number}.zip"
+
+    cd /home/container || return 1
+    mkdir -p ".apollo" || return 1
+
+    installed_version="$(cat "${version_file}" 2>/dev/null || true)"
+    
+    if [[ -d "BepInEx" && -n "${installed_version}" && "${installed_version}" == "${version_number}" ]]; then
+        echo "BepInEx up to date (${installed_version})"
+        return 0
+    fi
+
+    wget -O "${zip_name}" "$download_url"
+    unzip -o "${zip_name}"
+    cp -al "/home/container/${extracted_dir}/"* /home/container
+
+
+    ##cleanup
+    echo "-------------------------------------------------------"
+    echo "cleanup files..."
+    echo "-------------------------------------------------------"
+    local -a cleanup_paths=(
+        "${extracted_dir}"
+        "${zip_name}"
+        "icon.png"
+        "manifest.json"
+        "CHANGELOG.md"
+        "README.m"
+        "README.md"
+    )
+    rm -rf "${cleanup_paths[@]}"
+    printf '%s\n' "${version_number}" > "${version_file}"
+
+
+    echo "-------------------------------------------------------"
+    echo "Installation completed"
+    echo "-------------------------------------------------------"
+}
+
 # Steam Utils
 RunSteamCMD() { #[Input: int server=0 mod=1; int id]
     local steamcmd_log steamcmd_dir game_id workshop_dir updateAttempt  steamcmdExitCode 
     workshop_dir="./Steam/steamapps/workshop"
     steamcmd_dir="$SERVER_HOME/steamcmd"
     steamcmd_log="${steamcmd_dir}/steamcmd.log" 
-    # Clear previous SteamCMD log
-    if [[ -f "${steamcmd_log}" ]]; then
-        rm -f "${steamcmd_log:?}"
-    fi
     updateAttempt=0
     while (( $updateAttempt < $STEAMCMD_ATTEMPTS )); do # Loop for specified number of attempts
+        # Clear previous SteamCMD log
+        if [[ -f "${steamcmd_log}" ]]; then
+            rm -f "${steamcmd_log:?}"
+        fi
+
         # Increment attempt counter
         updateAttempt=$((updateAttempt+1))
 
@@ -82,6 +155,9 @@ RunSteamCMD() { #[Input: int server=0 mod=1; int id]
                 echo -e "Your Egg, or your client's server, is not configured with valid Steam credentials."
                 echo -e "Either the username/password is wrong, or Steam Guard is not properly configuredaccording to this egg's documentation/README."
                 exit 1
+            elif [[ $1 == 1 ]] && [[ -n $(grep -i "Failed updating depot" "${steamcmd_log}") ]] && [[ -n $(grep -i "File Not Found\|Missing game files" "${steamcmd_log}") ]]; then # Corrupt or incomplete workshop download
+                echo -e "[UPDATE]: Workshop download is missing files. Removing cached mod files and retrying..."
+                rm -rf "${workshop_dir}/content/${GAME_ID}/$2"
             elif [[ -n $(grep -i "Download item" "${steamcmd_log}") ]]; then # Steam account does not own base game for mod downloads, or unknown
                 echo -e "[UPDATE]: Cannot download mod - Download failed"
                 echo -e "While unknown, this error is likely due to your host's Steam account not owning the base game."
@@ -215,7 +291,7 @@ check_mod_update(){
     echo -e "[MOD_INSTALLATION]: Checking for mod update for $mod_id"
     last_remote_timestamp=$(curl -sL https://steamcommunity.com/sharedfiles/filedetails/changelog/$mod_id | grep '<p id=' | head -1 | cut -d'"' -f2)
 
-    last_local_timestamp=$(find "@${mod_id}" -mindepth 1 -print -quit 2>/dev/null | xargs stat -c%Y)
+    last_local_timestamp=$(find "@${mod_id}" -mindepth 1 -print0 -quit 2>/dev/null | xargs -0 -r stat -c%Y)
 
     if [[ -z $last_local_timestamp ]]; then
         return 0
@@ -413,6 +489,17 @@ startup_arma3(){
 
 
 }
+
+game_pre_startup(){
+    case $SRCDS_APPID in
+        1829350)
+            if [[ "${INSTALL_BEPINEX:-0}" -eq 1 ]]; then
+                export WINEDLLOVERRIDES="winhttp=n,b${WINEDLLOVERRIDES:+;${WINEDLLOVERRIDES}}"
+            fi
+        ;;
+    esac
+}
+
 
 startup_game(){
     case $SRCDS_APPID in
