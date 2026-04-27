@@ -1,5 +1,5 @@
 sleep 1
-source /spark_utils.sh
+source /spark-utils.sh
 cd /home/container
 
 if [ "${AUTO_UPDATE}" == "1" ]; then 
