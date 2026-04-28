@@ -93,6 +93,7 @@
 - [`games-mta`](https://github.com/sparkedhost/images/blob/main/games/mta/Dockerfile)
 - [`games-fivem`](https://github.com/sparkedhost/images/blob/main/games/fivem/Dockerfile)
 - [`games-project-zomboid`](https://github.com/sparkedhost/images/blob/main/games/project-zomboid/Dockerfile)
+- [`games-sbox`](https://github.com/sparkedhost/images/blob/main/games/sbox/Dockerfile)
 
 
 ### Bot Hosting images
