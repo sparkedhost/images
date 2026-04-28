@@ -3,7 +3,7 @@
 # Image: ghcr.io/sparkedhost/images:games-sbox
 # ----------------------------------
 
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
 LABEL author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
