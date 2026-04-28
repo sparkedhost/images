@@ -12,7 +12,7 @@ if [ "${AUTO_UPDATE}" == "1" ] && [ -n "${SRCDS_APPID}" ]; then
     if [ -d "./steam" ]; then
     ./steam/steamcmd.sh +@sSteamCmdForcePlatformBitness 64 +force_install_dir /home/container +login anonymous +app_update ${SRCDS_APPID} $( [[ -z ${SRCDS_BETAID} ]] || printf %s "-beta ${SRCDS_BETAID}" ) $( [[ -z ${SRCDS_BETAPASS} ]] || printf %s "-betapassword ${SRCDS_BETAPASS}" ) $( [[ "${VALIDATE}" == "1" ]] && printf %s "validate" ) +quit
     fi
-elif [ "${AUTO_UPDATE}" != "1" ]; then
+else
     echo -e "Not updating game server as auto update was set to 0. Starting Server"
 fi
 
