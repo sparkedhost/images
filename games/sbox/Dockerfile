@@ -31,5 +31,5 @@ USER container
 ENV USER=container HOME=/home/container DOTNET_ROOT=/usr/share/dotnet
 
 WORKDIR /home/container
-
+COPY ./spark-utils/spark-utils.sh /spark-utils.sh
 CMD ["/bin/bash", "/entrypoint.sh"]
