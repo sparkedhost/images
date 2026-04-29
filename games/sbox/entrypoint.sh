@@ -5,8 +5,8 @@ cd /home/container
 function migrate() {
     echo "Migrating from old sbox-public directory to new sbox directory..."
     rm -rf /home/container/data /home/container/config
-    mv ./sbox-public/game/data data
-    mv ./sbox-public/game/config config
+    mv ./sbox-public/game/data data || true
+    mv ./sbox-public/game/config config || true
     rm -rf sbox-public .dotnet .local .cache .nuget .wget-hsts Steam
     
     SERVER_HOME=/home/container
