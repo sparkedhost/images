@@ -10,7 +10,7 @@ LABEL author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update -y && \
-    apt install -y ca-certificates curl wget iproute2 tini libicu-dev libgdiplus libssl-dev libkrb5-3 libc6 libstdc++6 \ 
+    apt install -y ca-certificates curl wget iproute2 tini libicu-dev libgdiplus libssl-dev libkrb5-3 libc6 lib32gcc-s1 libstdc++6 \ 
     && rm -rf /var/lib/apt/lists/*
 
 RUN wget https://dot.net/v1/dotnet-install.sh && \
