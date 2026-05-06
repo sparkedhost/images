@@ -27,5 +27,6 @@ ENV  HOME /home/container
 WORKDIR /home/container
 
 COPY ./source/entrypoint.sh /entrypoint.sh
+COPY ./spark-utils/spark-utils.sh /spark-utils.sh
 
 CMD ["/bin/bash", "/entrypoint.sh"]
