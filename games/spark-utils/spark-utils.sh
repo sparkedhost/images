@@ -374,6 +374,7 @@ add_to_dayzsa() {
     done
 
     echo "❌ Failed to register server with DayZ SA Launcher after $max_attempts attempts."
+    echo "Response was $response"
     return 1
 }
 
