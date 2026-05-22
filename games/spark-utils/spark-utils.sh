@@ -188,6 +188,16 @@ RunSteamCMD() { #[Input: int server=0 mod=1; int id]
                 echo -e "[UPDATE]: Game server is up to date!"
             else # Mod -- this will work for arma3 and dayz, for others we can add cases
                 case "${GAME_ID}" in
+                    1169040)
+                        local necesse_jar_file necesse_jar_name necesse_jar_found
+
+                        mkdir -p "mods"
+                        rm -f "mods/$2-"*.jar
+                        while IFS= read -r -d '' necesse_jar_file; do
+                            necesse_jar_name="$(basename "${necesse_jar_file}")"
+                            cp -f "${necesse_jar_file}" "mods/$2-${necesse_jar_name}"
+                        done < <(find "${workshop_dir}/content/${GAME_ID}/$2" -name "*.jar" -type f -print0)
+                        ;;
                     440900)
                         find "${workshop_dir}/content/${GAME_ID}/$2" -name "*.pak" -type f -exec cp -t "./ConanSandbox/Mods" {} +
                         ;;
@@ -249,10 +259,20 @@ install_update_mods() { #[Input: str list of mods]
             modName=$(curl -sL https://steamcommunity.com/sharedfiles/filedetails/changelog/$modID | grep 'workshopItemTitle' | cut -d'>' -f2 | cut -d'<' -f1)
             [[ -d @$modID ]] && rmdir "@$modID" 2>/dev/null
             mod_missing=false
-            if [[ ! -d @$modID ]] || [[ -z "$(find "@$modID" -mindepth 1 -print -quit 2>/dev/null)" ]]; then
-                mod_missing=true
-                echo -e "[MOD_INSTALLATION]: Downloading missing Mod: \"${modName}\" (${modID})"
-            fi
+            case "${GAME_ID}" in
+                1169040)
+                    if [[ -z "$(find "mods" -maxdepth 1 -name "${modID}-*.jar" -type f -print -quit 2>/dev/null)" ]]; then
+                        mod_missing=true
+                        echo -e "[MOD_INSTALLATION]: Downloading missing Mod: \"${modName}\" (${modID})"
+                    fi
+                    ;;
+                *)
+                    if [[ ! -d @$modID ]] || [[ -z "$(find "@$modID" -mindepth 1 -print -quit 2>/dev/null)" ]]; then
+                        mod_missing=true
+                        echo -e "[MOD_INSTALLATION]: Downloading missing Mod: \"${modName}\" (${modID})"
+                    fi
+                    ;;
+            esac
 
             update_available=false
             if ! $mod_missing && check_mod_update "$modID"; then
@@ -291,7 +311,14 @@ check_mod_update(){
     echo -e "[MOD_INSTALLATION]: Checking for mod update for $mod_id"
     last_remote_timestamp=$(curl -sL https://steamcommunity.com/sharedfiles/filedetails/changelog/$mod_id | grep '<p id=' | head -1 | cut -d'"' -f2)
 
-    last_local_timestamp=$(find "@${mod_id}" -mindepth 1 -print0 -quit 2>/dev/null | xargs -0 -r stat -c%Y)
+    case "${GAME_ID}" in
+        1169040)
+            last_local_timestamp=$(find "mods" -maxdepth 1 -name "${mod_id}-*.jar" -type f -print0 2>/dev/null | xargs -0 -r stat -c%Y | head -1)
+            ;;
+        *)
+            last_local_timestamp=$(find "@${mod_id}" -mindepth 1 -print0 -quit 2>/dev/null | xargs -0 -r stat -c%Y)
+            ;;
+    esac
 
     if [[ -z $last_local_timestamp ]]; then
         return 0
@@ -491,6 +518,17 @@ startup_arma3(){
 
 }
 
+startup_necesse(){
+    GAME_ID=1169040
+    mkdir -p "mods"
+    solve_mods
+    install_update_mods "$allMods"
+    modifiedStartup=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
+
+    echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m ${modifiedStartup}"
+    eval ${modifiedStartup}
+}
+
 game_pre_startup(){
     case $SRCDS_APPID in
         1829350)
@@ -512,6 +550,9 @@ startup_game(){
         ;;
         443030)
             startup_conan
+        ;;
+        1169370)
+            startup_necesse
         ;;
         *)
             MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
