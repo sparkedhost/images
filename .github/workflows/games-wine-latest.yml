@@ -8,6 +8,7 @@ on:
     paths:
       - "games/wine-latest/*"
       - .github/workflows/games-wine-latest.yml
+      - "games/spark-utils/spark-utils.sh"
 
 jobs:
   build:

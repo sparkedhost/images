@@ -8,6 +8,7 @@ on:
     paths:
       - "games/sbox/*"
       - .github/workflows/games-sbox.yml
+      - "games/spark-utils/spark-utils.sh"
 
 jobs:
   build:

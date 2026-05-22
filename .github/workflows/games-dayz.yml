@@ -8,6 +8,7 @@ on:
     paths:
       - "games/dayz/*"
       - .github/workflows/games-dayz.yml
+      - "games/spark-utils/spark-utils.sh"
 
 jobs:
   build:

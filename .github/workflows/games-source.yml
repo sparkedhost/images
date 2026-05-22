@@ -8,6 +8,7 @@ on:
     paths:
       - "games/source/*"
       - .github/workflows/games-source.yml
+      - "games/spark-utils/spark-utils.sh"
 
 jobs:
   build:
