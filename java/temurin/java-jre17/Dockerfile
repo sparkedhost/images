@@ -12,9 +12,9 @@ RUN apt-get update -y \
  && useradd -d /home/container -m container \
  && mkdir -p /opt/java
 
-# Download pre-built Temurin JRE binaries
-ADD https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.14%2B7/OpenJDK17U-jre_x64_linux_hotspot_17.0.14_7.tar.gz /opt/java/java.tar.gz
-RUN tar -C /opt/java --strip-components=1 -xzf /opt/java/java.tar.gz \
+# Dont download full .tar file, and auto-update java
+RUN curl -L "https://api.adoptium.net/v3/binary/latest/17/ga/linux/x64/jre/hotspot/normal/eclipse" -o /opt/java/java.tar.gz \
+ && tar -C /opt/java --strip-components=1 -xzf /opt/java/java.tar.gz \
  && rm -f /opt/java/java.tar.gz
 
 

@@ -12,9 +12,9 @@ RUN apt-get update -y \
  && useradd -d /home/container -m container \
  && mkdir -p /opt/java
 
-# Download pre-built Temurin JRE binaries
-ADD https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u402-b06/OpenJDK8U-jre_x64_linux_hotspot_8u402b06.tar.gz /opt/java/java.tar.gz
-RUN tar -C /opt/java --strip-components=1 -xzf /opt/java/java.tar.gz \
+# Dont download full .tar file, and auto-update java
+RUN curl -L "https://api.adoptium.net/v3/binary/latest/8/ga/linux/x64/jre/hotspot/normal/eclipse" -o /opt/java/java.tar.gz \
+ && tar -C /opt/java --strip-components=1 -xzf /opt/java/java.tar.gz \
  && rm -f /opt/java/java.tar.gz
 
 # Set user that will run the entrypoint script, and overwrite USER, HOME and PATH environment variables

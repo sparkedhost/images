@@ -1,6 +1,6 @@
 # ----------------------------------
 # Sparked Host Custom Docker Image
-# Image: ghcr.io/sparkedhost/images:java-jre21
+# Image: ghcr.io/sparkedhost/images:java-jre27ea
 # ----------------------------------
 
 FROM        debian:trixie-slim
@@ -12,10 +12,11 @@ RUN apt-get update -y \
  && useradd -d /home/container -m container \
  && mkdir -p /opt/java
 
-# Dont download full .tar file, and auto-update java
-RUN curl -L "https://api.adoptium.net/v3/binary/latest/21/ga/linux/x64/jre/hotspot/normal/eclipse" -o /opt/java/java.tar.gz \
+# Download pre-built Temurin JRE binaries
+RUN curl -L "https://api.adoptium.net/v3/binary/latest/27/ea/linux/x64/jre/hotspot/normal/eclipse" -o /opt/java/java.tar.gz \
  && tar -C /opt/java --strip-components=1 -xzf /opt/java/java.tar.gz \
  && rm -f /opt/java/java.tar.gz
+
 
 # Set user that will run the entrypoint script, and overwrite USER, HOME and PATH environment variables
 # We need to inject the path to the Java binaries in the PATH environment variable
