@@ -12,10 +12,11 @@ RUN apt-get update -y \
     && useradd -d /home/container -m container \
     && mkdir -p /opt/java
 
-# Download pre-built Temurin JRE binaries
-ADD https://github.com/graalvm/graalvm-ce-builds/releases/download/jdk-21.0.2/graalvm-community-jdk-21.0.2_linux-x64_bin.tar.gz /opt/java/java.tar.gz
-RUN tar -C /opt/java --strip-components=1 -xzf /opt/java/java.tar.gz \
-    && rm -f /opt/java/java.tar.gz
+# Dont download full .tar file, and auto-update java
+RUN DOWNLOAD_URL=$(curl -s https://api.github.com/repos/graalvm/graalvm-ce-builds/releases | jq -r '.[] | select(.tag_name | startswith("jdk-21")) | .assets[] | select(.name | contains("linux-x64") and endswith(".tar.gz")) | .browser_download_url' | head -n 1) \
+ && curl -L "$DOWNLOAD_URL" -o /opt/java/java.tar.gz \
+ && tar -C /opt/java --strip-components=1 -xzf /opt/java/java.tar.gz \
+ && rm -f /opt/java/java.tar.gz
 
 # Set user that will run the entrypoint script, and overwrite USER, HOME and PATH environment variables
 # We need to inject the path to the Java binaries in the PATH environment variable
