@@ -472,7 +472,31 @@ add_to_dayzsa() {
 }
 
 startup_dayz(){
+    local mpmissions_backup steamcmd_status
     GAME_ID=221100 
+    [[ ! -x $SERVER_HOME/steamcmd/steamcmd.sh ]] && install_steamcmd
+    cd /home/container
+
+    if [ "${AUTO_UPDATE}" == "1" ]; then
+        extraFlags="$( [[ -z ${SRCDS_BETAID} ]] || printf %s "-beta ${SRCDS_BETAID}" ) $( [[ -z ${SRCDS_BETAPASS} ]] || printf %s "-betapassword ${SRCDS_BETAPASS}" ) ${INSTALL_FLAGS} ${STEAMCMD_EXTRA_FLAGS}"
+        validateServer=$( [[ "${VALIDATE_SERVER}" == "1" ]] && printf %s "validate" )
+        if [[ -d mpmissions ]]; then
+            mpmissions_backup="mpmissions_backup_${EPOCHSECONDS:-$(date +%s)}_$$"
+            mv mpmissions "${mpmissions_backup}"
+        fi
+
+        RunSteamCMD 0 "${SRCDS_APPID}"
+
+        if [[ -n "${mpmissions_backup}" ]]; then
+            rm -rf mpmissions
+            mv "${mpmissions_backup}" mpmissions
+        fi
+
+    else
+        echo -e "Not updating game server as auto update is off. Starting Server"
+    fi
+
+    chmod +x ./${SERVER_BINARY}
     solve_mods
     install_update_mods "$allMods"
     mods_lowercase
@@ -537,6 +561,41 @@ clear_hc_cache(){
     fi
 }
 
+update_arma3_server(){
+    local zip_file remote_url remote_modified remote_modified_normalized local_modified
+    zip_file="game${SRCDS_APPID}.zip"
+    remote_url="https://modpack-cdn.sparkedhost.us/games/game${SRCDS_APPID}.zip"
+
+    if [ "${AUTO_UPDATE}" == "1" ]; then
+        if [ -f "${zip_file}" ]; then
+            remote_modified=$(curl -sI "${remote_url}" | grep -i "Last-Modified" | sed 's/Last-Modified: //I' | xargs)
+            remote_modified_normalized=$(date -d "${remote_modified}" "+%Y-%m-%d %H:%M:%S")
+            local_modified=$(stat -c %y "${zip_file}" | cut -d '.' -f1)
+
+            if [[ "${remote_modified_normalized}" == "${local_modified}" ]]; then
+                echo -e "The server is already up to date. No update needed."
+            else
+                echo -e "The server is outdated. Updating now!"
+                wget -q -O "${zip_file}" "${remote_url}"
+                if ! unzip -t "${zip_file}" > /dev/null; then
+                    rm -f "${zip_file}"
+                    exit 1
+                fi
+                unzip -o "${zip_file}"
+            fi
+        else
+            wget -q -O "${zip_file}" "${remote_url}"
+            if ! unzip -t "${zip_file}" > /dev/null; then
+                rm -f "${zip_file}"
+                exit 1
+            fi
+            unzip -o "${zip_file}"
+        fi
+    else
+        echo -e "Not updating game server as auto update is off. Starting Server"
+    fi
+}
+
 startup_conan(){
     GAME_ID=440900
     mkdir -p "./ConanSandbox/Mods"
@@ -553,6 +612,8 @@ startup_arma3(){
     GAME_ID=107410
     LOG_FILE="/home/container/serverprofile/rpt/arma3server_$(date '+%m_%d_%Y_%H%M%S').rpt"
     mkdir -p /home/container/serverprofile/rpt
+    update_arma3_server
+    chmod +x ./${SERVER_BINARY}
     clear_hc_cache
     solve_mods
     install_update_mods "$allMods"
