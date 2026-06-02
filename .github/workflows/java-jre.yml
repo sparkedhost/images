@@ -29,6 +29,7 @@ jobs:
           - 23
           - 24
           - 25
+          - 26
     uses: ./.github/workflows/docker-build.yml
     with:
       context: ./java
