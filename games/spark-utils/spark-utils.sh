@@ -290,6 +290,7 @@ install_update_mods() { #[Input: str list of mods]
             fi
         fi
     done
+    unset STEAM_USER STEAM_PASS
 }
 
 install_steamcmd(){
