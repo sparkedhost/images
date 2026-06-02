@@ -562,35 +562,13 @@ clear_hc_cache(){
 }
 
 update_arma3_server(){
-    local zip_file remote_url remote_modified remote_modified_normalized local_modified
-    zip_file="game${SRCDS_APPID}.zip"
-    remote_url="https://modpack-cdn.sparkedhost.us/games/game${SRCDS_APPID}.zip"
+    [[ ! -x $SERVER_HOME/steamcmd/steamcmd.sh ]] && install_steamcmd
+    cd /home/container || exit 1
 
     if [ "${AUTO_UPDATE}" == "1" ]; then
-        if [ -f "${zip_file}" ]; then
-            remote_modified=$(curl -sI "${remote_url}" | grep -i "Last-Modified" | sed 's/Last-Modified: //I' | xargs)
-            remote_modified_normalized=$(date -d "${remote_modified}" "+%Y-%m-%d %H:%M:%S")
-            local_modified=$(stat -c %y "${zip_file}" | cut -d '.' -f1)
-
-            if [[ "${remote_modified_normalized}" == "${local_modified}" ]]; then
-                echo -e "The server is already up to date. No update needed."
-            else
-                echo -e "The server is outdated. Updating now!"
-                wget -q -O "${zip_file}" "${remote_url}"
-                if ! unzip -t "${zip_file}" > /dev/null; then
-                    rm -f "${zip_file}"
-                    exit 1
-                fi
-                unzip -o "${zip_file}"
-            fi
-        else
-            wget -q -O "${zip_file}" "${remote_url}"
-            if ! unzip -t "${zip_file}" > /dev/null; then
-                rm -f "${zip_file}"
-                exit 1
-            fi
-            unzip -o "${zip_file}"
-        fi
+        extraFlags="$( [[ -z ${SRCDS_BETAID} ]] || printf %s "-beta ${SRCDS_BETAID}" ) $( [[ -z ${SRCDS_BETAPASS} ]] || printf %s "-betapassword ${SRCDS_BETAPASS}" ) ${INSTALL_FLAGS} ${STEAMCMD_EXTRA_FLAGS}"
+        validateServer=$( [[ "${VALIDATE_SERVER}" == "1" ]] && printf %s "validate" )
+        RunSteamCMD 0 "${SRCDS_APPID}"
     else
         echo -e "Not updating game server as auto update is off. Starting Server"
     fi
