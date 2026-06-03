@@ -121,6 +121,12 @@
 - [`golang-121`](https://github.com/sparkedhost/images/blob/main/golang/golang-121/Dockerfile)
 - [`golang-124`](https://github.com/sparkedhost/images/blob/main/golang/golang-124/Dockerfile)
 
+### Rust images
+
+- [`rust-1.56`](https://github.com/sparkedhost/images/blob/main/rust/rust-1.56/Dockerfile)
+- [`rust-1.6`](https://github.com/sparkedhost/images/blob/main/rust/rust-1.6/Dockerfile)
+- [`rust-latest`](https://github.com/sparkedhost/images/blob/main/rust/rust-latest/Dockerfile)
+
 ### Generic images
 
 - [`generic-debian`](https://github.com/sparkedhost/images/blob/main/generic/debian/Dockerfile)

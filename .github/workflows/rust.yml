@@ -1,0 +1,27 @@
+name: Build Rust
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "rust/**/*"
+      - .github/workflows/rust.yml
+
+jobs:
+  build:
+    name: "Rust ${{ matrix.version }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - 1.56
+          - 1.6
+          - latest
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      context: ./rust
+      file: ./rust/rust-${{ matrix.version }}/Dockerfile
+      tags: ghcr.io/sparkedhost/images:rust-${{ matrix.version }}
+    secrets: inherit
