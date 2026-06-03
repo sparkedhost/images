@@ -20,6 +20,7 @@
 - [`java-jre23`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre23/Dockerfile)[^eol]
 - [`java-jre24`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre24/Dockerfile)[^eol]
 - [`java-jre25`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre25/Dockerfile)
+- [`java-jre26`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre26/Dockerfile)
 
 #### GraalVM Community Edition
 
