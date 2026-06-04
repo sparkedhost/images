@@ -26,7 +26,7 @@ jobs:
     uses: ./.github/workflows/docker-build.yml
     with:
       context: ./rust
-      file: ./rust/rust-${{ matrix.version }}/Dockerfile
+      file: ./rust/${{ matrix.version }}/Dockerfile
       tags: ghcr.io/sparkedhost/images:rust-${{ matrix.version }}
     secrets: inherit
    
@@ -37,6 +37,6 @@ jobs:
     uses: ./.github/workflows/docker-build.yml
     with:
       context: ./rust
-      file: ./rust/rust-latest/Dockerfile
+      file: ./rust/latest/Dockerfile
       tags: ghcr.io/sparkedhost/images:rust-latest
     secrets: inherit
