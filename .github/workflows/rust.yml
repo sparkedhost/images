@@ -9,19 +9,34 @@ on:
       - "rust/**/*"
       - .github/workflows/rust.yml
 
+  schedule:
+    - cron: "0 3 * * 0"
+
 jobs:
   build:
     name: "Rust ${{ matrix.version }}"
+    if: github.event_name != 'schedule'
     strategy:
       fail-fast: false
       matrix:
         version:
           - 1.56
-          - 1.6
+          - 1.60
           - latest
     uses: ./.github/workflows/docker-build.yml
     with:
       context: ./rust
       file: ./rust/rust-${{ matrix.version }}/Dockerfile
       tags: ghcr.io/sparkedhost/images:rust-${{ matrix.version }}
+    secrets: inherit
+   
+  build-latest-weekly:
+    name: "Rust Weekly Build"
+    if: github.event_name == 'schedule'
+
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      context: ./rust
+      file: ./rust/rust-latest/Dockerfile
+      tags: ghcr.io/sparkedhost/images:rust-latest
     secrets: inherit
