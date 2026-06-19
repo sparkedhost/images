@@ -18,4 +18,4 @@ WORKDIR /home/container
 
 COPY        ./entrypoint.sh /entrypoint.sh
 ENTRYPOINT    ["/usr/bin/tini", "-g", "--"]
-CMD         ["/entrypoint.sh"]
+CMD         ["/bin/bash", "/entrypoint.sh"]
