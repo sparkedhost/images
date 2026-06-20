@@ -9,28 +9,45 @@
 #### Temurin (OpenJDK)
 
 - [`java-jre8`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre8/Dockerfile)
+- [`java-jre8jem`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre8jem/Dockerfile)
+- [`java-jre8mim`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre8mim/Dockerfile)
 - [`java-jre11`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre11/Dockerfile)
+- [`java-jre11jem`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre11jem/Dockerfile)
+- [`java-jre11mim`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre11mim/Dockerfile)
 - [`java-jre16`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre16/Dockerfile)[^eol]
 - [`java-jre17`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre17/Dockerfile)
+- [`java-jre17jem`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre17jem/Dockerfile)
+- [`java-jre17mim`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre17mim/Dockerfile)
 - [`java-jre18`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre18/Dockerfile)[^eol]
 - [`java-jre19`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre19/Dockerfile)[^eol]
 - [`java-jre20`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre20/Dockerfile)[^eol]
 - [`java-jre21`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre21/Dockerfile)
+- [`java-jre21jem`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre21jem/Dockerfile)
+- [`java-jre21mim`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre21mim/Dockerfile)
 - [`java-jre22`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre22/Dockerfile)[^eol]
 - [`java-jre23`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre23/Dockerfile)[^eol]
 - [`java-jre24`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre24/Dockerfile)[^eol]
 - [`java-jre25`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre25/Dockerfile)
+- [`java-jre25jem`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre25jem/Dockerfile)
+- [`java-jre25mim`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre25mim/Dockerfile)
 - [`java-jre26`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre26/Dockerfile)
 
 #### GraalVM Community Edition
 
+- [`graalvm-17`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-17/Dockerfile)[^eol]
+- [`graalvm-17jem`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-17jem/Dockerfile)[^eol]
+- [`graalvm-17mim`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-17mim/Dockerfile)[^eol]
 - [`graalvm-19`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-19/Dockerfile)[^eol]
 - [`graalvm-20`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-20/Dockerfile)[^eol]
 - [`graalvm-21`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-21/Dockerfile)[^eol]
+- [`graalvm-21jem`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-21jem/Dockerfile)[^eol]
+- [`graalvm-21mim`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-21mim/Dockerfile)[^eol]
 - [`graalvm-22`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-22/Dockerfile)[^eol]
 - [`graalvm-23`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-23/Dockerfile)[^eol]
 - [`graalvm-24`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-24/Dockerfile)[^eol]
 - [`graalvm-25`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-25/Dockerfile)
+- [`graalvm-25jem`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-25jem/Dockerfile)
+- [`graalvm-25mim`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-25mim/Dockerfile)
 
 #### Azul Prime 
 
@@ -141,6 +158,11 @@ This means we have to keep these images as small as possible. That being said, i
 images that is breaking normal functionality, or have a feature request that you believe is only going to
 marginally increase the size, please feel free to create an issue or submit a pull request, we're always
 open to new ideas.
+
+
+## Acknowledgments
+
+* [Skullians](https://github.com/Skullians) for his permission to use his [Java Docker Images](https://github.com/Skullians/native-leak-profiling) to add [Jemalloc](https://github.com/jemalloc/jemalloc) and [Mimalloc](https://github.com/microsoft/mimalloc) to Sparked images
 
 [^eol]:
     The software inside this image (Java, Node.js, Python...) is considered end of life, meaning official
