@@ -290,6 +290,7 @@ install_update_mods() { #[Input: str list of mods]
             fi
         fi
     done
+    unset STEAM_USER STEAM_PASS
 }
 
 install_steamcmd(){
@@ -362,6 +363,72 @@ mods_lowercase(){
 
 }
 
+build_conan_modlist(){
+    local mods_dir workshop_content_dir custom_modlist modlist
+    local workshop_id workshop_dir pak_file pak_file_name mod_pak mod_pak_name
+    local -a sorted_workshop_ids custom_files
+    local -A matched_files existing_files
+
+    mods_dir="./ConanSandbox/Mods"
+    workshop_content_dir="./Steam/steamapps/workshop/content/440900"
+    custom_modlist="${mods_dir}/custom_modlist.txt"
+    modlist="${mods_dir}/modlist.txt"
+
+    mkdir -p "${mods_dir}"
+
+    if [[ ! -f "${custom_modlist}" ]]; then
+        cat <<EOF > "${custom_modlist}"
+# Custom Conan mod loading order
+# Add one mod per line to use a custom order for modlist.txt.
+# Example:
+# *ExampleMod.pak
+# Leave this file with only comments or blank lines to auto-generate modlist.txt.
+EOF
+    fi
+
+    if awk '!/^[[:space:]]*($|#)/ { found=1 } END { exit !found }' "${custom_modlist}"; then
+        awk '!/^[[:space:]]*($|#)/ { print }' "${custom_modlist}" > "${modlist}"
+        return
+    fi
+
+    for workshop_id in ${allMods}; do
+        workshop_id="${workshop_id#@}"
+        workshop_dir="${workshop_content_dir}/${workshop_id}"
+
+        if [[ -d "${workshop_dir}" ]]; then
+            pak_file="$(find "${workshop_dir}" -name "*.pak" -type f -print -quit)"
+            pak_file_name="$(basename "${pak_file}")"
+
+            if [[ -n "${pak_file_name}" ]]; then
+                matched_files["${workshop_id}"]="${pak_file_name}"
+                existing_files["${pak_file_name}"]=1
+            fi
+        fi
+    done
+
+    : > "${modlist}"
+
+    if (( ${#matched_files[@]} > 0 )); then
+        readarray -t sorted_workshop_ids < <(printf '%s\n' "${!matched_files[@]}" | sort -n)
+        for workshop_id in "${sorted_workshop_ids[@]}"; do
+            printf '*%s\n' "${matched_files[${workshop_id}]}" >> "${modlist}"
+        done
+    fi
+
+    while IFS= read -r -d '' mod_pak; do
+        mod_pak_name="$(basename "${mod_pak}")"
+        if [[ -z ${existing_files[${mod_pak_name}]} ]]; then
+            custom_files+=("${mod_pak_name}")
+        fi
+    done < <(find "${mods_dir}" -maxdepth 1 -name "*.pak" -type f -print0)
+
+    if (( ${#custom_files[@]} > 0 )); then
+        printf '%s\n' "${custom_files[@]}" | sort | while IFS= read -r mod_pak_name; do
+            printf '*%s\n' "${mod_pak_name}" >> "${modlist}"
+        done
+    fi
+}
+
 
 # Dayz Utils
 ensure_beserver_conf() {
@@ -406,7 +473,31 @@ add_to_dayzsa() {
 }
 
 startup_dayz(){
+    local mpmissions_backup steamcmd_status
     GAME_ID=221100 
+    [[ ! -x $SERVER_HOME/steamcmd/steamcmd.sh ]] && install_steamcmd
+    cd /home/container
+
+    if [ "${AUTO_UPDATE}" == "1" ]; then
+        extraFlags="$( [[ -z ${SRCDS_BETAID} ]] || printf %s "-beta ${SRCDS_BETAID}" ) $( [[ -z ${SRCDS_BETAPASS} ]] || printf %s "-betapassword ${SRCDS_BETAPASS}" ) ${INSTALL_FLAGS} ${STEAMCMD_EXTRA_FLAGS}"
+        validateServer=$( [[ "${VALIDATE_SERVER}" == "1" ]] && printf %s "validate" )
+        if [[ -d mpmissions ]]; then
+            mpmissions_backup="mpmissions_backup_${EPOCHSECONDS:-$(date +%s)}_$$"
+            mv mpmissions "${mpmissions_backup}"
+        fi
+
+        RunSteamCMD 0 "${SRCDS_APPID}"
+
+        if [[ -n "${mpmissions_backup}" ]]; then
+            rm -rf mpmissions
+            mv "${mpmissions_backup}" mpmissions
+        fi
+
+    else
+        echo -e "Not updating game server as auto update is off. Starting Server"
+    fi
+
+    chmod +x ./${SERVER_BINARY}
     solve_mods
     install_update_mods "$allMods"
     mods_lowercase
@@ -471,12 +562,25 @@ clear_hc_cache(){
     fi
 }
 
+update_arma3_server(){
+    [[ ! -x $SERVER_HOME/steamcmd/steamcmd.sh ]] && install_steamcmd
+    cd /home/container || exit 1
+
+    if [ "${AUTO_UPDATE}" == "1" ]; then
+        extraFlags="$( [[ -z ${SRCDS_BETAID} ]] || printf %s "-beta ${SRCDS_BETAID}" ) $( [[ -z ${SRCDS_BETAPASS} ]] || printf %s "-betapassword ${SRCDS_BETAPASS}" ) ${INSTALL_FLAGS} ${STEAMCMD_EXTRA_FLAGS}"
+        validateServer=$( [[ "${VALIDATE_SERVER}" == "1" ]] && printf %s "validate" )
+        RunSteamCMD 0 "${SRCDS_APPID}"
+    else
+        echo -e "Not updating game server as auto update is off. Starting Server"
+    fi
+}
+
 startup_conan(){
     GAME_ID=440900
     mkdir -p "./ConanSandbox/Mods"
     solve_mods
     install_update_mods "$allMods"
-    find "./ConanSandbox/Mods" -maxdepth 1 -name "*.pak" -type f -printf '*%f\n' | sort > "./ConanSandbox/Mods/modlist.txt"
+    build_conan_modlist
     # Replace Startup Variables
     modifiedStartup=`eval echo $(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')`
     # Start the Server
@@ -487,6 +591,8 @@ startup_arma3(){
     GAME_ID=107410
     LOG_FILE="/home/container/serverprofile/rpt/arma3server_$(date '+%m_%d_%Y_%H%M%S').rpt"
     mkdir -p /home/container/serverprofile/rpt
+    update_arma3_server
+    chmod +x ./${SERVER_BINARY}
     clear_hc_cache
     solve_mods
     install_update_mods "$allMods"
