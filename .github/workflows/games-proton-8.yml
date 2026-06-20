@@ -1,0 +1,18 @@
+name: Build games-proton-8
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "games/proton-8/*"
+      - .github/workflows/games-proton-8.yml
+
+jobs:
+  build:
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      context: ./games
+      file: ./games/proton-8/Dockerfile
+      tags: ghcr.io/sparkedhost/images:games-proton-8

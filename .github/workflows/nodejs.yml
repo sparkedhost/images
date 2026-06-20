@@ -17,9 +17,7 @@ jobs:
       matrix:
         version:
           - 12
-          - 13
           - 14
-          - 15
           - 16
           - 17
           - 18
@@ -29,6 +27,8 @@ jobs:
           - 22
           - 23
           - 24
+          - 26
+
     uses: ./.github/workflows/docker-build.yml
     with:
       context: ./nodejs

@@ -1,9 +1,9 @@
 # ----------------------------------
 # Sparked Host Custom Image
-# Image: ghcr.io/sparkedhost/images:nodejs-20
+# Image: ghcr.io/sparkedhost/images:nodejs-26
 # ----------------------------------
 
-FROM        node:20-slim
+FROM        node:26-slim
 
 LABEL       author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
