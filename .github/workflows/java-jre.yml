@@ -18,17 +18,27 @@ jobs:
       matrix:
         version:
           - 8
+          - 8jem
+          - 8mim
           - 11
+          - 11jem
+          - 11mim
           - 16
           - 17
+          - 17jem
+          - 17mim
           - 18
           - 19
           - 20
           - 21
+          - 21jem
+          - 21mim
           - 22
           - 23
           - 24
           - 25
+          - 25jem
+          - 25mim
           - 26
     uses: ./.github/workflows/docker-build.yml
     with:
