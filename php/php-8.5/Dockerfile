@@ -1,9 +1,9 @@
 # ----------------------------------
 # Sparked Host Custom Image
-# Image: ghcr.io/sparkedhost/images:php-8.3
+# Image: ghcr.io/sparkedhost/images:php-8.5
 # ----------------------------------
 
-FROM php:8.3-cli
+FROM php:8.5-cli
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
@@ -13,20 +13,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libfreetype6-dev \
     libicu-dev \
     libjpeg62-turbo-dev \
-    libonig-dev \
     libpng-dev \
-    libxml2-dev \
     libzip-dev \
   && docker-php-ext-configure gd --with-freetype --with-jpeg \
   && docker-php-ext-install -j"$(nproc)" \
     bcmath \
-    dom \
     exif \
     gd \
     intl \
-    mbstring \
     mysqli \
-    opcache \
     pcntl \
     pdo_mysql \
     sockets \

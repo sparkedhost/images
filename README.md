@@ -108,6 +108,8 @@
 ### PHP images
 
 - [`php-8.3`](https://github.com/sparkedhost/images/blob/main/php/php-8.3/Dockerfile)
+- [`php-8.4`](https://github.com/sparkedhost/images/blob/main/php/php-8.4/Dockerfile)
+- [`php-8.5`](https://github.com/sparkedhost/images/blob/main/php/php-8.5/Dockerfile)
 
 ### .NET images
 

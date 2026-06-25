@@ -1,0 +1,28 @@
+name: Build PHP
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "php/**/*"
+      - php/entrypoint.sh
+      - .github/workflows/php.yml
+
+jobs:
+  build:
+    name: "PHP ${{ matrix.version }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - 8.3
+          - 8.4
+          - 8.5
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      context: ./php
+      file: ./php/php-${{ matrix.version }}/Dockerfile
+      tags: ghcr.io/sparkedhost/images:php-${{ matrix.version }}
+    secrets: inherit
