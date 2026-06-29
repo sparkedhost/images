@@ -307,7 +307,7 @@ malware_scan() {
   
   if grep -RPInl -m 1 --exclude-dir='[[]builders[]]' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='webpack' --exclude-dir='yarn' --include='*.js' -P '(^|[^a-zA-Z0-9_])\b(eval\s*\(|(?<!new\s)Function\s*\()' ${dirs[@]} >/dev/null 2>/dev/null; then
     echo "[Malware Scanner] Please wait while log files are generated for support."
-    grep -RPInl -m 1 --exclude-dir='[[]builders[]]' --exclude-dir='webpack' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='yarn' --include='*.js' -P '(^|[^a-zA-Z0-9_])\b(eval\s*\(|(?<!new\s)Function\s*\()' ${dirs[@]} > malware_scan_potential.log 2>/dev/null
+    grep -RPInl -m 1 --exclude-dir='[[]builders[]]' --exclude-dir='webpack' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='yarn' --include='*.js' -P '(^|[^a-zA-Z0-9_])\b(eval\s*\(|(?<!new\s)Function\s*\()' ${dirs[@]} >> malware_scan_potential.log 2>/dev/null
     echo "[Malware Scanner] Log file generated, please contact support!"
     potential_malware_found=1
   fi
