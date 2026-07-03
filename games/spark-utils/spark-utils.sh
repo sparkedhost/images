@@ -157,7 +157,7 @@ RunSteamCMD() { #[Input: int server=0 mod=1; int id]
                 exit 1
             elif [[ $1 == 1 ]] && [[ -n $(grep -i "Failed updating depot" "${steamcmd_log}") ]] && [[ -n $(grep -i "File Not Found\|Missing game files" "${steamcmd_log}") ]]; then # Corrupt or incomplete workshop download
                 echo -e "[UPDATE]: Workshop download is missing files. Removing cached mod files and retrying..."
-                rm -rf "${workshop_dir}/content/${GAME_ID}/$2"
+                rm -f "${workshop_dir}/appworkshop_${GAME_ID}.acf"
             elif [[ -n $(grep -i "Download item" "${steamcmd_log}") ]]; then # Steam account does not own base game for mod downloads, or unknown
                 echo -e "[UPDATE]: Cannot download mod - Download failed"
                 echo -e "While unknown, this error is likely due to your host's Steam account not owning the base game."
