@@ -18,10 +18,16 @@ if which mariadb > /dev/null ; then
   MARIADB_EXECUTABLE="mariadbd"
   MARIADB_INSTALLDB_EXECUTABLE="mariadb-install-db"
   MARIADB_UPGRADE_EXECUTABLE="mariadb-upgrade"
+  MARIADB_SAFE_EXECUTABLE="mariadbd-safe"
+  MARIADB_CLIENT_EXECUTABLE="mariadb"
+  MARIADB_ADMIN_EXECUTABLE="mariadb-admin"
 else
   MARIADB_EXECUTABLE="mysqld"
   MARIADB_INSTALLDB_EXECUTABLE="mysql_install_db"
   MARIADB_UPGRADE_EXECUTABLE="mysql_upgrade"
+  MARIADB_SAFE_EXECUTABLE="mysqld_safe"
+  MARIADB_CLIENT_EXECUTABLE="mysql"
+  MARIADB_ADMIN_EXECUTABLE="mysqladmin"
 fi
 
 # Ensure required folders exist
@@ -37,6 +43,69 @@ mkdir -p /home/container/etc/php-fpm
 mkdir -p /home/container/etc/caddy/
 mkdir -p /home/container/etc/pma/
 mkdir -p /tmp/pma/
+
+initialize_database() {
+  if [ -d "$MARIADB_DATADIR/mysql" ] && [ ! -f /home/container/install.cnf ]; then
+    return 0
+  fi
+
+  if [ ! -d "$MARIADB_DATADIR/mysql" ]; then
+    echo "Installing MariaDB database"
+    curl https://raw.githubusercontent.com/parkervcp/eggs/master/database/sql/mariadb/install.my.cnf > /home/container/install.cnf
+    sed -i 's|/mnt/server|/home/container|g' /home/container/install.cnf
+
+    INSTALL_ARGS=(--defaults-file=/home/container/install.cnf)
+    if "$MARIADB_INSTALLDB_EXECUTABLE" --help 2>&1 | grep -q -- "--auth-root-authentication-method"; then
+      INSTALL_ARGS+=(--auth-root-authentication-method=normal)
+    fi
+
+    "$MARIADB_INSTALLDB_EXECUTABLE" "${INSTALL_ARGS[@]}"
+  fi
+
+  echo "Starting MariaDB to create users"
+  "$MARIADB_SAFE_EXECUTABLE" \
+    --defaults-file=/home/container/install.cnf \
+    --datadir="$MARIADB_DATADIR" \
+    --socket="$MARIADB_SOCKET" \
+    --pid-file=/home/container/run/mysqld/mysqld.pid &
+  sleep 20
+
+  MAX_TRIES=30
+  TRIES=0
+  while ! "$MARIADB_CLIENT_EXECUTABLE" -u root --socket="$MARIADB_SOCKET" -e "SELECT 1" >/dev/null 2>&1; do
+    sleep 1
+    TRIES=$((TRIES+1))
+    if [ "$TRIES" -gt "$MAX_TRIES" ]; then
+      echo "MariaDB failed to start after $MAX_TRIES seconds"
+      exit 1
+    fi
+  done
+
+  echo "Creating admin user"
+  if [ -n "$ADMIN_USER" ] && [ -n "$ADMIN_PASSWORD" ]; then
+    if "$MARIADB_CLIENT_EXECUTABLE" -u root --socket="$MARIADB_SOCKET" -e "DROP DATABASE test;" && \
+       "$MARIADB_CLIENT_EXECUTABLE" -u root --socket="$MARIADB_SOCKET" -e "CREATE USER '${ADMIN_USER}'@'%' IDENTIFIED BY '${ADMIN_PASSWORD}';" && \
+       "$MARIADB_CLIENT_EXECUTABLE" -u root --socket="$MARIADB_SOCKET" -e "GRANT ALL PRIVILEGES ON *.* TO '${ADMIN_USER}'@'%' WITH GRANT OPTION;" && \
+       "$MARIADB_CLIENT_EXECUTABLE" -u root --socket="$MARIADB_SOCKET" -e "FLUSH PRIVILEGES;"; then
+      echo "Admin user created successfully"
+    else
+      echo "Failed to create admin user"
+      exit 1
+    fi
+  else
+    echo "ADMIN_USER or ADMIN_PASSWORD not set, skipping admin user creation"
+  fi
+
+  echo "Stopping MariaDB"
+  "$MARIADB_ADMIN_EXECUTABLE" -u root --socket="$MARIADB_SOCKET" shutdown
+  rm -rf /home/container/install.cnf
+
+  sleep 5
+
+  echo "Install complete"
+}
+
+initialize_database
 
 # Generate Caddyfile
 generate_caddyfile() {
@@ -110,4 +179,3 @@ trap handle_shutdown SIGINT SIGTERM
 
 # Wait to keep the script running and catch signals
 wait
-
