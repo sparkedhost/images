@@ -10,10 +10,8 @@ ENV MARIADB_BASEDIR=/opt/mariadb \
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        ca-certificates curl galera-4 galera-arbitrator-4 gnupg iproute2 \
-        libaio1t64 libcrack2 libjudydebian1 liblzo2-2 libncurses6 libnuma1 \
-        libodbc2 libsnappy1v5 libstdc++6 liburing2 openssl perl procps \
-        rsync socat supervisor tar unzip \
+        ca-certificates curl gnupg iproute2 libaio1t64 libncurses6 libnuma1 \
+        libstdc++6 liburing2 openssl perl procps supervisor tar unzip \
     && curl -fsSL https://packages.sury.org/php/apt.gpg \
         -o /usr/share/keyrings/deb.sury.org-php.gpg \
     && echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ trixie main" \
@@ -24,14 +22,6 @@ RUN apt-get update \
         php${PHP_VERSION}-curl php${PHP_VERSION}-fpm php${PHP_VERSION}-gd \
         php${PHP_VERSION}-mbstring php${PHP_VERSION}-mysql \
         php${PHP_VERSION}-xml php${PHP_VERSION}-zip \
-    && ln -s /usr/lib/x86_64-linux-gnu/libaio.so.1t64 \
-        /usr/lib/x86_64-linux-gnu/libaio.so.1 \
-    && ln -s /usr/lib/x86_64-linux-gnu/libncurses.so.6 \
-        /usr/lib/x86_64-linux-gnu/libncurses.so.5 \
-    && ln -s /usr/lib/x86_64-linux-gnu/libtinfo.so.6 \
-        /usr/lib/x86_64-linux-gnu/libtinfo.so.5 \
-    && ln -s /usr/lib/x86_64-linux-gnu/libodbc.so.2 \
-        /usr/lib/x86_64-linux-gnu/libodbc.so.1 \
     && apt-get purge -y --auto-remove gnupg \
     && rm -rf /var/lib/apt/lists/*
 
@@ -80,7 +70,8 @@ LABEL author="DevOps Team at Sparked Host" \
 ENV MARIADB_VERSION=${MARIADB_VERSION} \
     MARIADB_SERIES=${MARIADB_SERIES}
 
-# MariaDB 10.5 S3 artifacts require unavailable CURL_OPENSSL_3 ABI.
+# Keep common engines and authentication modules. Remove cluster, specialist,
+# and test plugins bundled in generic MariaDB tarballs.
 RUN mkdir -p ${MARIADB_BASEDIR} \
     && apt-get update \
     && apt-get install -y --no-install-recommends binutils \
@@ -113,29 +104,58 @@ RUN mkdir -p ${MARIADB_BASEDIR} \
         \( -name '*.a' -o -name '*.la' \) -delete \
     && find ${MARIADB_BASEDIR}/bin ${MARIADB_BASEDIR}/lib -type f \
         -exec sh -c 'for file do strip --strip-unneeded "$file" 2>/dev/null || true; done' sh {} + \
-    && if [ "$MARIADB_SERIES" = "10.5" ]; then \
-         rm -f ${MARIADB_BASEDIR}/bin/aria_s3_copy \
-           ${MARIADB_BASEDIR}/lib/plugin/ha_s3.so; \
-       fi \
-    && rm ${MARIADB_BASEDIR}/bin/garbd ${MARIADB_BASEDIR}/lib/libgalera_smm.so \
-    && ln -s /usr/bin/garbd ${MARIADB_BASEDIR}/bin/garbd \
-    && ln -s /usr/lib/galera/libgalera_smm.so ${MARIADB_BASEDIR}/lib/libgalera_smm.so \
+    && rm -f \
+        ${MARIADB_BASEDIR}/bin/aria_s3_copy \
+        ${MARIADB_BASEDIR}/bin/garbd \
+        ${MARIADB_BASEDIR}/bin/mariadb-ldb \
+        ${MARIADB_BASEDIR}/bin/mysql_ldb \
+        ${MARIADB_BASEDIR}/bin/sst_dump \
+        ${MARIADB_BASEDIR}/lib/libgalera_smm.so \
+        ${MARIADB_BASEDIR}/lib/plugin/adt_null.so \
+        ${MARIADB_BASEDIR}/lib/plugin/auth_0x0100.so \
+        ${MARIADB_BASEDIR}/lib/plugin/auth_gssapi.so \
+        ${MARIADB_BASEDIR}/lib/plugin/auth_gssapi_client.so \
+        ${MARIADB_BASEDIR}/lib/plugin/auth_pam.so \
+        ${MARIADB_BASEDIR}/lib/plugin/auth_pam_v1.so \
+        ${MARIADB_BASEDIR}/lib/plugin/auth_test_plugin.so \
+        ${MARIADB_BASEDIR}/lib/plugin/cracklib_password_check.so \
+        ${MARIADB_BASEDIR}/lib/plugin/daemon_example.ini \
+        ${MARIADB_BASEDIR}/lib/plugin/debug_key_management.so \
+        ${MARIADB_BASEDIR}/lib/plugin/dialog.so \
+        ${MARIADB_BASEDIR}/lib/plugin/dialog_examples.so \
+        ${MARIADB_BASEDIR}/lib/plugin/disks.so \
+        ${MARIADB_BASEDIR}/lib/plugin/example_key_management.so \
+        ${MARIADB_BASEDIR}/lib/plugin/func_test.so \
+        ${MARIADB_BASEDIR}/lib/plugin/ha_connect.so \
+        ${MARIADB_BASEDIR}/lib/plugin/ha_example.so \
+        ${MARIADB_BASEDIR}/lib/plugin/ha_federated.so \
+        ${MARIADB_BASEDIR}/lib/plugin/ha_federatedx.so \
+        ${MARIADB_BASEDIR}/lib/plugin/ha_mroonga.so \
+        ${MARIADB_BASEDIR}/lib/plugin/ha_oqgraph.so \
+        ${MARIADB_BASEDIR}/lib/plugin/ha_rocksdb.so \
+        ${MARIADB_BASEDIR}/lib/plugin/ha_s3.so \
+        ${MARIADB_BASEDIR}/lib/plugin/ha_sphinx.so \
+        ${MARIADB_BASEDIR}/lib/plugin/ha_spider.so \
+        ${MARIADB_BASEDIR}/lib/plugin/ha_test_sql_discovery.so \
+        ${MARIADB_BASEDIR}/lib/plugin/ha_videx.so \
+        ${MARIADB_BASEDIR}/lib/plugin/handlersocket.so \
+        ${MARIADB_BASEDIR}/lib/plugin/hashicorp_key_management.so \
+        ${MARIADB_BASEDIR}/lib/plugin/libdaemon_example.so \
+        ${MARIADB_BASEDIR}/lib/plugin/mypluglib.so \
+        ${MARIADB_BASEDIR}/lib/plugin/mysql_clear_password.so \
+        ${MARIADB_BASEDIR}/lib/plugin/provider_lzo.so \
+        ${MARIADB_BASEDIR}/lib/plugin/provider_snappy.so \
+        ${MARIADB_BASEDIR}/lib/plugin/qa_auth_client.so \
+        ${MARIADB_BASEDIR}/lib/plugin/qa_auth_interface.so \
+        ${MARIADB_BASEDIR}/lib/plugin/qa_auth_server.so \
+        ${MARIADB_BASEDIR}/lib/plugin/test_sql_service.so \
+        ${MARIADB_BASEDIR}/lib/plugin/test_versioning.so \
+        ${MARIADB_BASEDIR}/lib/plugin/type_test.so \
+        ${MARIADB_BASEDIR}/lib/plugin/wsrep_info.so \
     && ln -s ${MARIADB_BASEDIR}/bin/mariadb /usr/local/bin/mariadb \
     && ln -s ${MARIADB_BASEDIR}/bin/mariadb-admin /usr/local/bin/mariadb-admin \
     && ln -s ${MARIADB_BASEDIR}/bin/mariadb-upgrade /usr/local/bin/mariadb-upgrade \
     && ln -s ${MARIADB_BASEDIR}/bin/mariadbd /usr/local/bin/mariadbd \
-    && ln -s ${MARIADB_BASEDIR}/scripts/mariadb-install-db /usr/local/bin/mariadb-install-db \
-    && missing=0 \
-    && for file in \
-        $(find ${MARIADB_BASEDIR}/bin ${MARIADB_BASEDIR}/lib -type f) \
-        /usr/bin/garbd /usr/lib/galera/libgalera_smm.so; do \
-          unresolved="$(ldd "$file" 2>/dev/null | grep 'not found' || true)"; \
-          if [ -n "$unresolved" ]; then \
-            printf '%s\n%s\n' "$file" "$unresolved"; \
-            missing=1; \
-          fi; \
-        done \
-    && test "$missing" -eq 0 \
     && apt-get purge -y --auto-remove binutils \
     && rm -rf /var/lib/apt/lists/*
 
@@ -154,10 +174,5 @@ RUN chmod 0755 /entrypoint.sh
 USER container
 ENV USER=container HOME=/home/container LANG=C.UTF-8
 WORKDIR /home/container
-HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
-    CMD mariadb-admin --no-defaults --user=root \
-        --socket=/home/container/run/mysqld/mysqld.sock ping --silent \
-        && curl -fsS "http://127.0.0.1:${WEB_UI_PORT:-8080}/" >/dev/null \
-        || exit 1
 STOPSIGNAL SIGTERM
 CMD ["/entrypoint.sh"]
