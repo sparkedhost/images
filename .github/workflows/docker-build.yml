@@ -15,6 +15,11 @@ on:
         required: true
         type: string
         description: "Image tags"
+      build_args:
+        required: false
+        type: string
+        default: ""
+        description: "Docker build arguments"
 
 jobs:
   build:
@@ -34,3 +39,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: ${{ inputs.tags }}
+          build-args: ${{ inputs.build_args }}

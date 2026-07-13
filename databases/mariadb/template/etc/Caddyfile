@@ -1,0 +1,25 @@
+:@@WEB_UI_PORT@@ {
+	root * /var/www/phpmyadmin
+	encode zstd gzip
+	file_server
+
+	@forbidden path_regexp forbidden ^/(doc|libraries|setup|sql|templates|vendor)(/|$)
+	respond @forbidden 403
+
+	request_body {
+		max_size 50GB
+	}
+
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Robots-Tag "none"
+		Content-Security-Policy "frame-ancestors 'self'"
+		X-Frame-Options "DENY"
+		Referrer-Policy "same-origin"
+	}
+
+	php_fastcgi 127.0.0.1:9999
+
+	@htaccess path_regexp htaccess /\.ht
+	respond @htaccess 403
+}
