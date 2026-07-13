@@ -11,28 +11,38 @@ on:
 
 jobs:
   build:
-    name: "MariaDB ${{ matrix.version }}"
+    name: "MariaDB ${{ matrix.series }}"
     strategy:
       fail-fast: false
       matrix:
-        version:
-          - 10.4
-          - 10.5
-          - 10.6
-          - 10.7
-          - 10.8
-          - "10.10"
-          - "11.0"
-          - 11.1
-          - 11.2
-          - 11.3
-          - 11.4
-          - 11.5
-          - 11.6
-          - 11.7
+        include:
+          - { series: "10.4", release: "10.4.34" } # EOL
+          - { series: "10.5", release: "10.5.29" } # EOL
+          - { series: "10.6", release: "10.6.27" } # EOL
+          - { series: "10.7", release: "10.7.8" } # EOL
+          - { series: "10.8", release: "10.8.8" } # EOL
+          - { series: "10.9", release: "10.9.8" } # EOL
+          - { series: "10.10", release: "10.10.7" } # EOL
+          - { series: "10.11", release: "10.11.18" }
+          - { series: "11.0", release: "11.0.6" } # EOL
+          - { series: "11.1", release: "11.1.6" } # EOL
+          - { series: "11.2", release: "11.2.6" } # EOL
+          - { series: "11.3", release: "11.3.2" } # EOL
+          - { series: "11.4", release: "11.4.12" }
+          - { series: "11.5", release: "11.5.2" } # EOL
+          - { series: "11.6", release: "11.6.2" } # EOL
+          - { series: "11.7", release: "11.7.2" } # EOL
+          - { series: "11.8", release: "11.8.8" }
+          - { series: "12.0", release: "12.0.2" } # EOL
+          - { series: "12.1", release: "12.1.2" } # EOL
+          - { series: "12.2", release: "12.2.2" } # EOL
+          - { series: "12.3", release: "12.3.2" }
     uses: ./.github/workflows/docker-build.yml
     with:
       context: ./databases/mariadb
-      file: ./databases/mariadb/mariadb-${{ matrix.version }}/Dockerfile
-      tags: ghcr.io/sparkedhost/images:mariadb-${{ matrix.version }}
+      file: ./databases/mariadb/Dockerfile
+      tags: ghcr.io/sparkedhost/images:mariadb-${{ matrix.series }}
+      build_args: |
+        MARIADB_SERIES=${{ matrix.series }}
+        MARIADB_VERSION=${{ matrix.release }}
     secrets: inherit
