@@ -253,6 +253,7 @@ install_update_mods() { #[Input: str list of mods]
     local latest_update update_available mod_missing
     [[ -z $1 ]] && return
     [[ $1 == 0 ]] && return
+    rm -f /home/container/Steam/steamapps/workshop/*.acf
     echo -e "[MOD_INSTALLATION]: Checking for missing mods"
     for modID in $(echo "$1" | sed -e 's/@//g'); do
         if [[ $modID =~ ^[0-9]+$ ]]; then # Only check mods that are in ID-form
