@@ -18,6 +18,7 @@ jobs:
         version:
           - 121
           - 124
+          - 126
     uses: ./.github/workflows/docker-build.yml
     with:
       context: ./golang
