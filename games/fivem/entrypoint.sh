@@ -222,7 +222,7 @@ EOF
 
     cat << 'EOF' > ./resources/prevent_malware/fxmanifest.lua
 fx_version 'cerulean'
-game 'gta5'
+games { 'gta5', 'gta5enhanced' }
 
 author 'Host'
 description 'Prevent malware'
