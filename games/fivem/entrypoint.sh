@@ -82,6 +82,21 @@ fix_missing_artifacts(){
     fi
 
 }
+convert_legacy_enhanced(){
+    if [[ "$GAME_NAME" == "gta5" && ! -f alpine/opt/cfx-server/ld-musl-x86_64.so.1 ]] || [[ "$GAME_NAME" == "gta5enhanced" && -f alpine/opt/cfx-server/ld-musl-x86_64.so.1 ]]; then
+        echo "Detected change between fivem and enhanced, cleaning up old artifacts and cache"
+        rm -rf "alpine" "cache"
+        LAST_VERSION=""
+    fi
+}
+
+cleanup_cache_on_startup(){
+    if [[ ${CLEANUP_CACHE_ON_STARTUP:-0} == 1 ]]; then
+        echo "Cleaning up cache on startup..."
+        rm -rf cache
+    fi
+}
+
 
 start_gta5(){
     "$(pwd)/alpine/opt/cfx-server/ld-musl-x86_64.so.1" \
@@ -383,6 +398,7 @@ malware_scan() {
 sleep 5
 cd /home/container
 check_license
+convert_legacy_enhanced
 if [[ ${UPDATE_SERVER} == 1 ]]; then
     case $AUTO_UPDATE_CHOICE in
         both)
@@ -406,6 +422,7 @@ add_logo
 prevent_malware 
 malware_scan
 check_license
+cleanup_cache_on_startup
 mkdir -p logs/
 
 MODIFIED_STARTUP=$(echo "${STARTUP}" | sed -e 's/{{/${/g' -e 's/}}/}/g')
