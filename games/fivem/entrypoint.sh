@@ -98,6 +98,7 @@ start_rdr3(){
 }
 
 start_gta5enhanced(){
+    export TXHOST_DATA_PATH="$(pwd)/txData"
     export TXHOST_TXA_PORT="${TXADMIN_PORT}"
 
     exec "$(pwd)/alpine/lib/ld-musl-x86_64.so.1" \
