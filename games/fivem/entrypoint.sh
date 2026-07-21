@@ -76,10 +76,62 @@ fix_default_resources(){
 }
 
 fix_missing_artifacts(){
-    if [[ ! -d alpine || ! -f alpine/opt/cfx-server/ld-musl-x86_64.so.1 ]]; then
+    if [[ ! -d alpine || ( ! -f alpine/opt/cfx-server/ld-musl-x86_64.so.1 && ! -f alpine/opt/cfx-server/cfx-server ) ]]; then
         LAST_VERSION="" # Resetting last version so updating works
         update_artifacts
     fi
+
+}
+
+start_gta5(){
+    "$(pwd)/alpine/opt/cfx-server/ld-musl-x86_64.so.1" \
+        --library-path "$(pwd)/alpine/usr/lib/v8/:$(pwd)/alpine/lib/:$(pwd)/alpine/usr/lib/" -- \
+        "$(pwd)/alpine/opt/cfx-server/FXServer" \
+        +set citizen_dir "$(pwd)/alpine/opt/cfx-server/citizen/" \
+        +set serverProfile default \
+        +set txAdminPort "${TXADMIN_PORT}" \
+        "$@"
+}
+
+start_rdr3(){
+    start_gta5 "$@"
+}
+
+start_gta5enhanced(){
+    export TXHOST_TXA_PORT="${TXADMIN_PORT}"
+
+    exec "$(pwd)/alpine/lib/ld-musl-x86_64.so.1" \
+        --library-path "$(pwd)/alpine/lib/:$(pwd)/alpine/usr/lib/" -- \
+        "$(pwd)/alpine/opt/cfx-server/cfx-server" \
+        +set citizen_dir "$(pwd)/alpine/opt/cfx-server/citizen/" \
+        "$@"
+}
+
+get_latest_enhanced_download_link(){
+    local download_page page_data
+
+    if ! download_page=$(curl -fsSL https://docs.fivem.net/docs/server-download/); then
+        echo "Failed to fetch the FiveM server download page." >&2
+        return 1
+    fi
+
+    page_data=$(printf '%s' "$download_page" | grep -oP '<script id="__NEXT_DATA__" type="application/json">\K.*?(?=</script>)')
+    if [[ -z "$page_data" ]]; then
+        echo "Failed to find the FiveM server download data." >&2
+        return 1
+    fi
+
+    if ! DOWNLOAD_LINK=$(printf '%s' "$page_data" | jq -er '.props.pageProps.enhanced.linux[0].downloadURL'); then
+        echo "Failed to find the latest FiveM Enhanced Linux download link." >&2
+        return 1
+    fi
+
+    if ! TARGET_VERSION=$(printf '%s' "$page_data" | jq -er '.props.pageProps.enhanced.linux[0].subtitle | capture("build (?<version>[0-9]+)").version'); then
+        echo "Failed to find the latest FiveM Enhanced Linux build number." >&2
+        return 1
+    fi
+
+    printf '%s\n' "$DOWNLOAD_LINK"
 }
 
 generate_download_link(){
@@ -88,42 +140,44 @@ generate_download_link(){
         ["25988"]="25987"
         ["27417"]="27055"
     )
-    
-    # This is really silly, but we cannot trust fivem and it seems sometimes we cannot trust jg scripts either, so we need manual overrides for when this happens
-    release_page=$(curl -sSL https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/)
-    changelogs_page=$(curl -sSL https://changelogs-live.fivem.net/api/changelog/versions/linux/server)
 
-    echo "Computing versions"
-    latest_version=$(echo "$changelogs_page" | jq -r '.latest')
-    latest_version_download_link=$(echo "$changelogs_page" | jq -r '.latest_download')
+    if [[ "$GAME_NAME" == "gta5enhanced" ]]; then
+        get_latest_enhanced_download_link >/dev/null || return 0
+    else
+        # This is really silly, but we cannot trust fivem and it seems sometimes we cannot trust jg scripts either, so we need manual overrides for when this happens
+        release_page=$(curl -sSL https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/)
+        changelogs_page=$(curl -sSL https://changelogs-live.fivem.net/api/changelog/versions/linux/server)
 
-    jg_recommended_download_link=$(curl -s https://artifacts.jgscripts.com/ | grep "https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/[0-9]*-[\\w]*/fx.tar.xz" -oP | head -1) # JG Scripts recommended version, trustworthy and tested
-    jg_recommended_version=$(echo "$jg_recommended_download_link" | sed -nE 's#^.*/master/([^/]+)/fx\.tar\.xz$#\1#p' | grep -oE '^[0-9]+' | head -n 1)
+        echo "Computing versions"
+        latest_version=$(echo "$changelogs_page" | jq -r '.latest')
+        latest_version_download_link=$(echo "$changelogs_page" | jq -r '.latest_download')
 
-    forced_version_latest="${VERSION_FALLBACKS[$latest_version]}"
-    forced_version_recommended="${VERSION_FALLBACKS[$jg_recommended_version]}"
+        jg_recommended_download_link=$(curl -s https://artifacts.jgscripts.com/ | grep "https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/[0-9]*-[\\w]*/fx.tar.xz" -oP | head -1) # JG Scripts recommended version, trustworthy and tested
+        jg_recommended_version=$(echo "$jg_recommended_download_link" | sed -nE 's#^.*/master/([^/]+)/fx\.tar\.xz$#\1#p' | grep -oE '^[0-9]+' | head -n 1)
 
-    [[ "${FIVEM_VERSION}" == "latest" && -n "$forced_version_latest" ]] && FIVEM_VERSION="$forced_version_latest"
-    [[ "${FIVEM_VERSION}" == "recommended" && -n "$forced_version_recommended" ]] && FIVEM_VERSION="$forced_version_recommended"
-    
-    
-    case $FIVEM_VERSION in
-        latest)
-            TARGET_VERSION="$latest_version"
-            DOWNLOAD_LINK="$latest_version_download_link"
-        ;;
-        recommended)
-            DOWNLOAD_LINK="$jg_recommended_download_link"
-            TARGET_VERSION="$jg_recommended_version"
-        ;;
-        *)
-            [[ -z "${FIVEM_VERSION}" ]] && return 0
-            version_link=$(echo -e "${release_page}" | grep -Eo '".*/*.tar.xz"' | grep -Eo '".*/*.tar.xz"' | sed 's/\"//g' | sed 's/\.\///1' | grep -iw "${FIVEM_VERSION}" | grep -o =.* | tr -d '=')
-            TARGET_VERSION=$(echo $version_link | grep -oE '^[0-9]+' | head -n 1)
-            DOWNLOAD_LINK="https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${version_link}"
-        
-        ;;
-    esac
+        forced_version_latest="${VERSION_FALLBACKS[$latest_version]}"
+        forced_version_recommended="${VERSION_FALLBACKS[$jg_recommended_version]}"
+
+        [[ "${FIVEM_VERSION}" == "latest" && -n "$forced_version_latest" ]] && FIVEM_VERSION="$forced_version_latest"
+        [[ "${FIVEM_VERSION}" == "recommended" && -n "$forced_version_recommended" ]] && FIVEM_VERSION="$forced_version_recommended"
+
+        case $FIVEM_VERSION in
+            latest)
+                TARGET_VERSION="$latest_version"
+                DOWNLOAD_LINK="$latest_version_download_link"
+            ;;
+            recommended)
+                DOWNLOAD_LINK="$jg_recommended_download_link"
+                TARGET_VERSION="$jg_recommended_version"
+            ;;
+            *)
+                [[ -z "${FIVEM_VERSION}" ]] && return 0
+                version_link=$(echo -e "${release_page}" | grep -Eo '".*/*.tar.xz"' | grep -Eo '".*/*.tar.xz"' | sed 's/\"//g' | sed 's/\.\///1' | grep -iw "${FIVEM_VERSION}" | grep -o =.* | tr -d '=')
+                TARGET_VERSION=$(echo $version_link | grep -oE '^[0-9]+' | head -n 1)
+                DOWNLOAD_LINK="https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${version_link}"
+            ;;
+        esac
+    fi
     if [[ -z "${TARGET_VERSION}" || -z "${DOWNLOAD_LINK}" ]]; then
         echo "Download link not found, skipping update." 
         return 0
