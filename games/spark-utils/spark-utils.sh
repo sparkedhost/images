@@ -666,7 +666,7 @@ startup_game(){
 
             echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
 
-            eval ${MODIFIED_STARTUP}
+            eval "exec ${MODIFIED_STARTUP}"
         ;;
     esac
 }
