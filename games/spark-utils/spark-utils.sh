@@ -188,6 +188,14 @@ RunSteamCMD() { #[Input: int server=0 mod=1; int id]
                 echo -e "[UPDATE]: Game server is up to date!"
             else # Mod -- this will work for arma3 and dayz, for others we can add cases
                 case "${GAME_ID}" in
+                    393380)
+                        local squad_mod_dir
+
+                        squad_mod_dir="SquadGame/Plugins/Mods/$2"
+                        mkdir -p "SquadGame/Plugins/Mods"
+                        rm -rf "${squad_mod_dir}"
+                        cp -al "${workshop_dir}/content/${GAME_ID}/$2" "${squad_mod_dir}"
+                        ;;
                     1169040)
                         local necesse_jar_file necesse_jar_name necesse_jar_found
 
@@ -261,6 +269,12 @@ install_update_mods() { #[Input: str list of mods]
             [[ -d @$modID ]] && rmdir "@$modID" 2>/dev/null
             mod_missing=false
             case "${GAME_ID}" in
+                393380)
+                    if [[ ! -d "SquadGame/Plugins/Mods/${modID}" ]] || [[ -z "$(find "SquadGame/Plugins/Mods/${modID}" -mindepth 1 -print -quit 2>/dev/null)" ]]; then
+                        mod_missing=true
+                        echo -e "[MOD_INSTALLATION]: Downloading missing Mod: \"${modName}\" (${modID})"
+                    fi
+                    ;;
                 1169040)
                     if [[ -z "$(find "mods" -maxdepth 1 -name "${modID}-*.jar" -type f -print -quit 2>/dev/null)" ]]; then
                         mod_missing=true
@@ -314,6 +328,9 @@ check_mod_update(){
     last_remote_timestamp=$(curl -sL https://steamcommunity.com/sharedfiles/filedetails/changelog/$mod_id | grep '<p id=' | head -1 | cut -d'"' -f2)
 
     case "${GAME_ID}" in
+        393380)
+            last_local_timestamp=$(find "SquadGame/Plugins/Mods/${mod_id}" -mindepth 1 -print0 -quit 2>/dev/null | xargs -0 -r stat -c%Y)
+            ;;
         1169040)
             last_local_timestamp=$(find "mods" -maxdepth 1 -name "${mod_id}-*.jar" -type f -print0 2>/dev/null | xargs -0 -r stat -c%Y | head -1)
             ;;
@@ -636,6 +653,17 @@ startup_necesse(){
     eval ${modifiedStartup}
 }
 
+startup_squad(){
+    GAME_ID=393380
+    mkdir -p "SquadGame/Plugins/Mods"
+    solve_mods
+    install_update_mods "$allMods"
+    modifiedStartup=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
+
+    echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m ${modifiedStartup}"
+    eval ${modifiedStartup}
+}
+
 game_pre_startup(){
     case $SRCDS_APPID in
         1829350)
@@ -660,6 +688,9 @@ startup_game(){
         ;;
         1169370)
             startup_necesse
+        ;;
+        403240)
+            startup_squad
         ;;
         *)
             MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
