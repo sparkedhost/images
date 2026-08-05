@@ -55,8 +55,4 @@ done
 [[ $INSTALL_BEPINEX -eq 1 ]] && install_bepinex
 game_pre_startup
 
-MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
-
-echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
-
-eval ${MODIFIED_STARTUP}
+startup_game

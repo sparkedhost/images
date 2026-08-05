@@ -646,9 +646,33 @@ game_pre_startup(){
     esac
 }
 
+startup_with_signal_forwarding(){
+    MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
+
+    echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
+
+    forward_signal() {
+        local signal="$1"
+
+        kill "-${signal}" -- "-${server_pid}" 2>/dev/null || true
+        wait "${server_pid}"
+        exit $?
+    }
+
+    trap 'forward_signal INT' INT
+    trap 'forward_signal TERM' TERM
+
+    setsid /bin/bash -c "${MODIFIED_STARTUP}" &
+    server_pid=$!
+    wait "${server_pid}"
+}
+
 
 startup_game(){
     case $SRCDS_APPID in
+        1829350)
+            startup_with_signal_forwarding
+        ;;
         233780)
             startup_arma3
         ;;
