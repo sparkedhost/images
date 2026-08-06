@@ -688,6 +688,10 @@ startup_game(){
         *)
             MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
 
+            if [[ -f /home/container/Pal/Binaries/Linux/libUE4SS.so ]]; then
+                MODIFIED_STARTUP="UE4SS_LAUNCH_TARGET_EXE=/home/container/Pal/Binaries/Linux/PalServer-Linux-Shipping UE4SS_LAUNCH_LD_PRELOAD_WAS_SET=0 UE4SS_LAUNCH_ORIGINAL_LD_PRELOAD= UE4SS_MODULE_PATH=/home/container/Pal/Binaries/Linux/libUE4SS.so LD_PRELOAD=/home/container/Pal/Binaries/Linux/libUE4SS.so ${MODIFIED_STARTUP}"
+            fi
+
             echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
 
             exec /bin/bash -c "${MODIFIED_STARTUP}"
