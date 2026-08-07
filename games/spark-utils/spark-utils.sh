@@ -189,16 +189,12 @@ RunSteamCMD() { #[Input: int server=0 mod=1; int id]
             else # Mod -- this will work for arma3 and dayz, for others we can add cases
                 case "${GAME_ID}" in
                     393380)
-                        local squad_mod_dir squad_workshop_dir
+                        local squad_mod_dir
 
-                        squad_workshop_dir="${workshop_dir}/content/${GAME_ID}/$2"
                         squad_mod_dir="SquadGame/Plugins/Mods/$2"
-                        mkdir -p "SquadGame/Plugins/Mods" "SquadGame/Content"
+                        mkdir -p "SquadGame/Plugins/Mods"
                         rm -rf "${squad_mod_dir}"
-                        cp -al "${squad_workshop_dir}" "${squad_mod_dir}"
-                        if [[ -d "${squad_workshop_dir}/Content" ]]; then
-                            cp -al "${squad_workshop_dir}/Content/." "SquadGame/Content"
-                        fi
+                        cp -al "${workshop_dir}/content/${GAME_ID}/$2" "${squad_mod_dir}"
                         ;;
                     1169040)
                         local necesse_jar_file necesse_jar_name necesse_jar_found
