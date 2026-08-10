@@ -105,6 +105,76 @@ install_bepinex() {
     echo "-------------------------------------------------------"
 }
 
+install_ue4ss() {
+    local api_response download_url archive_name installed_version
+    local api_url="https://api.github.com/repos/NullPrism/RE-UE4SS-Linux/releases?per_page=1"
+    local install_dir="/home/container/Pal/Binaries/Linux"
+    local version_file="${install_dir}/.ue4ss_version"
+    local archive_file="/tmp/re-ue4ss-linux.tar.gz"
+
+    echo "-------------------------------------------------------"
+    echo "installing UE4SS..."
+    echo "-------------------------------------------------------"
+
+    if ! api_response=$(curl -fsSL --connect-timeout 10 --max-time 30 -H "Accept: application/vnd.github+json" -H "User-Agent: Sparked-Utils" "${api_url}"); then
+        echo "Error: could not retrieve the latest UE4SS Linux release from GitHub"
+        return 1
+    fi
+
+    download_url=$(printf '%s\n' "${api_response}" \
+        | grep -oE '"browser_download_url":[[:space:]]*"[^"]+"' \
+        | sed -E 's/^"browser_download_url":[[:space:]]*"([^"]+)"$/\1/' \
+        | grep -E '/RE-UE4SS-Linux-[^/]+-x86_64\.tar\.gz$' \
+        | head -n 1 || true)
+
+    if [[ -z "${download_url}" ]]; then
+        echo "Error: the latest UE4SS Linux release has no regular x86_64.tar.gz asset"
+        return 1
+    fi
+
+    archive_name="${download_url##*/}"
+    installed_version=$(cat "${version_file}" 2>/dev/null || true)
+
+    if [[ -f "${install_dir}/libUE4SS.so" && "${installed_version}" == "${archive_name}" ]]; then
+        echo "UE4SS is up to date (${archive_name})"
+        return 0
+    fi
+
+    mkdir -p "${install_dir}"
+    if ! curl -fL --connect-timeout 10 --max-time 180 --retry 3 --retry-delay 2 -H "User-Agent: Sparked-Utils" "${download_url}" -o "${archive_file}"; then
+        echo "Error: could not download ${archive_name}"
+        rm -f "${archive_file}"
+        return 1
+    fi
+
+    if ! tar -xzf "${archive_file}" --strip-components=1 -C "${install_dir}"; then
+        echo "Error: could not extract ${archive_name}"
+        rm -f "${archive_file}"
+        return 1
+    fi
+    rm -f "${archive_file}"
+
+    if [[ ! -f "${install_dir}/libUE4SS.so" ]]; then
+        echo "Error: UE4SS archive did not contain libUE4SS.so"
+        return 1
+    fi
+
+    printf '%s\n' "${archive_name}" > "${version_file}"
+    echo "UE4SS installation completed (${archive_name})"
+}
+
+configure_ue4ss() {
+    local ue4ss_library="/home/container/Pal/Binaries/Linux/libUE4SS.so"
+
+    [[ -f "${ue4ss_library}" ]] || return 0
+
+    export UE4SS_LAUNCH_TARGET_EXE="/home/container/Pal/Binaries/Linux/PalServer-Linux-Shipping"
+    export UE4SS_LAUNCH_LD_PRELOAD_WAS_SET=0
+    export UE4SS_LAUNCH_ORIGINAL_LD_PRELOAD=""
+    export UE4SS_MODULE_PATH="${ue4ss_library}"
+    export LD_PRELOAD="${ue4ss_library}"
+}
+
 # Steam Utils
 RunSteamCMD() { #[Input: int server=0 mod=1; int id]
     local steamcmd_log steamcmd_dir game_id workshop_dir updateAttempt  steamcmdExitCode 
@@ -667,6 +737,14 @@ startup_with_signal_forwarding(){
     wait "${server_pid}"
 }
 
+regular_startup(){
+    MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
+
+    echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
+
+    exec /bin/bash -c "${MODIFIED_STARTUP}"
+}
+
 
 startup_game(){
     case $SRCDS_APPID in
@@ -685,12 +763,15 @@ startup_game(){
         1169370)
             startup_necesse
         ;;
+        2394010)
+            if [[ "${INSTALL_UE4SS:-0}" == "1" ]]; then
+                install_ue4ss
+            fi
+            configure_ue4ss
+            regular_startup
+        ;;
         *)
-            MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
-
-            echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
-
-            exec /bin/bash -c "${MODIFIED_STARTUP}"
+            regular_startup
         ;;
     esac
 }
