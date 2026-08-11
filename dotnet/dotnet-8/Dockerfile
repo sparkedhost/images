@@ -3,7 +3,7 @@
 # Image: ghcr.io/sparkedhost/images:dotnet-8
 # ----------------------------------
 
-FROM        debian:bullseye-slim
+FROM        debian:trixie-slim
 
 LABEL       author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
@@ -26,5 +26,4 @@ ENV         USER=container HOME=/home/container DOTNET_ROOT=/usr/share/
 WORKDIR     /home/container
 
 COPY        ./entrypoint.sh /entrypoint.sh
-
 CMD         ["/bin/bash", "/entrypoint.sh"]
