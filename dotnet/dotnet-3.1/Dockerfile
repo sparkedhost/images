@@ -3,14 +3,14 @@
 # Image: ghcr.io/sparkedhost/images:dotnet-3.1
 # ----------------------------------
 
-FROM        debian:trixie-slim
+FROM        debian:bullseye-slim
 
 LABEL       author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
 ENV         DEBIAN_FRONTEND noninteractive
 
 RUN         apt update -y \
-            && apt install -y apt-transport-https wget curl iproute2 libgdiplus tini libssl-dev \
+            && apt install -y apt-transport-https wget curl iproute2 libgdiplus tini libicu67 libssl1.1 \
             && wget https://dot.net/v1/dotnet-install.sh \
             && D_V="$(curl -sSL https://dotnet.microsoft.com/en-us/download/dotnet/3.1 | grep -i  '<h3 id="sdk-3.*">SDK 3.1.*</h3>'  | head -1 | awk -F\" '{print $3}' | awk '{print $2;}' | sed 's/<\/h3>//g')" \ 
             && chmod +x dotnet-install.sh \
