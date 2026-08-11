@@ -12,6 +12,18 @@ setup_nss_wrapper(){
     export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libnss_wrapper.so
 }
 
+forward_signal() {
+    local signal="$1"
+
+    if [[ -n "${rcon_pid:-}" ]]; then
+        kill "-${signal}" "${rcon_pid}" 2>/dev/null || true
+    fi
+
+    kill "-${signal}" -- "-${server_pid}" 2>/dev/null || kill "-${signal}" "${server_pid}" 2>/dev/null || true
+    wait "${server_pid}"
+    exit $?
+}
+
 
 rotate_log() {
     local log_path max_rotations base old new
@@ -433,15 +445,25 @@ EOF
 
 # Dayz Utils
 ensure_beserver_conf() {
-    local beserver_conf_path
-    beserver_conf_path="battleye/beserver_x64.cfg"
+    local beserver_conf_path="battleye/beserver_x64.cfg"
+    local rcon_port="${BATTLEYE_PORT:-${RCON_PORT}}"
+    local rcon_password="${BATTLEYE_PASSWORD:-${RCON_PASSWORD}}"
+
+    case "${GAME_ID}:${SERVER_BINARY}" in
+        107410:arma3server|107410:arma3serverprofiling)
+            beserver_conf_path="battleye/launch/beserver.cfg"
+            ;;
+        107410:*)
+            beserver_conf_path="battleye/launch/beserver_x64.cfg"
+            ;;
+    esac
 
     if [[ ! -f "${beserver_conf_path}" ]]; then
         mkdir -p "$(dirname "${beserver_conf_path}")"
         # defaults are ok for this because they get replaced on startup
         cat <<EOF > "${beserver_conf_path}"
-RConPort $RCON_PORT
-RConPassword $RCON_PASSWORD
+RConPort $rcon_port
+RConPassword $rcon_password
 RestrictRCon 0
 EOF
     fi
@@ -471,6 +493,59 @@ add_to_dayzsa() {
     echo "❌ Failed to register server with DayZ SA Launcher after $max_attempts attempts."
     echo "Response was $response"
     return 1
+}
+
+startup_with_rcon() {
+    local rcon_port="${BATTLEYE_PORT:-${RCON_PORT}}"
+    local rcon_password="${BATTLEYE_PASSWORD:-${RCON_PASSWORD}}"
+    local normal_exit_code="${RCON_NORMAL_EXIT_CODE:-0}"
+
+    # Start the server in its own process group so signals can be forwarded
+    # while the interactive BattlEye RCon client owns the container stdin.
+    if [[ -n "${LOG_FILE:-}" && "$STARTUP_PARAMS" != *"-noLogs"* ]]; then
+        setsid /bin/bash -c "exec ${modifiedStartup}" > >(tee -a "$LOG_FILE") 2>&1 &
+    else
+        setsid /bin/bash -c "exec ${modifiedStartup}" &
+    fi
+    server_pid=$!
+
+    rcon_loop() {
+        local rcon_command
+
+        while IFS= read -r rcon_command; do
+            rcon_command="${rcon_command%$'\r'}"
+            [[ -z "${rcon_command}" ]] && continue
+
+            bercon-cli -i 127.0.0.1 -p "${rcon_port}" -P "${rcon_password}" -- "${rcon_command}" || true
+        done
+    }
+
+    trap 'forward_signal INT' INT
+    trap 'forward_signal TERM' TERM
+
+    rcon_loop <&0 &
+    rcon_pid=$!
+
+    while kill -0 "${server_pid}" 2>/dev/null; do
+        if ! kill -0 "${rcon_pid}" 2>/dev/null; then
+            wait "${rcon_pid}" 2>/dev/null || true
+            rcon_loop <&0 &
+            rcon_pid=$!
+        fi
+
+        sleep 1
+    done
+
+    kill -TERM "${rcon_pid}" 2>/dev/null || true
+    wait "${rcon_pid}" 2>/dev/null || true
+    wait "${server_pid}"
+    server_status=$?
+    if [[ $server_status -eq "$normal_exit_code" ]]; then
+        exit 0
+    fi
+
+    echo -e "\n${RED} There was an error while attempting to run the start command.${NC}\n"
+    exit 1
 }
 
 startup_dayz(){
@@ -531,7 +606,8 @@ startup_dayz(){
         done
         ) &
     fi
-    eval ${modifiedStartup}
+    RCON_NORMAL_EXIT_CODE=255
+    startup_with_rcon
 }
 
 # Arma 3 Utils
@@ -598,31 +674,13 @@ startup_arma3(){
     solve_mods
     install_update_mods "$allMods"
     mods_lowercase
+    ensure_beserver_conf
     start_headless_clients
     setup_nss_wrapper
     # Replace Startup Variables
     modifiedStartup=`eval echo $(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')`
-
-    # Start the Server
-    if [[ "$STARTUP_PARAMS" == *"-noLogs"* ]]; then
-        ${modifiedStartup}
-    else
-        ${modifiedStartup} 2>&1 | tee -a "$LOG_FILE"
-    fi
-
-    if [ $? -ne 0 ]; then
-        echo -e "\n${RED}PTDL_CONTAINER_ERR: There was an error while attempting to run the start command.${NC}\n"
-        exit 1
-    fi
-
-
-    if [[ "$STARTUP_PARAMS" == *"-noLogs"* ]]; then
-        ${modifiedStartup}
-    else
-        ${modifiedStartup} 2>&1 | tee -a "$LOG_FILE"
-    fi
-
-
+    RCON_NORMAL_EXIT_CODE=0
+    startup_with_rcon
 }
 
 startup_necesse(){
@@ -646,18 +704,13 @@ game_pre_startup(){
     esac
 }
 
+# This is for games that require simple signal forwarding for proper shutdown
+# This should only be used for games that do not have a shutdown command, or that do not forward the term signal properly
+# The whole process group will get the signal at once, so it must be used with care
 startup_with_signal_forwarding(){
     MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
 
     echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
-
-    forward_signal() {
-        local signal="$1"
-
-        kill "-${signal}" -- "-${server_pid}" 2>/dev/null || true
-        wait "${server_pid}"
-        exit $?
-    }
 
     trap 'forward_signal INT' INT
     trap 'forward_signal TERM' TERM
