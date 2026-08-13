@@ -31,6 +31,6 @@ ENV DISPLAY_DEPTH=16
 ENV AUTO_UPDATE=1
 ENV XVFB=1
 
-COPY ./entrypoint.sh /entrypoint.sh
+COPY ./wine/entrypoint.sh /entrypoint.sh
 COPY ./spark-utils/spark-utils.sh /spark-utils.sh
 CMD ["/bin/bash", "/entrypoint.sh"]

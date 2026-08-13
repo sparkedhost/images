@@ -22,7 +22,7 @@ jobs:
 
     uses: ./.github/workflows/docker-build.yml
     with:
-      context: ./games/wine
+      context: ./games
       file: ./games/wine/wine-${{ matrix.version }}/Dockerfile
       tags: ghcr.io/sparkedhost/images:wine-game-${{ matrix.version }}
     secrets: inherit
