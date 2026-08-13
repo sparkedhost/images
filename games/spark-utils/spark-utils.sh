@@ -112,10 +112,6 @@ enable_ue4ss() {
     local version_file="${install_dir}/.ue4ss_version"
     local archive_file="/tmp/re-ue4ss-linux.tar.gz"
 
-    echo "-------------------------------------------------------"
-    echo "installing UE4SS..."
-    echo "-------------------------------------------------------"
-
     if ! api_response=$(curl -fsSL --connect-timeout 10 --max-time 30 -H "Accept: application/vnd.github+json" -H "User-Agent: Sparked-Utils" "${api_url}"); then
         echo "Error: could not retrieve the latest UE4SS Linux release from GitHub"
         return 1
@@ -139,6 +135,10 @@ enable_ue4ss() {
         echo "UE4SS is up to date (${archive_name})"
         return 0
     fi
+
+    echo "-------------------------------------------------------"
+    echo "installing UE4SS..."
+    echo "-------------------------------------------------------"
 
     mkdir -p "${install_dir}"
     if ! curl -fL --connect-timeout 10 --max-time 180 --retry 3 --retry-delay 2 -H "User-Agent: Sparked-Utils" "${download_url}" -o "${archive_file}"; then
@@ -803,6 +803,62 @@ regular_startup(){
     exec /bin/bash -c "${MODIFIED_STARTUP}"
 }
 
+startup_ue4ss(){
+    local output_directory
+    local output_pipe
+    local shutdown_marker
+    local server_pid
+    local output_pid
+    local server_status
+
+    MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
+
+    echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
+
+    output_directory=$(mktemp -d) || return 1
+    output_pipe="${output_directory}/output"
+    shutdown_marker="${output_directory}/stopping"
+    mkfifo "${output_pipe}" || {
+        rmdir "${output_directory}"
+        return 1
+    }
+
+    stop_ue4ss() {
+        trap '' INT TERM
+
+        touch "${shutdown_marker}"
+        kill -INT -- "-${server_pid}" 2>/dev/null || true
+        wait "${server_pid}" || true
+        wait "${output_pid}" || true
+        rm -rf "${output_directory}"
+        exit 0
+    }
+
+    setsid env --default-signal=INT /bin/bash -c "${MODIFIED_STARTUP}" > "${output_pipe}" 2>&1 &
+    server_pid=$!
+
+    (
+        local line
+
+        while IFS= read -r line; do
+            printf '%s\n' "${line}"
+
+            if [[ -f "${shutdown_marker}" && "${line}" == *"Exiting abnormally (error code: 130)"* ]]; then
+                kill -KILL -- "-${server_pid}" 2>/dev/null || true
+            fi
+        done < "${output_pipe}"
+    ) &
+    output_pid=$!
+
+    trap 'stop_ue4ss' INT TERM
+    wait "${server_pid}"
+    server_status=$?
+    wait "${output_pid}" || true
+    rm -rf "${output_directory}"
+
+    return "${server_status}"
+}
+
 
 startup_game(){
     case $SRCDS_APPID in
@@ -827,8 +883,10 @@ startup_game(){
         2394010)
             if [[ "${INSTALL_UE4SS:-0}" == "1" ]]; then
                 enable_ue4ss
+                configure_ue4ss
+                startup_ue4ss
+                return
             fi
-            configure_ue4ss
             regular_startup
         ;;
         *)
