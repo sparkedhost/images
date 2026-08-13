@@ -105,7 +105,7 @@ install_bepinex() {
     echo "-------------------------------------------------------"
 }
 
-install_ue4ss() {
+enable_ue4ss() {
     local api_response download_url archive_name installed_version
     local api_url="https://api.github.com/repos/NullPrism/RE-UE4SS-Linux/releases?per_page=1"
     local install_dir="/home/container/Pal/Binaries/Linux"
@@ -173,6 +173,45 @@ configure_ue4ss() {
     export UE4SS_LAUNCH_ORIGINAL_LD_PRELOAD=""
     export UE4SS_MODULE_PATH="${ue4ss_library}"
     export LD_PRELOAD="${ue4ss_library}"
+}
+
+install_arkapi() {
+    local install_dir="/home/container/ShooterGame/Binaries/Win64"
+    local archive_file="/tmp/ArkApi_3.56.zip"
+    local download_url="https://ark-server-api.com/resources/ase-server-api.32/download"
+
+    [[ "${SRCDS_APPID}" == "376030" ]] || return 0
+    [[ "${USE_ARKAPI}" == "1" ]] || return 0
+    [[ -f "${install_dir}/ShooterGameServer.exe" ]] || return 0
+
+    if [[ -f "${install_dir}/version.dll" ]]; then
+        echo "ArkApi is already installed"
+        return 0
+    fi
+
+    echo "-------------------------------------------------------"
+    echo "installing ArkApi..."
+    echo "-------------------------------------------------------"
+
+    if ! curl -fsSL "${download_url}" -o "${archive_file}"; then
+        echo "Error: could not download ArkApi"
+        return 1
+    fi
+
+    if ! unzip -qo "${archive_file}" -d "${install_dir}"; then
+        rm -f "${archive_file}"
+        echo "Error: could not extract ArkApi"
+        return 1
+    fi
+
+    rm -f "${archive_file}"
+
+    if [[ ! -f "${install_dir}/version.dll" ]]; then
+        echo "Error: ArkApi installation did not create version.dll"
+        return 1
+    fi
+
+    echo "ArkApi installation completed"
 }
 
 # Steam Utils
@@ -706,6 +745,25 @@ startup_necesse(){
     eval ${modifiedStartup}
 }
 
+startup_ark(){
+    if [[ "${USE_ARKAPI:-0}" == "1" ]]; then
+        if ! install_arkapi; then
+            echo "ArkApi installation failed"
+            return 1
+        fi
+
+        export WINEDLLOVERRIDES="version=n,b${WINEDLLOVERRIDES:+;${WINEDLLOVERRIDES}}"
+        STARTUP="${STARTUP/ShooterGame\/Binaries\/Linux/ShooterGame\/Binaries\/Win64}"
+        STARTUP="${STARTUP/.\/ShooterGameServer/proton run .\/ShooterGameServer.exe}"
+    fi
+
+    MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
+
+    echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
+
+    exec /bin/bash -c "${MODIFIED_STARTUP}"
+}
+
 game_pre_startup(){
     case $SRCDS_APPID in
         1829350)
@@ -748,6 +806,9 @@ regular_startup(){
 
 startup_game(){
     case $SRCDS_APPID in
+        376030)
+            startup_ark
+        ;;
         1829350)
             startup_with_signal_forwarding
         ;;
@@ -765,7 +826,7 @@ startup_game(){
         ;;
         2394010)
             if [[ "${INSTALL_UE4SS:-0}" == "1" ]]; then
-                install_ue4ss
+                enable_ue4ss
             fi
             configure_ue4ss
             regular_startup
