@@ -105,6 +105,76 @@ install_bepinex() {
     echo "-------------------------------------------------------"
 }
 
+enable_ue4ss() {
+    local api_response download_url archive_name installed_version
+    local api_url="https://api.github.com/repos/NullPrism/RE-UE4SS-Linux/releases?per_page=1"
+    local install_dir="/home/container/Pal/Binaries/Linux"
+    local version_file="${install_dir}/.ue4ss_version"
+    local archive_file="/tmp/re-ue4ss-linux.tar.gz"
+
+    if ! api_response=$(curl -fsSL --connect-timeout 10 --max-time 30 -H "Accept: application/vnd.github+json" -H "User-Agent: Sparked-Utils" "${api_url}"); then
+        echo "Error: could not retrieve the latest UE4SS Linux release from GitHub"
+        return 1
+    fi
+
+    download_url=$(printf '%s\n' "${api_response}" \
+        | grep -oE '"browser_download_url":[[:space:]]*"[^"]+"' \
+        | sed -E 's/^"browser_download_url":[[:space:]]*"([^"]+)"$/\1/' \
+        | grep -E '/RE-UE4SS-Linux-[^/]+-x86_64\.tar\.gz$' \
+        | head -n 1 || true)
+
+    if [[ -z "${download_url}" ]]; then
+        echo "Error: the latest UE4SS Linux release has no regular x86_64.tar.gz asset"
+        return 1
+    fi
+
+    archive_name="${download_url##*/}"
+    installed_version=$(cat "${version_file}" 2>/dev/null || true)
+
+    if [[ -f "${install_dir}/libUE4SS.so" && "${installed_version}" == "${archive_name}" ]]; then
+        echo "UE4SS is up to date (${archive_name})"
+        return 0
+    fi
+
+    echo "-------------------------------------------------------"
+    echo "installing UE4SS..."
+    echo "-------------------------------------------------------"
+
+    mkdir -p "${install_dir}"
+    if ! curl -fL --connect-timeout 10 --max-time 180 --retry 3 --retry-delay 2 -H "User-Agent: Sparked-Utils" "${download_url}" -o "${archive_file}"; then
+        echo "Error: could not download ${archive_name}"
+        rm -f "${archive_file}"
+        return 1
+    fi
+
+    if ! tar -xzf "${archive_file}" --strip-components=1 -C "${install_dir}"; then
+        echo "Error: could not extract ${archive_name}"
+        rm -f "${archive_file}"
+        return 1
+    fi
+    rm -f "${archive_file}"
+
+    if [[ ! -f "${install_dir}/libUE4SS.so" ]]; then
+        echo "Error: UE4SS archive did not contain libUE4SS.so"
+        return 1
+    fi
+
+    printf '%s\n' "${archive_name}" > "${version_file}"
+    echo "UE4SS installation completed (${archive_name})"
+}
+
+configure_ue4ss() {
+    local ue4ss_library="/home/container/Pal/Binaries/Linux/libUE4SS.so"
+
+    [[ -f "${ue4ss_library}" ]] || return 0
+
+    export UE4SS_LAUNCH_TARGET_EXE="/home/container/Pal/Binaries/Linux/PalServer-Linux-Shipping"
+    export UE4SS_LAUNCH_LD_PRELOAD_WAS_SET=0
+    export UE4SS_LAUNCH_ORIGINAL_LD_PRELOAD=""
+    export UE4SS_MODULE_PATH="${ue4ss_library}"
+    export LD_PRELOAD="${ue4ss_library}"
+}
+
 install_arkapi() {
     local install_dir="/home/container/ShooterGame/Binaries/Win64"
     local archive_file="/tmp/ArkApi_3.56.zip"
@@ -725,6 +795,70 @@ startup_with_signal_forwarding(){
     wait "${server_pid}"
 }
 
+regular_startup(){
+    MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
+
+    echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
+
+    exec /bin/bash -c "${MODIFIED_STARTUP}"
+}
+
+startup_ue4ss(){
+    local output_directory
+    local output_pipe
+    local shutdown_marker
+    local server_pid
+    local output_pid
+    local server_status
+
+    MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
+
+    echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
+
+    output_directory=$(mktemp -d) || return 1
+    output_pipe="${output_directory}/output"
+    shutdown_marker="${output_directory}/stopping"
+    mkfifo "${output_pipe}" || {
+        rmdir "${output_directory}"
+        return 1
+    }
+
+    stop_ue4ss() {
+        trap '' INT TERM
+
+        touch "${shutdown_marker}"
+        kill -INT -- "-${server_pid}" 2>/dev/null || true
+        wait "${server_pid}" || true
+        wait "${output_pid}" || true
+        rm -rf "${output_directory}"
+        exit 0
+    }
+
+    setsid env --default-signal=INT /bin/bash -c "${MODIFIED_STARTUP}" > "${output_pipe}" 2>&1 &
+    server_pid=$!
+
+    (
+        local line
+
+        while IFS= read -r line; do
+            printf '%s\n' "${line}"
+
+            if [[ -f "${shutdown_marker}" && "${line}" == *"Exiting abnormally (error code: 130)"* ]]; then
+                kill -KILL -- "-${server_pid}" 2>/dev/null || true
+            fi
+        done < "${output_pipe}"
+    ) &
+    output_pid=$!
+
+    trap 'stop_ue4ss' INT TERM
+    wait "${server_pid}"
+    server_status=$?
+    wait "${output_pid}" || true
+    rm -rf "${output_directory}"
+
+    return "${server_status}"
+}
+
 
 startup_game(){
     case $SRCDS_APPID in
@@ -746,12 +880,17 @@ startup_game(){
         1169370)
             startup_necesse
         ;;
+        2394010)
+            if [[ "${INSTALL_UE4SS:-0}" == "1" ]]; then
+                enable_ue4ss
+                configure_ue4ss
+                startup_ue4ss
+                return
+            fi
+            regular_startup
+        ;;
         *)
-            MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
-
-            echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
-
-            exec /bin/bash -c "${MODIFIED_STARTUP}"
+            regular_startup
         ;;
     esac
 }
