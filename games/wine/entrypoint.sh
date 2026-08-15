@@ -62,4 +62,7 @@ for trick in $WINETRICKS_RUN; do
         winetricks -q $trick
 done
 
+[[ $INSTALL_BEPINEX -eq 1 ]] && install_bepinex
+game_pre_startup
+
 startup_game

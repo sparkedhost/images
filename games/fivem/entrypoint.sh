@@ -17,13 +17,10 @@ fi
 if [[ -f $TXADMIN_CONFIG_FILE ]]; then
     TXADMIN_INSTALLED=true
     TXADMIN_VERSION=$(jq '.version' "$TXADMIN_CONFIG_FILE" -r)
-    if [[ $TXADMIN_VERSION == "2" ]];then
-        TXADMIN_SERVER_PATH=$(jq -r '.fxRunner.serverDataPath' $TXADMIN_CONFIG_FILE)
-    else
-        TXADMIN_SERVER_PATH=$(jq -r '.server.dataPath' $TXADMIN_CONFIG_FILE)
-    fi
+    TXADMIN_SERVER_PATH=$(jq -r '.fxRunner.serverDataPath // .server.dataPath // empty' "$TXADMIN_CONFIG_FILE")
 fi
 [[ $TXADMIN_SERVER_PATH ]] && SERVER_CONFIG_FILE=$(find "$TXADMIN_SERVER_PATH" -type f -name "server.cfg" | head -n 1)
+SERVER_CONFIG_FILE="${SERVER_CONFIG_FILE:-/home/container/server.cfg}"
 
 
 # Functions

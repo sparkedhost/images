@@ -1,0 +1,28 @@
+name: Build Games Wine
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "games/wine/**/*"
+      - .github/workflows/games-wine.yml
+      - "games/spark-utils/spark-utils.sh"
+
+jobs:
+  build:
+    name: "Wine ${{ matrix.version }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - latest
+          - staging
+
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      context: ./games
+      file: ./games/wine/wine-${{ matrix.version }}/Dockerfile
+      tags: ghcr.io/sparkedhost/images:wine-game-${{ matrix.version }}
+    secrets: inherit
