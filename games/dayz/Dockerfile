@@ -18,9 +18,9 @@ ENV         USER=container HOME=/home/container
 WORKDIR     /home/container
 
 RUN         cd /tmp/ \
-            && curl -sSL https://github.com/WoozyMasta/bercon/releases/download/1.0.0/bercon > bercon \
-            && mv bercon /usr/local/bin/ \
-            && chmod +x /usr/local/bin/bercon
+            && curl -sSL https://github.com/WoozyMasta/bercon-cli/releases/download/v0.4.4/bercon-cli-linux-amd64 > bercon-cli \
+            && mv bercon-cli /usr/local/bin/ \
+            && chmod +x /usr/local/bin/bercon-cli
 
 RUN         update-locale lang=en_US.UTF-8 \
             && dpkg-reconfigure --frontend noninteractive locales
