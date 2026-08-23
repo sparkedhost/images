@@ -8,7 +8,9 @@ setup_nss_wrapper(){
     # Setup NSS Wrapper for use ($NSS_WRAPPER_PASSWD and $NSS_WRAPPER_GROUP have been set by the Dockerfile)
     export USER_ID=$(id -u)
     export GROUP_ID=$(id -g)
+    export USER_NAME="${USER_NAME:-${USER:-container}}"
     envsubst < /passwd.template > ${NSS_WRAPPER_PASSWD}
+    printf '%s:x:%s:\n' "${USER_NAME}" "${GROUP_ID}" > ${NSS_WRAPPER_GROUP}
     export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libnss_wrapper.so
 }
 
@@ -50,6 +52,11 @@ install_bepinex() {
     local version_file=".apollo/bepinex_version"
     local api_response download_url version_number installed_version
 
+    if [[ "${SRCDS_APPID}" == "896660" && "${INSTALL_VALHEIM_PLUS:-0}" == "1" ]]; then
+        echo "Skipping BepInEx installation; ValheimPlus provides its compatible BepInEx version."
+        return 0
+    fi
+
     case "${SRCDS_APPID}" in
         896660)
             # Valheim
@@ -90,8 +97,13 @@ install_bepinex() {
         return 0
     fi
 
-    wget -O "${zip_name}" "$download_url"
-    unzip -o "${zip_name}"
+    if ! curl -fL --retry 3 --retry-delay 2 -o "${zip_name}" "${download_url}" \
+        || ! unzip -o "${zip_name}" \
+        || [[ ! -f "/home/container/${extracted_dir}/BepInEx/core/BepInEx.Preloader.dll" ]]; then
+        echo "Error: could not install BepInEx"
+        rm -f "${zip_name}"
+        return 1
+    fi
     cp -al "/home/container/${extracted_dir}/"* /home/container
 
 
@@ -115,6 +127,54 @@ install_bepinex() {
     echo "-------------------------------------------------------"
     echo "Installation completed"
     echo "-------------------------------------------------------"
+}
+
+install_valheim_plus() {
+    local release_url api_response download_url version_number installed_version archive_file extract_dir
+    local version_file=".apollo/valheim_plus_version"
+
+    if [[ "${VALHEIM_PLUS_VERSION:-latest}" == "latest" ]]; then
+        release_url="https://api.github.com/repos/Grantapher/ValheimPlus/releases/latest"
+    else
+        release_url="https://api.github.com/repos/Grantapher/ValheimPlus/releases/tags/${VALHEIM_PLUS_VERSION}"
+    fi
+
+    if ! api_response=$(curl -fsSL -H "Accept: application/vnd.github+json" -H "User-Agent: Sparked-Valheim" "${release_url}"); then
+        echo "Error: could not retrieve ValheimPlus release information from GitHub"
+        return 1
+    fi
+
+    version_number=$(jq -r '.tag_name // empty' <<< "${api_response}")
+    download_url=$(jq -r '.assets[] | select(.name == "UnixServer.zip") | .browser_download_url' <<< "${api_response}" | head -n 1)
+    installed_version=$(cat "${version_file}" 2>/dev/null || true)
+
+    if [[ -z "${version_number}" || -z "${download_url}" ]]; then
+        echo "Error: the selected ValheimPlus release has no UnixServer.zip asset"
+        return 1
+    fi
+
+    if [[ -f "BepInEx/plugins/ValheimPlus.dll" && "${installed_version}" == "${version_number}" ]]; then
+        echo "ValheimPlus is up to date (${version_number})"
+        return 0
+    fi
+
+    echo "Installing ValheimPlus (${version_number})..."
+    archive_file=$(mktemp /tmp/valheim-plus.XXXXXX.zip)
+    extract_dir=$(mktemp -d /tmp/valheim-plus.XXXXXX)
+
+    if ! curl -fL --retry 3 --retry-delay 2 -o "${archive_file}" "${download_url}" \
+        || ! unzip -q -o "${archive_file}" -d "${extract_dir}" \
+        || [[ ! -f "${extract_dir}/BepInEx/plugins/ValheimPlus.dll" ]]; then
+        echo "Error: could not install ValheimPlus"
+        rm -rf -- "${extract_dir}" "${archive_file}"
+        return 1
+    fi
+
+    cp -a "${extract_dir}/." /home/container/
+    rm -rf -- "${extract_dir}" "${archive_file}"
+    mkdir -p .apollo
+    printf '%s\n' "${version_number}" > "${version_file}"
+    echo "ValheimPlus installation completed (${version_number})"
 }
 
 enable_ue4ss() {
@@ -878,10 +938,31 @@ startup_with_signal_forwarding(){
 
 regular_startup(){
     MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
+    MODIFIED_STARTUP="${STARTUP_ENVIRONMENT_PREFIX:-}${MODIFIED_STARTUP}"
 
     echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
 
     exec /bin/bash -c "${MODIFIED_STARTUP}"
+}
+
+configure_valheim_bepinex(){
+    [[ -f "BepInEx/core/BepInEx.Preloader.dll" ]] || return 0
+
+    STARTUP_ENVIRONMENT_PREFIX='DOORSTOP_ENABLED=1 DOORSTOP_TARGET_ASSEMBLY="./BepInEx/core/BepInEx.Preloader.dll" LD_LIBRARY_PATH="./doorstop_libs:${LD_LIBRARY_PATH}" LD_PRELOAD="libdoorstop_x64.so:${LD_PRELOAD}" SteamAppId=892970 '
+}
+
+startup_valheim(){
+    if [[ "${INSTALL_BEPINEX:-0}" == "1" ]]; then
+        install_bepinex || return 1
+    fi
+
+    if [[ "${INSTALL_VALHEIM_PLUS:-0}" == "1" ]]; then
+        install_valheim_plus || return 1
+    fi
+
+    setup_nss_wrapper
+    configure_valheim_bepinex
+    regular_startup
 }
 
 startup_ue4ss(){
@@ -943,6 +1024,9 @@ startup_ue4ss(){
 
 startup_game(){
     case $SRCDS_APPID in
+        896660)
+            startup_valheim
+        ;;
         376030)
             startup_ark
         ;;
