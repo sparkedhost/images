@@ -13,12 +13,17 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN dpkg --add-architecture i386 \
     && apt update \
     && apt upgrade -y \
-    && apt install -y tar curl gcc g++ lib32gcc-s1 libgcc-s1 libcurl4-gnutls-dev:i386 libssl3:i386 libcurl4:i386 lib32tinfo6 libtinfo6:i386 lib32z1 lib32stdc++6 libncurses6:i386 libcurl3-gnutls:i386 libsdl2-2.0-0:i386 gdb libsdl1.2debian libfontconfig1 telnet net-tools netcat-traditional ca-certificates gcc-multilib file \
+    && apt install -y tar curl gcc g++ lib32gcc-s1 libgcc-s1 libcurl4-gnutls-dev:i386 libssl3:i386 libcurl4:i386 lib32tinfo6 libtinfo6:i386 lib32z1 lib32stdc++6 libncurses6:i386 libcurl3-gnutls:i386 libsdl2-2.0-0:i386 gdb libsdl1.2debian libfontconfig1 telnet net-tools netcat-traditional ca-certificates gcc-multilib file jq unzip gettext libnss-wrapper \
     && useradd -d /home/container -m container \
     && cd /tmp/ \
     && curl -sSL https://github.com/gorcon/rcon-cli/releases/download/v0.10.3/rcon-0.10.3-amd64_linux.tar.gz > rcon.tar.gz \
     && tar xvf rcon.tar.gz \
     && mv rcon-0.10.3-amd64_linux/rcon /usr/local/bin/
+
+ENV NSS_WRAPPER_PASSWD=/tmp/passwd NSS_WRAPPER_GROUP=/tmp/group
+RUN touch ${NSS_WRAPPER_PASSWD} ${NSS_WRAPPER_GROUP} \
+    && chgrp 0 ${NSS_WRAPPER_PASSWD} ${NSS_WRAPPER_GROUP} \
+    && chmod g+rw ${NSS_WRAPPER_PASSWD} ${NSS_WRAPPER_GROUP}
 
 USER container
 ENV  USER container
@@ -28,5 +33,6 @@ WORKDIR /home/container
 
 COPY ./source/entrypoint.sh /entrypoint.sh
 COPY ./spark-utils/spark-utils.sh /spark-utils.sh
+COPY ./source/passwd.template /passwd.template
 
 CMD ["/bin/bash", "/entrypoint.sh"]
