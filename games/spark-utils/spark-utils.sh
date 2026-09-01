@@ -52,11 +52,6 @@ install_bepinex() {
     local version_file=".apollo/bepinex_version"
     local api_response download_url version_number installed_version
 
-    if [[ "${SRCDS_APPID}" == "896660" && "${INSTALL_VALHEIM_PLUS:-0}" == "1" ]]; then
-        echo "Skipping BepInEx installation; ValheimPlus provides its compatible BepInEx version."
-        return 0
-    fi
-
     case "${SRCDS_APPID}" in
         896660)
             # Valheim
@@ -952,16 +947,27 @@ configure_valheim_bepinex(){
 }
 
 startup_valheim(){
-    if [[ "${INSTALL_BEPINEX:-0}" == "1" ]]; then
-        install_bepinex || return 1
-    fi
+    local mod_framework="${MOD_FRAMEWORK:-vanilla}"
 
-    if [[ "${INSTALL_VALHEIM_PLUS:-0}" == "1" ]]; then
-        install_valheim_plus || return 1
-    fi
+    case "${mod_framework}" in
+        vanilla)
+            ;;
+        bepinex)
+            install_bepinex || return 1
+            ;;
+        valheimplus)
+            install_valheim_plus || return 1
+            ;;
+        *)
+            echo "Error: invalid MOD_FRAMEWORK value '${mod_framework}'. Expected: vanilla, bepinex, or valheimplus."
+            return 1
+            ;;
+    esac
 
     setup_nss_wrapper
-    configure_valheim_bepinex
+    if [[ "${mod_framework}" != "vanilla" ]]; then
+        configure_valheim_bepinex
+    fi
     regular_startup
 }
 
