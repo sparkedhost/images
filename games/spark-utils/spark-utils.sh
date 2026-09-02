@@ -951,11 +951,6 @@ cleanup_valheim_framework(){
         bepinex)
             rm -f -- BepInEx/plugins/ValheimPlus.dll BepInEx/config/valheim_plus.cfg .apollo/valheim_plus_version
             ;;
-        vanilla)
-            rm -rf -- BepInEx doorstop_libs unstripped_corlib
-            rm -f -- doorstop_config.ini start_game_bepinex.sh start_server_bepinex.sh run_bepinex.sh
-            rm -f -- .apollo/bepinex_version .apollo/valheim_plus_version
-            ;;
     esac
 }
 
