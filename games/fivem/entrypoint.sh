@@ -46,7 +46,7 @@ add_logo(){
 }
 
 update_resources(){
-    if git clone -v https://github.com/citizenfx/cfx-server-data.git /tmp &>/dev/null; then
+    if git clone https://github.com/citizenfx/cfx-server-data.git /tmp &>/dev/null; then
         cp -Rf /tmp/resources/* resources/
         echo "[STARTUP]: CitizenFX Resources updated successfully!"
         return 0
