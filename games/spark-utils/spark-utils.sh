@@ -946,6 +946,10 @@ configure_valheim_bepinex(){
     STARTUP_ENVIRONMENT_PREFIX='DOORSTOP_ENABLED=1 DOORSTOP_TARGET_ASSEMBLY="./BepInEx/core/BepInEx.Preloader.dll" LD_LIBRARY_PATH="./doorstop_libs:${LD_LIBRARY_PATH}" LD_PRELOAD="libdoorstop_x64.so:${LD_PRELOAD}" SteamAppId=892970 '
 }
 
+cleanup_valheim_framework(){
+    rm -f -- BepInEx/plugins/ValheimPlus.dll BepInEx/config/valheim_plus.cfg .apollo/valheim_plus_version
+}
+
 startup_valheim(){
     local mod_framework="${MOD_FRAMEWORK:-vanilla}"
 
@@ -953,6 +957,7 @@ startup_valheim(){
         vanilla)
             ;;
         bepinex)
+            cleanup_valheim_framework
             install_bepinex || return 1
             ;;
         valheimplus)
