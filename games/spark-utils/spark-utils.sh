@@ -947,11 +947,7 @@ configure_valheim_bepinex(){
 }
 
 cleanup_valheim_framework(){
-    case "$1" in
-        bepinex)
-            rm -f -- BepInEx/plugins/ValheimPlus.dll BepInEx/config/valheim_plus.cfg .apollo/valheim_plus_version
-            ;;
-    esac
+    rm -f -- BepInEx/plugins/ValheimPlus.dll BepInEx/config/valheim_plus.cfg .apollo/valheim_plus_version
 }
 
 startup_valheim(){
@@ -959,10 +955,9 @@ startup_valheim(){
 
     case "${mod_framework}" in
         vanilla)
-            cleanup_valheim_framework vanilla
             ;;
         bepinex)
-            cleanup_valheim_framework bepinex
+            cleanup_valheim_framework
             install_bepinex || return 1
             ;;
         valheimplus)
