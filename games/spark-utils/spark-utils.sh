@@ -14,6 +14,28 @@ setup_nss_wrapper(){
     export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libnss_wrapper.so
 }
 
+setup_proton_compatibility() {
+    if [[ -z "${SRCDS_APPID:-}" ]]; then
+        echo -e "----------------------------------------------------------------------------------"
+        echo -e "WARNING!!! Proton needs variable SRCDS_APPID, else it will not work. Please add it"
+        echo -e "Server stops now"
+        echo -e "----------------------------------------------------------------------------------"
+        return 1
+    fi
+
+    mkdir -p "/home/container/.steam/steam/steamapps/compatdata/${SRCDS_APPID}"
+    export STEAM_COMPAT_CLIENT_INSTALL_PATH="/home/container/.steam/steam"
+    export STEAM_COMPAT_DATA_PATH="/home/container/.steam/steam/steamapps/compatdata/${SRCDS_APPID}"
+    export STEAM_COMPAT_APP_ID="${SRCDS_APPID}"
+    export SteamAppId="${SRCDS_APPID}"
+    export SteamGameId="${SRCDS_APPID}"
+    export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp/runtime-container}"
+    mkdir -p "${XDG_RUNTIME_DIR}"
+    chmod 700 "${XDG_RUNTIME_DIR}"
+    export WINETRICKS="/usr/sbin/winetricks"
+    export STEAM_DIR="/home/container/.steam/steam/"
+}
+
 forward_signal() {
     local signal="$1"
 
