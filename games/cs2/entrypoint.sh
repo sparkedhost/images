@@ -11,7 +11,14 @@ fi
 if [ "${METAMOD}" == "1" ]; then
 echo "Installing/Updating Metamod..."
 
-curl -sL https://github.com/alliedmodders/metamod-source/releases/download/2.0.0.1411/mmsource-2.0.0-git1411-linux.tar.gz -o metamod.tar.gz
+METAMOD_URL=$(curl -fsSL 'https://api.github.com/repos/alliedmodders/metamod-source/releases?per_page=100' 2>/dev/null | sed -n '/"tag_name": "2\.0\.0\.[0-9][0-9]*"/,/"tag_name":/ { /"browser_download_url": ".*mmsource-2\.0\.0-git[0-9][0-9]*-linux\.tar\.gz"/ { s/.*"browser_download_url": "\([^"]*\)".*/\1/p; q; } }')
+
+if [ -z "${METAMOD_URL}" ]; then
+    echo "Unable to find a MetaMod 2.0 beta Linux release, using fallback version 2.0.0.1411."
+    METAMOD_URL="https://github.com/alliedmodders/metamod-source/releases/download/2.0.0.1411/mmsource-2.0.0-git1411-linux.tar.gz"
+fi
+
+curl -fsSL "${METAMOD_URL}" -o metamod.tar.gz
 tar -xzf metamod.tar.gz -C /home/container/game/csgo
 rm metamod.tar.gz
 
