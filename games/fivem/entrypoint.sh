@@ -308,9 +308,13 @@ EOF
 
 malware_scan() {
   [[ $ENABLE_MALWARE_SCANNER == 0 ]] && return 0
+  : > malware_scan.log
+  : > malware_scan_potential.log
+  : > malware_scan_fonts.log
+
   local dirs=()
   local known_malware_found=0 potential_malware_found=0
-  local system_resources_count potential_patterns malware_count=0
+  local system_resources_count malware_count=0
   [[ -d alpine ]] && dirs+=("alpine")
   [[ -d resources ]] && dirs+=("resources")
   
@@ -335,27 +339,81 @@ malware_scan() {
     fi
   fi
 
-  # Known patterns, very crude method but there's plenty of normal resources with obfuscated javascript unfortunately so detection is difficult
   echo "[Malware Scanner] Checking for known malware patterns"
 
-  known_patterns=('Function("a","var b,ahA,ahB,ahC,__' 'const _xo="\\u0072\\u0064\\u0075\\u0' "sub(87565):gsub('%.%+', '')" )
+  local -a configured_malware_patterns=()
+  local -a known_patterns=()
+  local -a known_regex_patterns=()
+  local -a potential_patterns=()
+  local malware_patterns_url="https://apollo-assets-s3.sparkedhost.us/fivem/malware-patterns.txt"
+  local configured_malware_patterns_response
+  if configured_malware_patterns_response=$(curl -fsSL --connect-timeout 5 --max-time 15 "$malware_patterns_url"); then
+    mapfile -t configured_malware_patterns <<< "$configured_malware_patterns_response"
+    for configured_pattern in "${configured_malware_patterns[@]}"; do
+      [[ -z "$configured_pattern" || "$configured_pattern" == \#* ]] && continue
+      pattern_type="${configured_pattern%%:*}"
+      pattern="${configured_pattern#*:}"
+      case "$pattern_type" in
+        known-literal) known_patterns+=("$pattern") ;;
+        known-regex) known_regex_patterns+=("$pattern") ;;
+        potential-regex) potential_patterns+=("$pattern") ;;
+        *) echo "[Malware Scanner] Ignoring pattern with unknown type: $pattern_type" ;;
+      esac
+    done
+  else
+    echo "[Malware Scanner] Failed to download malware patterns, skipping configured pattern checks."
+  fi
+
   for pattern in "${known_patterns[@]}"; do
-    if grep -RlF --include='*.js' --include='*.lua' "$pattern" ${dirs[@]} >/dev/null 2>/dev/null; then
+    pattern_matches=$(grep -RlF --exclude-dir='prevent_malware' --include='*.js' --include='*.lua' "$pattern" "${dirs[@]}" 2>/dev/null)
+    if [[ -n "$pattern_matches" ]]; then
       malware_count=$((malware_count + 1))
       echo "[Malware Scanner] $malware_count Malware Found"
       echo "[Malware Scanner] Please wait while log files are generated for support."
-      grep -RlF --include='*.js' --include='*.lua' "$pattern" ${dirs[@]} 2>/dev/null >> malware_scan.log
+      printf '%s\n' "$pattern_matches" >> malware_scan.log
       echo "[Malware Scanner] Log file generated."
       known_malware_found=1
-      
     fi
   done
 
-  potential_patterns=('/* [' 'Buffer.from(b64' 'new Function(code)();' 'fromCharCode(104,116,116,112,115' "require('vm').runInThisContext" ) 
-  for pattern in "${potential_patterns[@]}"; do
-    if grep -RlF --exclude-dir='\[builders\]' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='webpack' --exclude-dir='yarn' --include='*.js' "$pattern" ${dirs[@]} >/dev/null 2>/dev/null; then
+  local -a known_malicious_domains=()
+  local malicious_domains_url="https://apollo-assets-s3.sparkedhost.us/fivem/malicious-domains.txt"
+  local known_malicious_domains_response
+  if known_malicious_domains_response=$(curl -fsSL --connect-timeout 5 --max-time 15 "$malicious_domains_url"); then
+    mapfile -t known_malicious_domains <<< "$known_malicious_domains_response"
+  else
+    echo "[Malware Scanner] Failed to download known malicious domains, skipping domain checks."
+  fi
+  local known_malicious_domain_pattern=""
+  if (( ${#known_malicious_domains[@]} > 0 )); then
+    local original_ifs="$IFS"
+    IFS='|'
+    known_malicious_domain_pattern="${known_malicious_domains[*]//./\\.}"
+    IFS="$original_ifs"
+  fi
+
+  if [[ -n "$known_malicious_domain_pattern" ]]; then
+    known_regex_patterns+=("$known_malicious_domain_pattern")
+  fi
+  for pattern in "${known_regex_patterns[@]}"; do
+    pattern_matches=$(grep -RIlE --exclude-dir='prevent_malware' --include='*.js' --include='*.lua' --include='*.html' --include='*.json' "$pattern" "${dirs[@]}" 2>/dev/null)
+    if [[ -n "$pattern_matches" ]]; then
+      malware_count=$((malware_count + 1))
+      echo "[Malware Scanner] $malware_count Malware Found"
       echo "[Malware Scanner] Please wait while log files are generated for support."
-      grep -RlF --exclude-dir='\[builders\]' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='webpack' --exclude-dir='yarn' --include='*.js' "$pattern" ${dirs[@]} 2>/dev/null >> malware_scan_potential.log
+      printf '%s\n' "$pattern_matches" >> malware_scan.log
+      echo "[Malware Scanner] Log file generated."
+      known_malware_found=1
+    fi
+  done
+
+  # These decode and execute payloads rather than merely using an execution primitive.
+  # They remain warnings because a legitimate resource can still use an obfuscator.
+  for pattern in "${potential_patterns[@]}"; do
+    pattern_matches=$(grep -RIlE --exclude-dir='prevent_malware' --exclude-dir='[[]builders[]]' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='webpack' --exclude-dir='yarn' --include='*.js' --include='*.html' "$pattern" "${dirs[@]}" 2>/dev/null)
+    if [[ -n "$pattern_matches" ]]; then
+      echo "[Malware Scanner] Please wait while log files are generated for support."
+      printf '%s\n' "$pattern_matches" >> malware_scan_potential.log
       echo "[Malware Scanner] Log file generated, please contact support!"
       potential_malware_found=1
     fi
@@ -369,15 +427,6 @@ malware_scan() {
       known_malware_found=1
     fi
   done < <(find ${dirs[@]} -type f -name '*.ttf' -size +0c -print0 2>/dev/null)
-  
-  # This can have a lot of false positives, but it can help us catch some of the infected javascript files
-  
-  if grep -RPInl -m 1 --exclude-dir='[[]builders[]]' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='webpack' --exclude-dir='yarn' --include='*.js' -P '(^|[^a-zA-Z0-9_])\b(eval\s*\(|(?<!new\s)Function\s*\()' ${dirs[@]} >/dev/null 2>/dev/null; then
-    echo "[Malware Scanner] Please wait while log files are generated for support."
-    grep -RPInl -m 1 --exclude-dir='[[]builders[]]' --exclude-dir='webpack' --exclude-dir='monitor' --exclude-dir='node_modules' --exclude-dir='yarn' --include='*.js' -P '(^|[^a-zA-Z0-9_])\b(eval\s*\(|(?<!new\s)Function\s*\()' ${dirs[@]} >> malware_scan_potential.log 2>/dev/null
-    echo "[Malware Scanner] Log file generated, please contact support!"
-    potential_malware_found=1
-  fi
   
   if [[ $known_malware_found -eq 1 ]];then 
     echo "[Malware Scanner] $malware_count Malware found"
