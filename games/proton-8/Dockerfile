@@ -5,14 +5,14 @@
 # ----------------------------------
 
 
-FROM debian:bullseye-slim
+FROM debian:trixie-slim
 
 LABEL author="DevOps Team at Sparked Host" maintainer="devops@sparkedhost.com"
 
 RUN  dpkg --add-architecture i386 \
      && apt update \
      && apt -y upgrade \
-     && apt install -y --no-install-recommends alsa-tools cabextract curl dbus ffmpeg git gnupg gnupg2 gnutls-bin iproute2 locales numactl mesa-utils net-tools netcat-openbsd pulseaudio python3 python3-pip python3-setuptools python3-venv software-properties-common tar tini virt-what wget winbind xauth xvfb lib32gcc-s1 libao-common libasound2 libsdl1.2debian libsdl1.2debian:i386 libsdl2-2.0-0 libsdl2-2.0-0:i386 libgdiplus libncurses5-dev:i386 libncurses6 libntlm0 libpulse-dev libpulse0 \ 
+     && apt install -y --no-install-recommends alsa-tools cabextract curl dbus ffmpeg git gnupg gnupg2 gnutls-bin iproute2 locales numactl mesa-utils net-tools netcat-openbsd pulseaudio python3 python3-pip python3-setuptools python3-venv tar tini virt-what wget winbind xauth xvfb lib32gcc-s1 libao-common libasound2 libsdl1.2debian libsdl1.2debian:i386 libsdl2-2.0-0 libsdl2-2.0-0:i386 libgdiplus libncurses-dev:i386 libncurses6 libntlm0 libpulse-dev libpulse0 \
      && curl -sLOJ "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton8-32/GE-Proton8-32.tar.gz" \
      && tar -xzf GE-Proton8-32.tar.gz -C /usr/local/bin/ --strip-components=1 \
      && rm GE-Proton8-32.tar.gz \
@@ -20,7 +20,7 @@ RUN  dpkg --add-architecture i386 \
      && dbus-uuidgen --ensure=/etc/machine-id \
      && rm /var/lib/dbus/machine-id \
      && dbus-uuidgen --ensure \
-     && python3 -m pip install protontricks \
+     && python3 -m pip install --break-system-packages protontricks \
      && wget -q -O /usr/sbin/winetricks https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks \
      && chmod +x /usr/sbin/winetricks \
      && cd /tmp/ \
