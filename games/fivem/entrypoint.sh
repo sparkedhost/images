@@ -422,9 +422,9 @@ malware_scan() {
 
   while IFS= read -r -d '' ttf_file; do
     if ! file "$ttf_file" | grep -iq 'font data'; then
-      echo "[Malware Scanner] Malware detected! $ttf_file"
+      echo "[Malware Scanner] Potentially suspicious font file found: $ttf_file"
       echo "$ttf_file" >> malware_scan_fonts.log
-      known_malware_found=1
+      potential_malware_found=1
     fi
   done < <(find ${dirs[@]} -type f -name '*.ttf' -size +0c -print0 2>/dev/null)
   
