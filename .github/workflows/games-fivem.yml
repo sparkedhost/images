@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - "games/fivem/*"
+      - "games/fivem-node22/*"
       - .github/workflows/games-fivem.yml
 
 jobs:
@@ -16,3 +17,11 @@ jobs:
       context: ./games
       file: ./games/fivem/Dockerfile
       tags: ghcr.io/sparkedhost/images:games-fivem
+
+  build-node22:
+    needs: build
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      context: ./games
+      file: ./games/fivem-node22/Dockerfile
+      tags: ghcr.io/sparkedhost/images:games-fivem-node22
