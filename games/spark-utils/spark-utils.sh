@@ -971,6 +971,19 @@ cleanup_valheim_framework(){
 
 startup_valheim(){
     local mod_framework="${MOD_FRAMEWORK:-vanilla}"
+    local modifier variable value
+
+    export VALHEIM_WORLD_ARGS=""
+    if [[ -n "${WORLD_PRESET:-}" && "${WORLD_PRESET}" != "Default" ]]; then
+        VALHEIM_WORLD_ARGS="-preset ${WORLD_PRESET}"
+    fi
+    for modifier in combat death_penalty resources raids portals; do
+        variable="MODIFIER_${modifier^^}"
+        value="${!variable}"
+        if [[ -n "${value}" && "${value}" != "Default" ]]; then
+            VALHEIM_WORLD_ARGS+=" -modifier ${modifier//_/} ${value}"
+        fi
+    done
 
     case "${mod_framework}" in
         vanilla)
