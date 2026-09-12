@@ -137,6 +137,21 @@ if [ "${AUTO_UPDATE_JAR}" = 1 ] && [ -n "${UPDATE_API_URL}" ]; then
     fi
 fi
 
+# Enforce Minecraft's bind address and allocated port before startup.
+if [ -f server.properties ] && [ -n "${SERVER_PORT}" ]; then
+    if grep -q '^server-ip=' server.properties; then
+        sed -i 's/^server-ip=.*/server-ip=0.0.0.0/' server.properties
+    else
+        printf '\nserver-ip=0.0.0.0\n' >> server.properties
+    fi
+
+    if grep -q '^server-port=' server.properties; then
+        sed -i "s/^server-port=.*/server-port=${SERVER_PORT}/" server.properties
+    else
+        printf '\nserver-port=%s\n' "${SERVER_PORT}" >> server.properties
+    fi
+fi
+
 # Print startup command to console
 echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m ${MODIFIED_STARTUP}"
 
