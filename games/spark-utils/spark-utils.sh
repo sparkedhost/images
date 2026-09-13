@@ -971,7 +971,8 @@ cleanup_valheim_framework(){
 
 startup_valheim(){
     local mod_framework="${MOD_FRAMEWORK:-vanilla}"
-    local modifier variable value
+    local modifier variable value key
+    local -a world_keys
 
     export VALHEIM_WORLD_ARGS=""
     if [[ -n "${WORLD_PRESET:-}" && "${WORLD_PRESET}" != "Default" ]]; then
@@ -982,6 +983,14 @@ startup_valheim(){
         value="${!variable}"
         if [[ -n "${value}" && "${value}" != "Default" ]]; then
             VALHEIM_WORLD_ARGS+=" -modifier ${modifier//_/} ${value}"
+        fi
+    done
+
+    IFS=';' read -r -a world_keys <<< "${WORLD_SETKEY:-}"
+    for key in "${world_keys[@]}"; do
+        key="${key//[[:space:]]/}"
+        if [[ -n "${key}" ]]; then
+            VALHEIM_WORLD_ARGS+=" -setkey ${key}"
         fi
     done
 
