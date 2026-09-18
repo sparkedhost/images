@@ -950,6 +950,46 @@ startup_with_signal_forwarding(){
     wait "${server_pid}"
 }
 
+startup_enshrouded(){
+    MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
+
+    echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
+
+    stop_enshrouded() {
+        local signal="$1"
+        local process process_name game_pid
+
+        trap '' INT TERM
+
+        for process in /proc/[0-9]*; do
+            if read -r process_name < "${process}/comm" 2>/dev/null && [[ "${process_name}" == "enshrouded_serv" ]]; then
+                game_pid="${process##*/}"
+                break
+            fi
+        done
+
+        if [[ -n "${game_pid:-}" ]]; then
+            kill "-${signal}" "${game_pid}" 2>/dev/null || true
+            while kill -0 "${game_pid}" 2>/dev/null; do
+                sleep 1
+            done
+            kill -TERM -- "-${server_pid}" 2>/dev/null || true
+        else
+            kill "-${signal}" -- "-${server_pid}" 2>/dev/null || true
+        fi
+
+        wait "${server_pid}" || true
+        exit 0
+    }
+
+    trap 'stop_enshrouded INT' INT
+    trap 'stop_enshrouded TERM' TERM
+
+    setsid /bin/bash -c "${MODIFIED_STARTUP}" &
+    server_pid=$!
+    wait "${server_pid}"
+}
+
 regular_startup(){
     MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
     MODIFIED_STARTUP="${STARTUP_ENVIRONMENT_PREFIX:-}${MODIFIED_STARTUP}"
@@ -1014,7 +1054,8 @@ startup_valheim(){
     if [[ "${mod_framework}" != "vanilla" ]]; then
         configure_valheim_bepinex
     fi
-    regular_startup
+    STARTUP="${STARTUP_ENVIRONMENT_PREFIX:-}${STARTUP}"
+    startup_with_signal_forwarding
 }
 
 startup_ue4ss(){
@@ -1084,6 +1125,9 @@ startup_game(){
         ;;
         1829350)
             startup_with_signal_forwarding
+        ;;
+        2278520)
+            startup_enshrouded
         ;;
         233780)
             startup_arma3
