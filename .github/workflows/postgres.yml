@@ -16,6 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         version:
+          - 13
           - 14
           - 15
           - 16
@@ -23,6 +24,7 @@ jobs:
     uses: ./.github/workflows/docker-build.yml
     with:
       context: ./databases/postgres
-      file: ./databases/postgres/postgres-${{ matrix.version }}/Dockerfile
+      file: ./databases/postgres/Dockerfile
       tags: ghcr.io/sparkedhost/images:postgres-${{ matrix.version }}
+      build_args: POSTGRES_MAJOR=${{ matrix.version }}
     secrets: inherit

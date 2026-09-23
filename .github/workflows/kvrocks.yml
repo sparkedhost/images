@@ -1,0 +1,20 @@
+name: Build KVRocks
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "databases/kvrocks/**/*"
+      - .github/workflows/kvrocks.yml
+
+jobs:
+  build:
+    name: "KVRocks 2"
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      context: ./databases/kvrocks
+      file: ./databases/kvrocks/Dockerfile
+      tags: ghcr.io/sparkedhost/images:kvrocks-2
+    secrets: inherit
