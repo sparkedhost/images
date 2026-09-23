@@ -11,10 +11,16 @@ on:
 
 jobs:
   build:
-    name: "KVRocks 2"
+    name: "KVRocks ${{ matrix.series }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { series: "2", release: "2.16.0" }
     uses: ./.github/workflows/docker-build.yml
     with:
       context: ./databases/kvrocks
       file: ./databases/kvrocks/Dockerfile
-      tags: ghcr.io/sparkedhost/images:kvrocks-2
+      tags: ghcr.io/sparkedhost/images:kvrocks-${{ matrix.series }}
+      build_args: KVROCKS_VERSION=${{ matrix.release }}
     secrets: inherit

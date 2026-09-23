@@ -1,18 +1,25 @@
-FROM apache/kvrocks:2.16.0
+ARG KVROCKS_VERSION=2.16.0
+
+FROM apache/kvrocks:${KVROCKS_VERSION} AS kvrocks
+
+FROM debian:trixie-slim
+
+ARG KVROCKS_VERSION
+ARG DEBIAN_FRONTEND=noninteractive
 
 LABEL author="DevOps Team at Sparked Host" \
       maintainer="devops@sparkedhost.com" \
-      org.opencontainers.image.title="Sparked Host KVRocks 2.16" \
+      org.opencontainers.image.title="Sparked Host KVRocks ${KVROCKS_VERSION}" \
+      org.opencontainers.image.version="${KVROCKS_VERSION}" \
       org.opencontainers.image.source="https://github.com/sparkedhost/images"
-
-USER root
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        ca-certificates iproute2 supervisor \
+        ca-certificates libatomic1 libssl3t64 libzstd1 supervisor zlib1g \
     && useradd --create-home --home-dir /home/container --shell /bin/bash container \
     && rm -rf /var/lib/apt/lists/*
 
+COPY --from=kvrocks /usr/bin/kvrocks /usr/bin/kvrocks
 COPY supervisord.conf /etc/supervisor/supervisord.conf
 COPY entrypoint.sh /entrypoint.sh
 

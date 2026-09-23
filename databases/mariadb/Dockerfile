@@ -10,7 +10,7 @@ ENV MARIADB_BASEDIR=/opt/mariadb \
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        ca-certificates curl gnupg iproute2 libaio1t64 libncurses6 libnuma1 \
+        ca-certificates curl iproute2 libaio1t64 libncurses6 libnuma1 \
         libstdc++6 liburing2 openssl perl procps supervisor tar unzip \
     && curl -fsSL https://packages.sury.org/php/apt.gpg \
         -o /usr/share/keyrings/deb.sury.org-php.gpg \
@@ -18,11 +18,10 @@ RUN apt-get update \
         > /etc/apt/sources.list.d/php.list \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-        php${PHP_VERSION} php${PHP_VERSION}-bcmath php${PHP_VERSION}-cli \
+        php${PHP_VERSION}-bcmath \
         php${PHP_VERSION}-curl php${PHP_VERSION}-fpm php${PHP_VERSION}-gd \
         php${PHP_VERSION}-mbstring php${PHP_VERSION}-mysql \
         php${PHP_VERSION}-xml php${PHP_VERSION}-zip \
-    && apt-get purge -y --auto-remove gnupg \
     && rm -rf /var/lib/apt/lists/*
 
 RUN useradd --create-home --home-dir /home/container --shell /bin/bash container
@@ -91,25 +90,18 @@ RUN mkdir -p ${MARIADB_BASEDIR} \
         ${MARIADB_BASEDIR}/include \
         ${MARIADB_BASEDIR}/man \
         ${MARIADB_BASEDIR}/mariadb-test \
+        ${MARIADB_BASEDIR}/mysql-test \
         ${MARIADB_BASEDIR}/sql-bench \
-    && rm -f \
-        ${MARIADB_BASEDIR}/bin/mariadb-client-test \
-        ${MARIADB_BASEDIR}/bin/mariadb-test \
-        ${MARIADB_BASEDIR}/bin/mariadb_config \
-        ${MARIADB_BASEDIR}/bin/mysql_client_test \
-        ${MARIADB_BASEDIR}/bin/mysql_config \
-        ${MARIADB_BASEDIR}/bin/mysqltest \
-        ${MARIADB_BASEDIR}/bin/test-connect-t \
+    && find ${MARIADB_BASEDIR}/bin -maxdepth 1 -type f \
+        ! -name mariadbd ! -name mariadb ! -name mariadb-admin \
+        ! -name mariadb-check ! -name mariadb-dump ! -name mariadb-upgrade \
+        ! -name my_print_defaults ! -name resolveip -delete \
+    && find ${MARIADB_BASEDIR}/bin -maxdepth 1 -xtype l -delete \
     && find ${MARIADB_BASEDIR}/lib -type f \
         \( -name '*.a' -o -name '*.la' \) -delete \
     && find ${MARIADB_BASEDIR}/bin ${MARIADB_BASEDIR}/lib -type f \
         -exec sh -c 'for file do strip --strip-unneeded "$file" 2>/dev/null || true; done' sh {} + \
     && rm -f \
-        ${MARIADB_BASEDIR}/bin/aria_s3_copy \
-        ${MARIADB_BASEDIR}/bin/garbd \
-        ${MARIADB_BASEDIR}/bin/mariadb-ldb \
-        ${MARIADB_BASEDIR}/bin/mysql_ldb \
-        ${MARIADB_BASEDIR}/bin/sst_dump \
         ${MARIADB_BASEDIR}/lib/libgalera_smm.so \
         ${MARIADB_BASEDIR}/lib/plugin/adt_null.so \
         ${MARIADB_BASEDIR}/lib/plugin/auth_0x0100.so \
@@ -156,7 +148,7 @@ RUN mkdir -p ${MARIADB_BASEDIR} \
     && ln -s ${MARIADB_BASEDIR}/bin/mariadb-admin /usr/local/bin/mariadb-admin \
     && ln -s ${MARIADB_BASEDIR}/bin/mariadb-upgrade /usr/local/bin/mariadb-upgrade \
     && ln -s ${MARIADB_BASEDIR}/bin/mariadbd /usr/local/bin/mariadbd \
-    && apt-get purge -y --auto-remove binutils \
+    && apt-get purge -y --auto-remove binutils curl unzip \
     && rm -rf /var/lib/apt/lists/*
 
 COPY template/etc/php-fpm.conf /etc/php/${PHP_VERSION}/fpm/php-fpm.conf

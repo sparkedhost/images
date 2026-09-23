@@ -11,21 +11,17 @@ on:
 
 jobs:
   build:
-    name: "MongoDB ${{ matrix.version }}"
+    name: "MongoDB ${{ matrix.series }}"
     strategy:
       fail-fast: false
       matrix:
         include:
-          - version: 6
-            image: 6.0.20
-          - version: 7
-            image: 7.0.16
-          - version: 8
-            image: 8.0.4
+          - { series: "7", release: "7.0.43" }
+          - { series: "8", release: "8.0.30" }
     uses: ./.github/workflows/docker-build.yml
     with:
       context: ./databases/mongodb
       file: ./databases/mongodb/Dockerfile
-      tags: ghcr.io/sparkedhost/images:mongodb-${{ matrix.version }}
-      build_args: MONGO_VERSION=${{ matrix.image }}
+      tags: ghcr.io/sparkedhost/images:mongodb-${{ matrix.series }}
+      build_args: MONGO_VERSION=${{ matrix.release }}
     secrets: inherit

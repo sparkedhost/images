@@ -21,7 +21,7 @@ case "$operation" in
     postgresql-dump|postgresql-restore)
         : "${POSTGRESQL_MAJOR:?POSTGRESQL_MAJOR is required}"
         case "$POSTGRESQL_MAJOR" in
-            13|14|15|16|17) ;;
+            14|15|16|17|18) ;;
             *)
                 echo "unsupported PostgreSQL major: $POSTGRESQL_MAJOR" >&2
                 exit 64
