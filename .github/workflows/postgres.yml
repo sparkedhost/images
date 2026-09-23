@@ -11,18 +11,22 @@ on:
 
 jobs:
   build:
-    name: "PostgreSQL ${{ matrix.version }}"
+    name: "PostgreSQL ${{ matrix.series }}"
     strategy:
       fail-fast: false
       matrix:
-        version:
-          - 14
-          - 15
-          - 16
-          - 17
+        include:
+          - { series: "14", release: "14.24" }
+          - { series: "15", release: "15.19" }
+          - { series: "16", release: "16.15" }
+          - { series: "17", release: "17.11" }
+          - { series: "18", release: "18.6" }
     uses: ./.github/workflows/docker-build.yml
     with:
       context: ./databases/postgres
-      file: ./databases/postgres/postgres-${{ matrix.version }}/Dockerfile
-      tags: ghcr.io/sparkedhost/images:postgres-${{ matrix.version }}
+      file: ./databases/postgres/Dockerfile
+      tags: ghcr.io/sparkedhost/images:postgres-${{ matrix.series }}
+      build_args: |
+        POSTGRES_MAJOR=${{ matrix.series }}
+        POSTGRES_RELEASE=${{ matrix.release }}
     secrets: inherit

@@ -1,0 +1,19 @@
+name: Build database tools
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "databases/db-tools/**"
+      - .github/workflows/db-tools.yml
+
+jobs:
+  build:
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      context: ./databases/db-tools
+      file: ./databases/db-tools/Dockerfile
+      tags: ghcr.io/sparkedhost/images:db-tools
+    secrets: inherit
