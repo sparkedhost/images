@@ -1090,6 +1090,8 @@ startup_windrose(){
         if [[ -n "${game_pid}" ]]; then
             # Wine turns SIGINT delivered to GameThread into a Windows CTRL_C_EVENT.
             kill -INT "${game_pid}"
+        else
+            kill -INT -- "-${server_pid}" 2>/dev/null || true
         fi
 
         wait "${server_pid}"
