@@ -31,6 +31,10 @@ class AdminerLoginServers extends Adminer\Plugin
 
     public function loginFormField($name, $heading, $value)
     {
+        if (getenv('ADMINER_DRIVER') === 'redis' && ($name === 'username' || $name === 'db')) {
+            return Adminer\input_hidden('auth['.$name.']', '');
+        }
+
         if ($name === 'driver') {
             return '';
         }
