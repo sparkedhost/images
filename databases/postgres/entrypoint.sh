@@ -13,6 +13,25 @@ done
 
 mkdir -p "$PGDATA"
 /usr/local/bin/prepare-adminer
+
+# Wings runs containers as the node's numeric UID/GID, which may not exist in
+# this image's passwd database. PostgreSQL requires getpwuid() to resolve it.
+if ! getent passwd "$(id -u)" >/dev/null; then
+    nss_wrapper="$(find /usr/lib -name libnss_wrapper.so -print -quit)"
+    [[ -n "$nss_wrapper" ]] || { echo 'libnss_wrapper.so not found' >&2; exit 1; }
+
+    passwd_file="$(mktemp)"
+    group_file="$(mktemp)"
+    uid="$(id -u)"
+    gid="$(id -g)"
+    printf 'root:x:0:0:root:/root:/bin/bash\ncontainer:x:%s:%s::/home/container:/bin/bash\nnobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin\n' \
+        "$uid" "$gid" > "$passwd_file"
+    printf 'root:x:0:\ncontainer:x:%s:\nnogroup:x:65534:\n' "$gid" > "$group_file"
+    export NSS_WRAPPER_PASSWD="$passwd_file"
+    export NSS_WRAPPER_GROUP="$group_file"
+    export LD_PRELOAD="$nss_wrapper${LD_PRELOAD:+:$LD_PRELOAD}"
+fi
+
 if [[ ! -f "$PGDATA/PG_VERSION" ]]; then
     password_file="$(mktemp)"
     chmod 0600 "$password_file"

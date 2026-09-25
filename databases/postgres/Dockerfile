@@ -14,7 +14,7 @@ LABEL author="DevOps Team at Sparked Host" \
 COPY adminer/install.sh /usr/local/bin/install-adminer
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates curl supervisor \
+    && apt-get install -y --no-install-recommends ca-certificates curl libnss-wrapper supervisor \
     && install -d -m 0755 /etc/apt/keyrings \
     && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
         -o /etc/apt/keyrings/postgresql.asc \
