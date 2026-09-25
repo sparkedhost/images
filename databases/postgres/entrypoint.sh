@@ -2,19 +2,17 @@
 set -Eeuo pipefail
 
 export SERVER_PORT="${SERVER_PORT:-5432}"
-export WEB_UI_PORT="${WEB_UI_PORT:-8080}"
-export WEB_UI_ENABLED="${WEB_UI_ENABLED:-1}"
+export ADMINER_DRIVER=pgsql ADMINER_SERVER_LABEL=PostgreSQL
 export ADMIN_USER="${ADMIN_USER:-admin}"
 export ADMIN_PASSWORD="${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}"
 export PGDATA=/home/container/postgres_db
 
-for value in "$SERVER_PORT" "$WEB_UI_PORT"; do
+for value in "$SERVER_PORT"; do
     [[ "$value" =~ ^[0-9]+$ ]] && (( value >= 1 && value <= 65535 )) || exit 1
 done
 
-mkdir -p "$PGDATA" /home/container/run/php/sessions
-sed "s/@@WEB_UI_PORT@@/${WEB_UI_PORT}/g" \
-    /etc/caddy/Caddyfile.template > /home/container/run/Caddyfile
+mkdir -p "$PGDATA"
+/usr/local/bin/prepare-adminer
 if [[ ! -f "$PGDATA/PG_VERSION" ]]; then
     password_file="$(mktemp)"
     chmod 0600 "$password_file"

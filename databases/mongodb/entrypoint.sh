@@ -2,6 +2,7 @@
 set -Eeuo pipefail
 
 export SERVER_PORT="${SERVER_PORT:-27017}"
+export ADMINER_DRIVER=mongo ADMINER_SERVER_LABEL=MongoDB
 export ADMIN_USER="${ADMIN_USER:-admin}"
 export ADMIN_PASSWORD="${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}"
 
@@ -10,6 +11,7 @@ for value in "$SERVER_PORT"; do
 done
 
 mkdir -p /home/container/{mongodb,etc,run}
+/usr/local/bin/prepare-adminer
 config=/home/container/etc/mongod.conf
 cat > "$config" <<EOF
 storage:

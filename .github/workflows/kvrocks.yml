@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - "databases/kvrocks/**/*"
+      - "databases/adminer/**/*"
       - .github/workflows/kvrocks.yml
 
 jobs:
@@ -19,7 +20,7 @@ jobs:
           - { series: "2", release: "2.16.0" }
     uses: ./.github/workflows/docker-build.yml
     with:
-      context: ./databases/kvrocks
+      context: ./databases
       file: ./databases/kvrocks/Dockerfile
       tags: ghcr.io/sparkedhost/images:kvrocks-${{ matrix.series }}
       build_args: KVROCKS_VERSION=${{ matrix.release }}

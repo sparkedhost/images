@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - "databases/mongodb/**/*"
+      - "databases/adminer/**/*"
       - .github/workflows/mongodb.yml
 
 jobs:
@@ -20,7 +21,7 @@ jobs:
           - { series: "8", release: "8.0.30" }
     uses: ./.github/workflows/docker-build.yml
     with:
-      context: ./databases/mongodb
+      context: ./databases
       file: ./databases/mongodb/Dockerfile
       tags: ghcr.io/sparkedhost/images:mongodb-${{ matrix.series }}
       build_args: MONGO_VERSION=${{ matrix.release }}

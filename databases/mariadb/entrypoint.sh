@@ -7,7 +7,6 @@ export PATH="/opt/mariadb/bin:/opt/mariadb/scripts:/usr/local/bin:${PATH}"
 export PS1='container@${HOSTNAME}:${PWD}\$ '
 export SERVER_PORT="${SERVER_PORT:-3306}"
 export WEB_UI_PORT="${WEB_UI_PORT:-8080}"
-export WEB_UI_ENABLED="${WEB_UI_ENABLED:-}"
 export MAX_CONNECTIONS="${MAX_CONNECTIONS_ENV:-1000}"
 
 readonly MARIADB_SOCKET=/home/container/run/mysqld/mysqld.sock

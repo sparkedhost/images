@@ -11,6 +11,8 @@ LABEL author="DevOps Team at Sparked Host" \
       org.opencontainers.image.version="${MONGO_VERSION}" \
       org.opencontainers.image.source="https://github.com/sparkedhost/images"
 
+COPY adminer/install.sh /usr/local/bin/install-adminer
+
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates curl libcurl4t64 libssl3t64 supervisor \
@@ -31,14 +33,22 @@ RUN apt-get update \
     && tar -xzf /tmp/mongosh.tgz --strip-components=2 -C /usr/local/bin \
         "mongosh-${MONGOSH_VERSION}-linux-x64/bin/mongosh" \
     && rm /tmp/mongodb.tgz /tmp/mongodb.sha256 /tmp/mongosh.tgz \
+    && bash /usr/local/bin/install-adminer mongo \
     && apt-get purge -y --auto-remove curl \
     && useradd --create-home --home-dir /home/container --shell /bin/bash container \
     && rm -rf /var/lib/apt/lists/*
 
-COPY supervisord.conf /etc/supervisor/supervisord.conf
-COPY entrypoint.sh /entrypoint.sh
+COPY adminer/start-adminer /usr/local/bin/start-adminer
+COPY adminer/prepare.sh /usr/local/bin/prepare-adminer
+COPY adminer/Caddyfile /etc/caddy/Caddyfile.template
+COPY adminer/php-fpm.conf /etc/php/8.5/fpm/php-fpm.conf
+COPY adminer/index.php /var/www/adminer/public/index.php
+COPY adminer/login-servers.php /var/www/adminer/public/plugins-enabled/login-servers.php
+COPY adminer/supervisord.conf /etc/supervisor/conf.d/adminer.conf
+COPY mongodb/supervisord.conf /etc/supervisor/supervisord.conf
+COPY mongodb/entrypoint.sh /entrypoint.sh
 
-RUN chmod 0755 /entrypoint.sh \
+RUN chmod 0755 /entrypoint.sh /usr/local/bin/start-adminer /usr/local/bin/prepare-adminer \
     && chown -R container:container /home/container
 
 USER container

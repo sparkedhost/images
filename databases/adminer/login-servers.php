@@ -8,20 +8,23 @@ class AdminerLoginServers extends Adminer\Plugin
     {
         $this->servers = $servers;
 
-        if ($_POST['auth']) {
+        if (isset($_POST['auth']['server'])) {
             $key = $_POST['auth']['server'];
+            if (!isset($this->servers[$key])) {
+                return;
+            }
             $_POST['auth']['driver'] = $this->servers[$key]['driver'];
         }
     }
 
     public function credentials()
     {
-        return [Adminer\idx($this->servers[Adminer\SERVER], 'server'), $_GET['username'], Adminer\get_password()];
+        return [Adminer\idx($this->servers[Adminer\SERVER] ?? [], 'server'), $_GET['username'] ?? '', Adminer\get_password()];
     }
 
     public function login($login, $password)
     {
-        if (!$this->servers[Adminer\SERVER]) {
+        if (!isset($this->servers[Adminer\SERVER])) {
             return false;
         }
     }
@@ -39,8 +42,8 @@ class AdminerLoginServers extends Adminer\Plugin
 }
 
 return new AdminerLoginServers([
-    'PostgreSQL' => [
-        'server' => '127.0.0.1:'.(getenv('ADMINER_DATABASE_PORT') ?: '5432'),
-        'driver' => 'pgsql',
+    (getenv('ADMINER_SERVER_LABEL') ?: 'Database') => [
+        'server' => '127.0.0.1:'.getenv('ADMINER_DATABASE_PORT'),
+        'driver' => getenv('ADMINER_DRIVER'),
     ],
 ]);

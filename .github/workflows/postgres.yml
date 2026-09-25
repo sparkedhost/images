@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - "databases/postgres/**/*"
+      - "databases/adminer/**/*"
       - .github/workflows/postgres.yml
 
 jobs:
@@ -23,7 +24,7 @@ jobs:
           - { series: "18", release: "18.6" }
     uses: ./.github/workflows/docker-build.yml
     with:
-      context: ./databases/postgres
+      context: ./databases
       file: ./databases/postgres/Dockerfile
       tags: ghcr.io/sparkedhost/images:postgres-${{ matrix.series }}
       build_args: |

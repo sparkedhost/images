@@ -15,5 +15,8 @@
 		Referrer-Policy "same-origin"
 	}
 
+	@directPhp path *.php
+	respond @directPhp 404
+
 	php_fastcgi 127.0.0.1:9999
 }

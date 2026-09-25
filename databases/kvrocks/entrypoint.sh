@@ -2,6 +2,7 @@
 set -Eeuo pipefail
 
 export SERVER_PORT="${SERVER_PORT:-6666}"
+export ADMINER_DRIVER=redis ADMINER_SERVER_LABEL=KVRocks
 export ADMIN_PASSWORD="${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}"
 
 for value in "$SERVER_PORT"; do
@@ -9,6 +10,7 @@ for value in "$SERVER_PORT"; do
 done
 
 mkdir -p /home/container/{data,run,etc}
+/usr/local/bin/prepare-adminer
 config=/home/container/etc/kvrocks.conf
 if [[ ! -f "$config" ]]; then
     cat > "$config" <<EOF
