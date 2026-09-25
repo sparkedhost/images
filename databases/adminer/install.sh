@@ -6,7 +6,6 @@ driver="${1:?Adminer driver is required}"
 php_version=8.5
 adminer_version=6.1.0
 adminer_sha256=95bf24b510b41904446f720f4f1212c9e28b1d523f3df44259480d7a12ea181e
-theme_sha256=5eb534b1c595697cdfcee9b1cd4371b5367b53892069bd69f5f0a3abafaa58a5
 login_reverse_proxy_sha256=6f702191760e91b5ffeab86306f545ae03d4f618ccff3f12088635eb94b9bc25
 mongo_driver_sha256=5cad54273126b473c90e45a8771a28c337ad882aecf44d3dad51e1f9a0f23957
 redis_driver_sha256=c66ed53fbc9071e3de8f5592e15011431bae11848d9c3afedc62b8f49ffaec00
@@ -44,9 +43,8 @@ curl -fsSL \
     -o /var/www/adminer/public/adminer.php
 echo "${adminer_sha256}  /var/www/adminer/public/adminer.php" | sha256sum -c -
 
-curl -fsSL https://raw.githubusercontent.com/devknown/simple-theme/master/adminer.css \
-    -o /var/www/adminer/public/adminer.css
-echo "${theme_sha256}  /var/www/adminer/public/adminer.css" | sha256sum -c -
+install -m 0644 /usr/share/doc/adminer/themes/hydra-dark/adminer.css \
+    /var/www/adminer/public/adminer.css
 
 curl -fsSL \
     "https://raw.githubusercontent.com/vrana/adminer/v${adminer_version}/plugins/login-reverse-proxy.php" \

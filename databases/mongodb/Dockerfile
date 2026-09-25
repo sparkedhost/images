@@ -12,6 +12,7 @@ LABEL author="DevOps Team at Sparked Host" \
       org.opencontainers.image.source="https://github.com/sparkedhost/images"
 
 COPY adminer/install.sh /usr/local/bin/install-adminer
+COPY adminer/themes/hydra-dark /usr/share/doc/adminer/themes/hydra-dark
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
