@@ -4,12 +4,12 @@ set -Eeuo pipefail
 # Shared Adminer, PHP-FPM and Caddy installation for database images.
 driver="${1:?Adminer driver is required}"
 php_version=8.5
-adminer_version=6.1.0
-adminer_sha256=95bf24b510b41904446f720f4f1212c9e28b1d523f3df44259480d7a12ea181e
-login_reverse_proxy_sha256=6f702191760e91b5ffeab86306f545ae03d4f618ccff3f12088635eb94b9bc25
-mongo_driver_sha256=5cad54273126b473c90e45a8771a28c337ad882aecf44d3dad51e1f9a0f23957
-redis_driver_sha256=c66ed53fbc9071e3de8f5592e15011431bae11848d9c3afedc62b8f49ffaec00
-kvrocks_driver_sha256=ea498d6d472f1286aa3a15d3769c050a70da06ec3afcc38a2806bbb3de3916d2
+adminer_version=6.1.1
+adminer_sha256=49c4d400994ef74bbb1b1b4d06c05445c1ba49ba3766b9092dce157750e09303
+login_reverse_proxy_sha256=cd8fcbeed32d8aa8b8213e88f56f0620f772f85aad44415cf953906c164c4f81
+mongo_driver_sha256=d4765e771a6dc1fedd03ff97d2fe7eafdb3f2921f090eda034d0621dbc7d1510
+redis_driver_sha256=d338a029743f4fe81b8062a06d9a42c216ce5ff0e5df705e6fd754c5f527ff76
+kvrocks_driver_sha256=bd7b8025d78f09ee390d5dfe26481e50044d4a143bb2917c0812068e7976afa2
 caddy_version=2.11.4
 
 case "$driver" in
@@ -42,6 +42,35 @@ curl -fsSL \
     "https://github.com/vrana/adminer/releases/download/v${adminer_version}/adminer-${adminer_version}.php" \
     -o /var/www/adminer/public/adminer.php
 echo "${adminer_sha256}  /var/www/adminer/public/adminer.php" | sha256sum -c -
+
+# Adminer treats a boolean's hidden input and checkbox as one DOM element.
+# Patch the compiled JavaScript to select the visible field, preserving both values.
+php -r '$_GET["file"] = "functions.js"; require "/var/www/adminer/public/adminer.php";' \
+    > /tmp/adminer-functions.js
+php <<'PHP'
+<?php
+$path = '/var/www/adminer/public/adminer.php';
+$javascript = str_replace(
+    "this.form[this.name.replace(/^function/,'fields')]",
+    "Array.from(this.form.elements).find(input => input.name === this.name.replace(/^function/,'fields') && input.type !== 'hidden')",
+    file_get_contents('/tmp/adminer-functions.js'),
+    $lookupCount
+);
+$source = preg_replace_callback(
+    '~(elseif\(\$_GET\["file"\]=="functions\.js"\)\{[^}]*?echo\s+)decompress_string\(\x27[^\x27]*\x27\)~',
+    static fn ($match) => $match[1].var_export($javascript, true),
+    file_get_contents($path),
+    -1,
+    $assetCount
+);
+if ($lookupCount !== 1 || $assetCount !== 1) {
+    throw new RuntimeException('Adminer boolean field patch no longer matches.');
+}
+// Invalidate cached scripts as well as Adminer's matching asset version check.
+$source = str_replace('6.1.1+43f4678f', '6.1.1+43f4678f-apollo1', $source);
+file_put_contents($path, $source);
+PHP
+rm /tmp/adminer-functions.js
 
 install -m 0644 /usr/share/doc/adminer/themes/hydra-dark/adminer.css \
     /var/www/adminer/public/adminer.css
