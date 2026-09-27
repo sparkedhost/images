@@ -4,12 +4,7 @@ set -Eeuo pipefail
 # Shared Adminer, PHP-FPM and Caddy installation for database images.
 driver="${1:?Adminer driver is required}"
 php_version=8.5
-adminer_version=6.1.0
-adminer_sha256=95bf24b510b41904446f720f4f1212c9e28b1d523f3df44259480d7a12ea181e
-login_reverse_proxy_sha256=6f702191760e91b5ffeab86306f545ae03d4f618ccff3f12088635eb94b9bc25
-mongo_driver_sha256=5cad54273126b473c90e45a8771a28c337ad882aecf44d3dad51e1f9a0f23957
-redis_driver_sha256=c66ed53fbc9071e3de8f5592e15011431bae11848d9c3afedc62b8f49ffaec00
-kvrocks_driver_sha256=ea498d6d472f1286aa3a15d3769c050a70da06ec3afcc38a2806bbb3de3916d2
+adminer_version=6.1.1
 caddy_version=2.11.4
 
 case "$driver" in
@@ -18,11 +13,11 @@ case "$driver" in
         ;;
     mongo)
         php_driver="php${php_version}-mongodb"
-        driver_sha256="$mongo_driver_sha256"
+        adminer_driver=mongo.php
         ;;
     redis)
         php_driver="php${php_version}-redis"
-        driver_sha256="$redis_driver_sha256"
+        adminer_driver=kvrocks.php
         ;;
     *)
         echo "Unsupported Adminer driver: $driver" >&2
@@ -38,31 +33,18 @@ apt-get update
 apt-get install -y --no-install-recommends "php${php_version}-fpm" "$php_driver"
 
 install -d -m 0755 /var/www/adminer/public/plugins-enabled /etc/caddy
-curl -fsSL \
-    "https://github.com/vrana/adminer/releases/download/v${adminer_version}/adminer-${adminer_version}.php" \
-    -o /var/www/adminer/public/adminer.php
-echo "${adminer_sha256}  /var/www/adminer/public/adminer.php" | sha256sum -c -
+install -m 0644 /usr/share/doc/adminer/vendor/adminer.php \
+    /var/www/adminer/public/adminer.php
 
 install -m 0644 /usr/share/doc/adminer/themes/hydra-dark/adminer.css \
     /var/www/adminer/public/adminer.css
 
-curl -fsSL \
-    "https://raw.githubusercontent.com/vrana/adminer/v${adminer_version}/plugins/login-reverse-proxy.php" \
-    -o /var/www/adminer/public/plugins-enabled/login-reverse-proxy.php
-echo "${login_reverse_proxy_sha256}  /var/www/adminer/public/plugins-enabled/login-reverse-proxy.php" | sha256sum -c -
+install -m 0644 /usr/share/doc/adminer/vendor/plugins/login-reverse-proxy.php \
+    /var/www/adminer/public/plugins-enabled/login-reverse-proxy.php
 
 if [[ "$driver" != pgsql ]]; then
-    driver_path="/var/www/adminer/public/plugins-enabled/${driver}.php"
-    curl -fsSL \
-        "https://www.adminer.org/static/download/${adminer_version}/drivers/${driver}.php" \
-        -o "$driver_path"
-    echo "${driver_sha256}  ${driver_path}" | sha256sum -c -
-
-    if [[ "$driver" == redis ]]; then
-        # KVRocks authenticates admin and namespace tokens with AUTH <password>.
-        sed -i 's/array("AUTH", $username, $password)/array("AUTH", $password)/' "$driver_path"
-        echo "${kvrocks_driver_sha256}  ${driver_path}" | sha256sum -c -
-    fi
+    install -m 0644 "/usr/share/doc/adminer/vendor/plugins/${adminer_driver}" \
+        "/var/www/adminer/public/plugins-enabled/${driver}.php"
 fi
 
 curl -fsSL \

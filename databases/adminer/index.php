@@ -18,6 +18,13 @@ namespace apollo {
 }
 
 namespace {
+    if (($_GET['file'] ?? null) === 'functions.js') {
+        header('Content-Type: text/javascript; charset=utf-8');
+        header('Cache-Control: no-store');
+        readfile(__DIR__.'/vendor/functions.js');
+        exit;
+    }
+
     function adminer_object() {
         return \apollo\adminer_object();
     }

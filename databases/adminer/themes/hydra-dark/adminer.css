@@ -65,6 +65,7 @@ hr { border: 0; border-top: 1px solid var(--border); }
     background: none;
     color: var(--muted);
     font-size: 12px;
+    white-space: normal;
     overflow-wrap: anywhere;
 }
 #breadcrumb a { color: var(--muted); }
@@ -79,7 +80,7 @@ hr { border: 0; border-top: 1px solid var(--border); }
     min-width: 0;
     height: 100dvh;
     margin: 0;
-    padding: 26px 18px 76px;
+    padding: 26px 18px 100px;
     overflow-y: auto;
     background: var(--surface);
     border-right: 1px solid var(--border);
@@ -121,6 +122,8 @@ hr { border: 0; border-top: 1px solid var(--border); }
 #menu #dbs { margin: 0 4px 20px; padding: 0; border: 0; }
 #dbs label { display: block; color: var(--muted); font-size: 12px; }
 #dbs select { display: block; width: 100%; margin-top: 6px; }
+#dbs input:not([type=submit]) { width: 100%; margin-top: 6px; }
+#dbs input[type=submit] { margin-top: 8px; }
 #menu .links { display: grid; gap: 4px; margin: 0 0 20px; padding: 0; border: 0; }
 #menu .links a {
     margin: 0;
@@ -146,12 +149,15 @@ hr { border: 0; border-top: 1px solid var(--border); }
     list-style: none;
     border-bottom: 0;
 }
-#tables li { padding: 6px 10px; border-radius: 6px; overflow-wrap: anywhere; }
+#tables li { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 6px; }
 #tables li:hover { background: var(--surface-hover); }
 #tables a { color: #c6cbd2; }
+#tables a:not(.select) { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #tables a.select {
-    float: right;
-    margin-left: 8px;
+    order: 1;
+    flex: none;
+    float: none;
+    margin: 0;
     padding: 2px 7px;
     border-radius: 4px;
     color: var(--muted);
@@ -165,8 +171,10 @@ hr { border: 0; border-top: 1px solid var(--border); }
     width: 204px;
     margin: 0;
     background: var(--surface);
+    color: var(--muted);
+    font-size: 12px;
 }
-#logout { width: 100%; background: var(--surface-hover); border-color: var(--border); color: #c6cbd2; }
+#logout { width: 100%; margin-top: 6px; background: var(--surface-hover); border-color: var(--border); color: #c6cbd2; }
 #menuopen, .js #menuopen { display: none; }
 #logins { padding: 0; }
 #logins a { display: block; padding: 8px; overflow-wrap: anywhere; }
@@ -270,6 +278,7 @@ textarea, .sqlarea { line-height: 1.65; }
 code { padding: 3px 6px; border-radius: 4px; background: var(--surface); color: #d3d9e1; }
 pre { max-width: 100%; overflow: auto; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
 pre code { padding: 0; background: none; }
+#content > p > code, #content > p > code .jush { white-space: pre-wrap; overflow-wrap: anywhere; }
 .jush { --text-color: #d3d9e1; --bg-color: #111519; --border-color: var(--border); --keyword-color: #93c5fd; --string-color: #8cdbb6; --string-plain-color: #8cdbb6; --number-color: #f2c68e; --identifier-color: #c4b5fd; --value-color: #d3d9e1; --attribute-color: #8bd6de; }
 .jush a, .jush a:visited { color: #93c5fd; }
 .jush-str, .jush-php_quo, .char { color: #8cdbb6; }
@@ -290,21 +299,43 @@ thead tr:first-child > :last-child { border-top-right-radius: var(--radius); }
 .odds tbody tr { background: var(--surface); }
 .odds tbody tr:nth-child(even) { background: #1d2024; }
 .odds tbody tr:hover, .checkable .checked td, .checkable .checked th { background: #292e34; }
+/* Adminer's hover cells otherwise erase row borders and form a dark strip. */
+#content .checkable td.hover { width: 1%; white-space: nowrap; background: transparent; border-bottom: 1px solid var(--border); }
+#content .checkable thead td.hover { background: #24292f; }
+#content .checkable tbody tr:last-child td.hover { border-bottom: 0; }
+#content .checkable td.hover input[type=checkbox] { margin: 0; }
+#content .checkable tbody tr:has(> td.hover input[type=checkbox]:checked) > * { background: #28334a; }
+#content .checkable tbody tr:has(> td.hover input[type=checkbox]:checked) > :first-child { box-shadow: inset 3px 0 var(--accent); }
 #table td:not(.check) { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; }
-#table .check { background: transparent; width: 72px; white-space: nowrap; }
-#table .check a { margin-right: 6px; font-size: 12px; }
-#table tbody tr:has(.check input:checked) > * { background: #28334a; }
-#table tbody tr:has(.check input:checked) > :first-child { box-shadow: inset 3px 0 var(--accent); }
+#table tr > :not(:first-child) { border-inline-start: 1px solid var(--border); }
+#content #table td.check { width: 84px; min-width: 84px; text-align: right; }
+#table .check a { margin-right: 10px; font-size: 12px; }
+/* Keep sort/search actions in the heading's layout, including keyboard focus. */
+#table th .column, #table th:not(:hover) .column { position: static; display: inline-flex; align-items: center; gap: 4px; margin: 0 0 0 8px; padding: 0; border: 0; background: none; vertical-align: middle; }
+#table th .column a { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 4px; border: 1px solid var(--border); border-radius: 4px; background: var(--surface-hover); color: var(--muted); }
+#table th .column a:hover, #table th .column a:focus-visible { color: var(--accent); border-color: var(--accent); text-decoration: none; }
 #table td i { color: var(--muted); }
 .scrollable { max-width: 100%; overflow: auto; margin: 18px 0 0; border: 1px solid var(--border); border-radius: var(--radius); }
 .scrollable > table { margin: 0; border: 0; border-radius: 0; }
 .layout { max-width: 760px; }
+.layout.nowrap { table-layout: fixed; }
+.layout.nowrap td.function { width: 124px; }
+.layout.nowrap input:not([type=checkbox]):not([type=radio]), .layout.nowrap textarea { max-width: 100%; }
 #content form > p:has(input[type=submit]), #content form > p:has(> label) { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin: 18px 0; }
 .layout th { width: 160px; color: var(--muted); font-weight: 500; }
 .layout td, .layout th { background: transparent; }
 .layout td:has(> label) { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; min-height: 48px; }
 .layout label { white-space: normal; }
 .layout input:not([type=checkbox]):not([type=radio]), .layout select { min-width: 0; }
+#content fieldset:has(input[name=search]) > div { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+#content table th > label.jsonly { margin-inline-start: 12px; }
+#content table select + label { margin-inline-start: 10px; }
+#content table .icon { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; min-height: 32px; padding: 0; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-hover); color: var(--fg); font-size: 18px; line-height: 1; }
+#content table .icon span { display: inline; }
+#content table .icon:hover { background: var(--lit); border-color: var(--accent); }
+#content #edit-fields { display: block; max-width: 100%; overflow-x: auto; }
+#edit-fields select.type { width: auto; min-width: 180px; }
+#schema { box-sizing: content-box; max-width: 100%; margin: 0; padding-bottom: 40px; overflow: auto; }
 #import:not(.hidden) { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 12px; max-width: 100%; }
 
 #content > .links { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
@@ -402,9 +433,14 @@ body:has(input[name="auth[password]"]) #lang { position: absolute; top: 24px; ri
     .layout th { width: auto; }
     .layout td, .layout th { padding: 10px; }
     .layout:not(.nowrap) th { width: 96px; }
-    .layout.nowrap { table-layout: fixed; white-space: normal; }
-    .layout.nowrap th { width: 72px; overflow-wrap: anywhere; }
-    .layout.nowrap td.function { width: 52px; }
+    .layout.nowrap { display: block; white-space: normal; }
+    .layout.nowrap tbody { display: block; }
+    .layout.nowrap tr { display: grid; grid-template-columns: 108px minmax(0, 1fr); border-bottom: 1px solid var(--border); }
+    .layout.nowrap tr:last-child { border-bottom: 0; }
+    .layout.nowrap th { grid-column: 1 / -1; width: auto; padding-bottom: 0; overflow-wrap: anywhere; }
+    .layout.nowrap td, .layout.nowrap th { min-width: 0; border-bottom: 0; }
+    .layout.nowrap td.function { width: auto; white-space: normal; overflow-wrap: anywhere; }
+    .layout.nowrap select { width: 100%; }
     .layout.nowrap input:not([type=checkbox]):not([type=radio]), .layout.nowrap textarea { width: 100%; }
     body:has(input[name="auth[password]"]) #foot.foot #menu { display: block; }
     body:has(input[name="auth[password]"]) #menuopen { display: none; }
