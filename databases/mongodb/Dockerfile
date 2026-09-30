@@ -1,6 +1,7 @@
 FROM debian:trixie-slim
 
 ARG MONGO_VERSION=8.0.30
+ARG MONGO_DISTRO=debian12
 ARG MONGOSH_VERSION=2.11.1
 ARG MONGOSH_SHA256=3cc12c23fcd1ad8da2663316966cfff6b0b6a99e764972e9e16771168a9f4c3a
 ARG DEBIAN_FRONTEND=noninteractive
@@ -19,15 +20,15 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates curl libcurl4t64 libssl3t64 supervisor \
     && curl -fsSL \
-        "https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-debian12-${MONGO_VERSION}.tgz" \
+        "https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGO_DISTRO}-${MONGO_VERSION}.tgz" \
         -o /tmp/mongodb.tgz \
     && curl -fsSL \
-        "https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-debian12-${MONGO_VERSION}.tgz.sha256" \
+        "https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGO_DISTRO}-${MONGO_VERSION}.tgz.sha256" \
         -o /tmp/mongodb.sha256 \
-    && sed "s#mongodb-linux-x86_64-debian12-${MONGO_VERSION}.tgz#/tmp/mongodb.tgz#" \
+    && sed "s#mongodb-linux-x86_64-${MONGO_DISTRO}-${MONGO_VERSION}.tgz#/tmp/mongodb.tgz#" \
         /tmp/mongodb.sha256 | sha256sum -c - \
     && tar -xzf /tmp/mongodb.tgz --strip-components=2 -C /usr/bin \
-        "mongodb-linux-x86_64-debian12-${MONGO_VERSION}/bin/mongod" \
+        "mongodb-linux-x86_64-${MONGO_DISTRO}-${MONGO_VERSION}/bin/mongod" \
     && curl -fsSL \
         "https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-x64.tgz" \
         -o /tmp/mongosh.tgz \

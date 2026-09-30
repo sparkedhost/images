@@ -1,14 +1,13 @@
 #!/bin/bash
 set -Eeuo pipefail
 
+export PS1='container@${HOSTNAME}:${PWD}\$ '
 export SERVER_PORT="${SERVER_PORT:-27017}"
 export ADMINER_DRIVER=mongo ADMINER_SERVER_LABEL=MongoDB
 export ADMIN_USER="${ADMIN_USER:-admin}"
 export ADMIN_PASSWORD="${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}"
 
-for value in "$SERVER_PORT"; do
-    [[ "$value" =~ ^[0-9]+$ ]] && (( value >= 1 && value <= 65535 )) || exit 1
-done
+[[ "$SERVER_PORT" =~ ^[0-9]+$ ]] && (( SERVER_PORT >= 1 && SERVER_PORT <= 65535 )) || exit 1
 
 mkdir -p /home/container/{mongodb,etc,run}
 /usr/local/bin/prepare-adminer
@@ -36,4 +35,32 @@ if [[ ! -f /home/container/mongodb/.apollo-initialized ]]; then
     touch /home/container/mongodb/.apollo-initialized
 fi
 
-exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
+supervisor_pid=""
+bash_pid=""
+
+shutdown_services() {
+    trap - SIGINT SIGTERM
+    if [[ -n "$supervisor_pid" ]] && kill -0 "$supervisor_pid" 2>/dev/null; then
+        kill -TERM "$supervisor_pid"
+        wait "$supervisor_pid" || true
+    fi
+    if [[ -n "$bash_pid" ]] && kill -0 "$bash_pid" 2>/dev/null; then
+        kill -HUP "$bash_pid" 2>/dev/null || true
+        wait "$bash_pid" || true
+    fi
+}
+
+trap 'shutdown_services; exit 130' SIGINT
+trap 'shutdown_services; exit 143' SIGTERM
+
+/usr/bin/supervisord -c /etc/supervisor/supervisord.conf </dev/null &
+supervisor_pid=$!
+
+/bin/bash --noprofile --norc -i <&0 &
+bash_pid=$!
+wait "$bash_pid" || true
+bash_pid=""
+wait "$supervisor_pid" || true
+supervisor_pid=""
+
+shutdown_services

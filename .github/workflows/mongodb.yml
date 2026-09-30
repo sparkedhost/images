@@ -17,12 +17,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { series: "7", release: "7.0.43" }
-          - { series: "8", release: "8.0.30" }
+          - { series: "7", release: "7.0.43", distro: "debian12" }
+          - { series: "8", release: "8.0.30", distro: "debian12" }
+          - { series: "9", release: "9.0.2", distro: "debian13" }
     uses: ./.github/workflows/docker-build.yml
     with:
       context: ./databases
       file: ./databases/mongodb/Dockerfile
       tags: ghcr.io/sparkedhost/images:mongodb-${{ matrix.series }}
-      build_args: MONGO_VERSION=${{ matrix.release }}
+      build_args: |
+        MONGO_VERSION=${{ matrix.release }}
+        MONGO_DISTRO=${{ matrix.distro }}
     secrets: inherit
