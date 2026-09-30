@@ -950,6 +950,174 @@ startup_with_signal_forwarding(){
     wait "${server_pid}"
 }
 
+find_console_window(){
+    local title_pattern="$1"
+    local auth_candidate socket window
+
+    console_window=""
+    console_display="${DISPLAY:-:0}"
+    console_xauthority=""
+
+    window="$(DISPLAY="${console_display}" xdotool search --onlyvisible --name "${title_pattern}" 2>/dev/null | tail -n 1)"
+    if [[ -n "${window}" ]]; then
+        console_window="${window}"
+        return 0
+    fi
+
+    for auth_candidate in /tmp/xvfb-run.*/Xauthority; do
+        [[ -f "${auth_candidate}" ]] || continue
+
+        for socket in /tmp/.X11-unix/X*; do
+            [[ -S "${socket}" ]] || continue
+            console_display=":${socket##*/X}"
+            window="$(XAUTHORITY="${auth_candidate}" DISPLAY="${console_display}" xdotool search --onlyvisible --name "${title_pattern}" 2>/dev/null | tail -n 1)"
+            if [[ -n "${window}" ]]; then
+                console_window="${window}"
+                console_xauthority="${auth_candidate}"
+                return 0
+            fi
+        done
+    done
+
+    return 1
+}
+
+console_bridge(){
+    local label="$1"
+    local title_pattern="$2"
+    local command attempt
+
+    while IFS= read -r command; do
+        command="${command%$'\r'}"
+        [[ -z "${command}" ]] && continue
+
+        for attempt in {1..20}; do
+            find_console_window "${title_pattern}" && break
+            sleep 1
+        done
+
+        if [[ -z "${console_window}" ]]; then
+            echo "[${label}] No matching Wine console window was found."
+            continue
+        fi
+
+        if XAUTHORITY="${console_xauthority}" DISPLAY="${console_display}" xdotool type --window "${console_window}" --clearmodifiers --delay 1 "${command}" \
+            && XAUTHORITY="${console_xauthority}" DISPLAY="${console_display}" xdotool key --window "${console_window}" Return; then
+            echo "[${label}] Sent a console line to X window ${console_window} on ${console_display}."
+        else
+            echo "[${label}] Could not send a console line to Wine console window ${console_window}."
+        fi
+    done
+}
+
+startup_with_console_bridge(){
+    local label="$1"
+    local title_pattern="$2"
+    local bridge_pid server_status
+
+    MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
+
+    echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
+
+    trap 'forward_signal INT' INT
+    trap 'forward_signal TERM' TERM
+
+    console_bridge "${label}" "${title_pattern}" <&0 &
+    bridge_pid=$!
+
+    # The bridge is the sole reader of Wings console input; Wine inherits EOF.
+    setsid /bin/bash -c "${MODIFIED_STARTUP}" </dev/null &
+    server_pid=$!
+    wait "${server_pid}"
+    server_status=$?
+
+    kill "${bridge_pid}" 2>/dev/null || true
+    wait "${bridge_pid}" 2>/dev/null || true
+
+    return "${server_status}"
+}
+
+startup_abiotic_console(){
+    startup_with_console_bridge "abiotic-console-bridge" 'Server Console \(AbioticFactor\)'
+}
+
+startup_moria(){
+    startup_with_console_bridge "moria-console-bridge" 'MoriaServer-Win64-Shipping\.exe'
+}
+
+find_process_pid(){
+    local process_name="$1"
+    local command_fragment="${2:-}"
+    local proc comm command
+
+    for proc in /proc/[0-9]*; do
+        [[ -r "${proc}/comm" ]] || continue
+        read -r comm < "${proc}/comm" || continue
+        [[ "${comm}" == "${process_name}" ]] || continue
+
+        if [[ -n "${command_fragment}" ]]; then
+            command="$(tr '\000' ' ' < "${proc}/cmdline" 2>/dev/null)"
+            [[ "${command}" == *"${command_fragment}"* ]] || continue
+        fi
+
+        printf '%s\n' "${proc##*/}"
+        return 0
+    done
+
+    return 1
+}
+
+tail_log_file(){
+    local log_path="$1"
+    local process_pid="$2"
+
+    tail -c0 -F "${log_path}" --pid="${process_pid}"
+}
+
+startup_windrose(){
+    local log_pid server_status
+
+    MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
+
+    echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
+
+    stop_windrose() {
+        local game_pid
+
+        trap '' INT TERM
+
+        game_pid="$(find_process_pid "GameThread" "WindroseServer-Win64-Shipping.exe")"
+        if [[ -n "${game_pid}" ]]; then
+            # Wine turns SIGINT delivered to GameThread into a Windows CTRL_C_EVENT.
+            kill -INT "${game_pid}"
+        else
+            kill -INT -- "-${server_pid}" 2>/dev/null || true
+        fi
+
+        wait "${server_pid}"
+        server_status=$?
+        kill "${log_pid}" 2>/dev/null || true
+        wait "${log_pid}" 2>/dev/null || true
+        exit "${server_status}"
+    }
+
+    trap 'stop_windrose' INT TERM
+
+    setsid /bin/bash -c "${MODIFIED_STARTUP}" &
+    server_pid=$!
+
+    tail_log_file "./R5/Saved/Logs/R5.log" "${server_pid}" &
+    log_pid=$!
+
+    wait "${server_pid}"
+    server_status=$?
+
+    kill "${log_pid}" 2>/dev/null || true
+    wait "${log_pid}" 2>/dev/null || true
+
+    return "${server_status}"
+}
+
 startup_enshrouded(){
     MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
 
@@ -957,16 +1125,11 @@ startup_enshrouded(){
 
     stop_enshrouded() {
         local signal="$1"
-        local process process_name game_pid
+        local game_pid
 
         trap '' INT TERM
 
-        for process in /proc/[0-9]*; do
-            if read -r process_name < "${process}/comm" 2>/dev/null && [[ "${process_name}" == "enshrouded_serv" ]]; then
-                game_pid="${process##*/}"
-                break
-            fi
-        done
+        game_pid="$(find_process_pid "enshrouded_serv")"
 
         if [[ -n "${game_pid:-}" ]]; then
             kill "-${signal}" "${game_pid}" 2>/dev/null || true
@@ -1125,6 +1288,21 @@ startup_game(){
         ;;
         1829350)
             startup_with_signal_forwarding
+        ;;
+        298740)
+            startup_with_signal_forwarding
+        ;;
+        2465200)
+            startup_with_signal_forwarding
+        ;;
+        2857200)
+            startup_abiotic_console
+        ;;
+        3349480)
+            startup_moria
+        ;;
+        4129620)
+            startup_windrose
         ;;
         2278520)
             startup_enshrouded
