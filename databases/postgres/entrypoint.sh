@@ -10,6 +10,9 @@ export PGDATA=/home/container/postgres_db
 
 [[ "$SERVER_PORT" =~ ^[0-9]+$ ]] && (( SERVER_PORT >= 1 && SERVER_PORT <= 65535 )) || exit 1
 
+rm -f /home/container/run/supervisord.pid /home/container/run/php-fpm.pid \
+    "$PGDATA/postmaster.pid" /home/container/run/.s.PGSQL.*
+
 mkdir -p "$PGDATA"
 /usr/local/bin/prepare-adminer
 

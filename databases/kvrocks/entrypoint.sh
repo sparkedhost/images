@@ -8,6 +8,9 @@ export ADMIN_PASSWORD="${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}"
 
 [[ "$SERVER_PORT" =~ ^[0-9]+$ ]] && (( SERVER_PORT >= 1 && SERVER_PORT <= 65535 )) || exit 1
 
+rm -f /home/container/run/supervisord.pid /home/container/run/php-fpm.pid \
+    /home/container/run/kvrocks.pid
+
 mkdir -p /home/container/{data,run,etc}
 /usr/local/bin/prepare-adminer
 config=/home/container/etc/kvrocks.conf

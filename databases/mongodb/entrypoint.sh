@@ -9,6 +9,10 @@ export ADMIN_PASSWORD="${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}"
 
 [[ "$SERVER_PORT" =~ ^[0-9]+$ ]] && (( SERVER_PORT >= 1 && SERVER_PORT <= 65535 )) || exit 1
 
+rm -f /home/container/run/supervisord.pid /home/container/run/php-fpm.pid \
+    /home/container/run/mongod.pid \
+    /tmp/mongodb-"${SERVER_PORT}".sock /tmp/mongodb-27018.sock
+
 mkdir -p /home/container/{mongodb,etc,run}
 /usr/local/bin/prepare-adminer
 config=/home/container/etc/mongod.conf

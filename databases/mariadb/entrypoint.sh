@@ -61,6 +61,10 @@ mkdir -p \
   /tmp/pma \
   "$MARIADB_DATADIR"
 
+rm -f /home/container/run/supervisord.pid /home/container/run/supervisor.sock \
+    /home/container/run/php-fpm.pid /home/container/run/php/php-fpm.pid \
+    /home/container/run/mysqld/mysqld.pid "$MARIADB_SOCKET"
+
 cp /etc/mariadb/my.cnf.template "$MARIADB_CONFIG"
 sed -i \
   -e "s/@@SERVER_PORT@@/${SERVER_PORT}/g" \
