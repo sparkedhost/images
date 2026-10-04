@@ -20,7 +20,7 @@
 - [`java-jre23`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre23/Dockerfile)[^eol]
 - [`java-jre24`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre24/Dockerfile)[^eol]
 - [`java-jre25`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre25/Dockerfile)
-- [`java-jre26`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre26/Dockerfile)
+- [`java-jre26`](https://github.com/sparkedhost/images/blob/main/java/temurin/java-jre26/Dockerfile)[^eol]
 
 #### GraalVM Community Edition
 
@@ -30,16 +30,16 @@
 - [`graalvm-22`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-22/Dockerfile)[^eol]
 - [`graalvm-23`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-23/Dockerfile)[^eol]
 - [`graalvm-24`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-24/Dockerfile)[^eol]
-- [`graalvm-25`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-25/Dockerfile)
+- [`graalvm-25`](https://github.com/sparkedhost/images/blob/main/java/graalvm/graalvm-25/Dockerfile)[^eol]
 
-#### Azul Prime 
+#### Azul Prime
 
 - [`azul-prime-17`](https://github.com/sparkedhost/images/blob/main/java/azul-prime/azul-prime-17/Dockerfile)
 - [`azul-prime-19`](https://github.com/sparkedhost/images/blob/main/java/azul-prime/azul-prime-19/Dockerfile)[^eol]
 
 #### Other
 
-- [`anti-malware`](https://github.com/sparkedhost/images/blob/main/java/anti-malware/Dockerfile)[^antimalware]
+- [`anti-malware`](https://github.com/sparkedhost/images/blob/main/java/anti-malware/Dockerfile)[^antimalware][^eol]
 
 ### Node.js images
 
@@ -51,7 +51,7 @@
 - [`nodejs-17`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-17/Dockerfile)[^eol]
 - [`nodejs-18`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-18/Dockerfile)[^eol]
 - [`nodejs-19`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-19/Dockerfile)[^eol]
-- [`nodejs-20`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-20/Dockerfile)
+- [`nodejs-20`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-20/Dockerfile)[^eol]
 - [`nodejs-21`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-21/Dockerfile)[^eol]
 - [`nodejs-22`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-22/Dockerfile)
 - [`nodejs-23`](https://github.com/sparkedhost/images/blob/main/nodejs/nodejs-23/Dockerfile)[^eol]
@@ -64,8 +64,8 @@
 - [`python-3.7`](https://github.com/sparkedhost/images/blob/main/python/python-3.7/Dockerfile)[^eol]
 - [`python-3.8`](https://github.com/sparkedhost/images/blob/main/python/python-3.8/Dockerfile)[^eol]
 - [`python-3.9`](https://github.com/sparkedhost/images/blob/main/python/python-3.9/Dockerfile)[^eol]
-- [`python-3.10`](https://github.com/sparkedhost/images/blob/main/python/python-3.10/Dockerfile)
-- [`python-3.11`](https://github.com/sparkedhost/images/blob/main/python/python-3.11/Dockerfile)
+- [`python-3.10`](https://github.com/sparkedhost/images/blob/main/python/python-3.10/Dockerfile)[^eol]
+- [`python-3.11`](https://github.com/sparkedhost/images/blob/main/python/python-3.11/Dockerfile)[^eol]
 - [`python-3.12`](https://github.com/sparkedhost/images/blob/main/python/python-3.12/Dockerfile)
 - [`python-3.13`](https://github.com/sparkedhost/images/blob/main/python/python-3.13/Dockerfile)
 - [`python-3.14`](https://github.com/sparkedhost/images/blob/main/python/python-3.14/Dockerfile)
@@ -74,34 +74,37 @@
 
 - [`games-rust`](https://github.com/sparkedhost/images/blob/main/games/rust/Dockerfile)
 - [`games-unturned`](https://github.com/sparkedhost/images/blob/main/games/unturned/Dockerfile)
-- [`games-liteloader-bds`](https://github.com/sparkedhost/images/blob/main/games/liteloader-bds/Dockerfile)
+- [`games-liteloader-bds`](https://github.com/sparkedhost/images/blob/main/games/liteloader-bds/Dockerfile)[^eol]
 - [`games-bdsx`](https://github.com/sparkedhost/images/blob/main/games/bdsx/Dockerfile)
 - [`games-source`](https://github.com/sparkedhost/images/blob/main/games/source/Dockerfile)
-- [`games-dotnet`](https://github.com/sparkedhost/images/blob/main/games/dotnet/Dockerfile)
-- [`games-wine-latest`](https://github.com/sparkedhost/images/blob/main/games/wine-latest/Dockerfile)
-- [`games-wine-staging`](https://github.com/sparkedhost/images/blob/main/games/wine-staging/Dockerfile)
+- [`games-dotnet`](https://github.com/sparkedhost/images/blob/main/games/dotnet/Dockerfile)[^eol]
+- [`wine-game-latest`](https://github.com/sparkedhost/images/blob/main/games/wine/wine-latest/Dockerfile)
+- [`wine-game-staging`](https://github.com/sparkedhost/images/blob/main/games/wine/wine-staging/Dockerfile)
 - [`games-proton`](https://github.com/sparkedhost/images/blob/main/games/proton/Dockerfile)
 - [`games-beammp`](https://github.com/sparkedhost/images/blob/main/games/beammp/Dockerfile)
 - [`games-cs2`](https://github.com/sparkedhost/images/blob/main/games/cs2/Dockerfile)
 - [`games-core-keeper`](https://github.com/sparkedhost/images/blob/main/games/core-keeper/Dockerfile)
 - [`games-tuxlauncher`](https://github.com/sparkedhost/images/blob/main/games/tuxlauncher/Dockerfile)
-- [`games-steam`](https://github.com/sparkedhost/images/blob/main/games/steam/Dockerfile)
-- [`games-arma3`](https://github.com/sparkedhost/images/blob/main/games/arma3/Dockerfile)
-- [`games-steam`](https://github.com/sparkedhost/images/blob/main/games/steam/Dockerfile)
-- [`games-altv`](https://github.com/sparkedhost/images/blob/main/games/altv/Dockerfile)
+- [`games-steam`](https://github.com/sparkedhost/images/blob/main/games/steam/Dockerfile)[^eol]
+- [`games-arma3`](https://github.com/sparkedhost/images/blob/main/games/arma3/Dockerfile)[^eol]
+- [`games-altv`](https://github.com/sparkedhost/images/blob/main/games/altv/Dockerfile)[^eol]
 - [`games-dayz`](https://github.com/sparkedhost/images/blob/main/games/dayz/Dockerfile)
-- [`games-mono`](https://github.com/sparkedhost/images/blob/main/games/mono/Dockerfile)
-- [`games-mta`](https://github.com/sparkedhost/images/blob/main/games/mta/Dockerfile)
+- [`games-mono`](https://github.com/sparkedhost/images/blob/main/games/mono/Dockerfile)[^eol]
+- [`games-mta`](https://github.com/sparkedhost/images/blob/main/games/mta/Dockerfile)[^eol]
 - [`games-fivem`](https://github.com/sparkedhost/images/blob/main/games/fivem/Dockerfile)
 - [`games-project-zomboid`](https://github.com/sparkedhost/images/blob/main/games/project-zomboid/Dockerfile)
 - [`games-sbox`](https://github.com/sparkedhost/images/blob/main/games/sbox/Dockerfile)
-
+- [`games-aneurism-iv`](https://github.com/sparkedhost/images/blob/main/games/aneurism-iv/Dockerfile)
+- [`games-fivem-node22`](https://github.com/sparkedhost/images/blob/main/games/fivem-node22/Dockerfile)
+- [`games-installer`](https://github.com/sparkedhost/images/blob/main/games/installer/Dockerfile)
+- [`games-proton-8`](https://github.com/sparkedhost/images/blob/main/games/proton-8/Dockerfile)[^eol]
+- [`games-tmodloader`](https://github.com/sparkedhost/images/blob/main/games/tmodloader/Dockerfile)[^eol]
 
 ### Bot Hosting images
 
-- [`bot-bastion`](https://github.com/sparkedhost/images/blob/main/bot/bastion/Dockerfile)
+- [`bot-bastion`](https://github.com/sparkedhost/images/blob/main/bot/bastion/Dockerfile)[^eol]
 - [`bot-lavalink`](https://github.com/sparkedhost/images/blob/main/bot/lavalink/Dockerfile)
-- [`bot-modmail`](https://github.com/sparkedhost/images/blob/main/bot/modmail/Dockerfile)
+- [`bot-modmail`](https://github.com/sparkedhost/images/blob/main/bot/modmail/Dockerfile)[^eol]
 - [`bot-redbot`](https://github.com/sparkedhost/images/blob/main/bot/redbot/Dockerfile)
 
 ### PHP images
@@ -118,22 +121,59 @@
 - [`dotnet-9`](https://github.com/sparkedhost/images/blob/main/dotnet/dotnet-9/Dockerfile)
 - [`dotnet-10`](https://github.com/sparkedhost/images/blob/main/dotnet/dotnet-10/Dockerfile)
 
-### Golang
+### Go images
 
-- [`golang-121`](https://github.com/sparkedhost/images/blob/main/golang/golang-121/Dockerfile)
-- [`golang-124`](https://github.com/sparkedhost/images/blob/main/golang/golang-124/Dockerfile)
+- [`golang-121`](https://github.com/sparkedhost/images/blob/main/golang/golang-121/Dockerfile)[^eol]
+- [`golang-124`](https://github.com/sparkedhost/images/blob/main/golang/golang-124/Dockerfile)[^eol]
+- [`golang-126`](https://github.com/sparkedhost/images/blob/main/golang/golang-126/Dockerfile)
 
 ### Rust images
 
-- [`rust-1.56`](https://github.com/sparkedhost/images/blob/main/rust/rust-1.56/Dockerfile)
-- [`rust-1.6`](https://github.com/sparkedhost/images/blob/main/rust/rust-1.6/Dockerfile)
-- [`rust-latest`](https://github.com/sparkedhost/images/blob/main/rust/rust-latest/Dockerfile)
+- [`rust-1.56`](https://github.com/sparkedhost/images/blob/main/rust/1.56/Dockerfile)[^eol]
+- [`rust-1.6`](https://github.com/sparkedhost/images/blob/main/rust/1.6/Dockerfile)[^eol]
+- [`rust-latest`](https://github.com/sparkedhost/images/blob/main/rust/latest/Dockerfile)
+
+### Database images
+
+#### MariaDB
+
+- [`mariadb-10.11`](https://github.com/sparkedhost/images/blob/main/databases/mariadb/Dockerfile)
+- [`mariadb-11.4`](https://github.com/sparkedhost/images/blob/main/databases/mariadb/Dockerfile)
+- [`mariadb-11.8`](https://github.com/sparkedhost/images/blob/main/databases/mariadb/Dockerfile)
+- [`mariadb-12.3`](https://github.com/sparkedhost/images/blob/main/databases/mariadb/Dockerfile)
+
+#### PostgreSQL
+
+- [`postgres-14`](https://github.com/sparkedhost/images/blob/main/databases/postgres/Dockerfile)
+- [`postgres-15`](https://github.com/sparkedhost/images/blob/main/databases/postgres/Dockerfile)
+- [`postgres-16`](https://github.com/sparkedhost/images/blob/main/databases/postgres/Dockerfile)
+- [`postgres-17`](https://github.com/sparkedhost/images/blob/main/databases/postgres/Dockerfile)
+- [`postgres-18`](https://github.com/sparkedhost/images/blob/main/databases/postgres/Dockerfile)
+
+#### MongoDB
+
+- [`mongodb-7`](https://github.com/sparkedhost/images/blob/main/databases/mongodb/Dockerfile)
+- [`mongodb-8`](https://github.com/sparkedhost/images/blob/main/databases/mongodb/Dockerfile)
+- [`mongodb-9`](https://github.com/sparkedhost/images/blob/main/databases/mongodb/Dockerfile)
+
+
+#### Apache Kvrocks
+
+- [`kvrocks-2`](https://github.com/sparkedhost/images/blob/main/databases/kvrocks/Dockerfile)
+
+#### Database tools
+
+- [`db-tools`](https://github.com/sparkedhost/images/blob/main/databases/db-tools/Dockerfile)
 
 ### Generic images
 
 - [`generic-debian`](https://github.com/sparkedhost/images/blob/main/generic/debian/Dockerfile)
 - [`generic-mono`](https://github.com/sparkedhost/images/blob/main/generic/mono/Dockerfile)
 - [`generic-wine`](https://github.com/sparkedhost/images/blob/main/generic/wine/Dockerfile)
+
+### Troubleshooting images
+
+- [`network-debian`](https://github.com/sparkedhost/images/blob/main/troubleshooting/network/Dockerfile)[^eol]
 
 ## Requesting changes
 

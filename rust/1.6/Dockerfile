@@ -1,6 +1,6 @@
 # ----------------------------------
 # Sparked Host Custom Image
-# Image: ghcr.io/sparkedhost/images:rust-1.60
+# Image: ghcr.io/sparkedhost/images:rust-1.6
 # ----------------------------------
 
 FROM rust:1.60-slim
