@@ -35,6 +35,8 @@ apt-get install -y --no-install-recommends "php${php_version}-fpm" "$php_driver"
 install -d -m 0755 /var/www/adminer/public/plugins-enabled /etc/caddy
 install -m 0644 /usr/share/doc/adminer/vendor/adminer.php \
     /var/www/adminer/public/adminer.php
+install -D -m 0644 /usr/share/doc/adminer/vendor/functions.js \
+    /var/www/adminer/public/vendor/functions.js
 
 install -m 0644 /usr/share/doc/adminer/themes/hydra-dark/adminer.css \
     /var/www/adminer/public/adminer.css
