@@ -460,7 +460,10 @@ install_update_mods() { #[Input: str list of mods]
     echo -e "[MOD_INSTALLATION]: Checking for missing mods"
     for modID in $(echo "$1" | sed -e 's/@//g'); do
         if [[ $modID =~ ^[0-9]+$ ]]; then # Only check mods that are in ID-form
-            modName=$(curl -sL https://steamcommunity.com/sharedfiles/filedetails/changelog/$modID | grep 'workshopItemTitle' | cut -d'>' -f2 | cut -d'<' -f1)
+            modName=$(curl -fsSL --connect-timeout 10 --max-time 30 --retry 2 \
+                --data "itemcount=1" --data "publishedfileids[0]=${modID}" --data "format=xml" \
+                https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/ \
+                | sed -n 's:^[[:space:]]*<title>\(.*\)</title>[[:space:]]*$:\1:p')
             [[ -d @$modID ]] && rmdir "@$modID" 2>/dev/null
             mod_missing=false
             case "${GAME_ID}" in
@@ -517,10 +520,21 @@ install_steamcmd(){
 
 
 check_mod_update(){
-    local last_local_timestamp last_remote_timestamp remote_modified remote_url mod_id=$1
+    local last_local_timestamp last_remote_timestamp api_response item_result mod_id=$1
     [[ $MOD_AUTO_UPDATE == "0" ]] && return 1
     echo -e "[MOD_INSTALLATION]: Checking for mod update for $mod_id"
-    last_remote_timestamp=$(curl -sL https://steamcommunity.com/sharedfiles/filedetails/changelog/$mod_id | grep '<p id=' | head -1 | cut -d'"' -f2)
+    if ! api_response=$(curl -fsSL --connect-timeout 10 --max-time 30 --retry 2 \
+        --data "itemcount=1" --data "publishedfileids[0]=${mod_id}" --data "format=xml" \
+        https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/); then
+        echo "[MOD_INSTALLATION]: Could not check mod update for ${mod_id}: Steam API request failed."
+        return 1
+    fi
+    item_result=$(printf '%s\n' "$api_response" | sed -n '/<publishedfile>/,/<\/publishedfile>/s:^[[:space:]]*<result>\([0-9]\+\)</result>[[:space:]]*$:\1:p')
+    last_remote_timestamp=$(printf '%s\n' "$api_response" | sed -n 's:^[[:space:]]*<time_updated>\([0-9]\+\)</time_updated>[[:space:]]*$:\1:p')
+    if [[ $item_result != "1" || ! $last_remote_timestamp =~ ^[0-9]+$ ]]; then
+        echo "[MOD_INSTALLATION]: Could not check mod update for ${mod_id}: Steam API returned no valid update timestamp (result: ${item_result:-unknown})."
+        return 1
+    fi
 
     case "${GAME_ID}" in
         393380)
