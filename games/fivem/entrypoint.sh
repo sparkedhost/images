@@ -148,7 +148,7 @@ get_latest_enhanced_download_link(){
 }
 
 generate_download_link(){
-    local release_page changelogs_page version_link latest_version forced_version
+    local release_page changelogs_page page_data latest_version forced_version
     local -A VERSION_FALLBACKS=(
         ["25988"]="25987"
         ["27417"]="27055"
@@ -185,9 +185,11 @@ generate_download_link(){
             ;;
             *)
                 [[ -z "${FIVEM_VERSION}" ]] && return 0
-                version_link=$(echo -e "${release_page}" | grep -Eo '".*/*.tar.xz"' | grep -Eo '".*/*.tar.xz"' | sed 's/\"//g' | sed 's/\.\///1' | grep -iw "${FIVEM_VERSION}" | grep -o =.* | tr -d '=')
-                TARGET_VERSION=$(echo $version_link | grep -oE '^[0-9]+' | head -n 1)
-                DOWNLOAD_LINK="https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${version_link}"
+                page_data=$(printf '%s' "$release_page" | grep -oP '<script id="__NEXT_DATA__" type="application/json">\K.*?(?=</script>)')
+                DOWNLOAD_LINK=$(printf '%s' "$page_data" | jq -r --arg version "$FIVEM_VERSION" '
+                    .props.pageProps.legacy.latest.linux[] | select(.subtitle == ("build " + $version)) | .downloadURL
+                ')
+                TARGET_VERSION=$(printf '%s' "$DOWNLOAD_LINK" | sed -nE 's#^.*/master/([0-9]+)-[^/]+/fx\.tar\.xz$#\1#p')
             ;;
         esac
     fi
