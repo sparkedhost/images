@@ -463,7 +463,8 @@ if [[ ${UPDATE_SERVER} == 1 ]]; then
 fi
 
 fix_missing_artifacts
-fix_default_resources
+# Temporarily disabled: sessionmanager is no longer included in the default resources. Not sure if they're needed at all now since a bunch were merged into cfx
+# fix_default_resources
 yarn_cleanup
 fix_configuration
 add_logo 
