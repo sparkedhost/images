@@ -157,19 +157,19 @@ generate_download_link(){
     if [[ "$GAME_NAME" == "gta5enhanced" ]]; then
         get_latest_enhanced_download_link >/dev/null || return 0
     else
-        # This is really silly, but we cannot trust fivem and it seems sometimes we cannot trust jg scripts either, so we need manual overrides for when this happens
-        release_page=$(curl -sSL https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/)
+        # Keep manual overrides for known problematic FiveM builds.
+        release_page=$(curl -sSL https://docs.fivem.net/docs/server-download/)
         changelogs_page=$(curl -sSL https://changelogs-live.fivem.net/api/changelog/versions/linux/server)
 
         echo "Computing versions"
         latest_version=$(echo "$changelogs_page" | jq -r '.latest')
         latest_version_download_link=$(echo "$changelogs_page" | jq -r '.latest_download')
 
-        jg_recommended_download_link=$(curl -s https://artifacts.jgscripts.com/ | grep "https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/[0-9]*-[\\w]*/fx.tar.xz" -oP | head -1) # JG Scripts recommended version, trustworthy and tested
-        jg_recommended_version=$(echo "$jg_recommended_download_link" | sed -nE 's#^.*/master/([^/]+)/fx\.tar\.xz$#\1#p' | grep -oE '^[0-9]+' | head -n 1)
+        recommended_download_link=$(echo "$changelogs_page" | jq -r '.recommended_download')
+        recommended_version=$(echo "$changelogs_page" | jq -r '.recommended')
 
         forced_version_latest="${VERSION_FALLBACKS[$latest_version]}"
-        forced_version_recommended="${VERSION_FALLBACKS[$jg_recommended_version]}"
+        forced_version_recommended="${VERSION_FALLBACKS[$recommended_version]}"
 
         [[ "${FIVEM_VERSION}" == "latest" && -n "$forced_version_latest" ]] && FIVEM_VERSION="$forced_version_latest"
         [[ "${FIVEM_VERSION}" == "recommended" && -n "$forced_version_recommended" ]] && FIVEM_VERSION="$forced_version_recommended"
@@ -180,8 +180,8 @@ generate_download_link(){
                 DOWNLOAD_LINK="$latest_version_download_link"
             ;;
             recommended)
-                DOWNLOAD_LINK="$jg_recommended_download_link"
-                TARGET_VERSION="$jg_recommended_version"
+                DOWNLOAD_LINK="$recommended_download_link"
+                TARGET_VERSION="$recommended_version"
             ;;
             *)
                 [[ -z "${FIVEM_VERSION}" ]] && return 0
