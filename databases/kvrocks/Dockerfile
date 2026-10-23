@@ -1,4 +1,4 @@
-ARG KVROCKS_VERSION=2.16.0
+ARG KVROCKS_VERSION=2.17.0
 
 FROM apache/kvrocks:${KVROCKS_VERSION} AS kvrocks
 
@@ -26,18 +26,17 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=kvrocks /usr/bin/kvrocks /usr/bin/kvrocks
-COPY adminer/start-adminer /usr/local/bin/start-adminer
-COPY adminer/prepare.sh /usr/local/bin/prepare-adminer
+COPY --chmod=0755 adminer/start-adminer /usr/local/bin/start-adminer
+COPY --chmod=0755 adminer/prepare.sh /usr/local/bin/prepare-adminer
 COPY adminer/Caddyfile /etc/caddy/Caddyfile.template
 COPY adminer/php-fpm.conf /etc/php/8.5/fpm/php-fpm.conf
 COPY adminer/index.php /var/www/adminer/public/index.php
 COPY adminer/login-servers.php /var/www/adminer/public/plugins-enabled/login-servers.php
 COPY adminer/supervisord.conf /etc/supervisor/conf.d/adminer.conf
 COPY kvrocks/supervisord.conf /etc/supervisor/supervisord.conf
-COPY kvrocks/entrypoint.sh /entrypoint.sh
+COPY --chmod=0755 kvrocks/entrypoint.sh /entrypoint.sh
 
-RUN chmod 0755 /entrypoint.sh /usr/local/bin/start-adminer /usr/local/bin/prepare-adminer \
-    && chown -R container:container /home/container
+RUN chown -R container:container /home/container
 
 USER container
 ENV USER=container HOME=/home/container LANG=C.UTF-8

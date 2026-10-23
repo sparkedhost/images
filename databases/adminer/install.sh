@@ -4,8 +4,6 @@ set -Eeuo pipefail
 # Shared Adminer, PHP-FPM and Caddy installation for database images.
 driver="${1:?Adminer driver is required}"
 php_version=8.5
-adminer_version=6.1.1
-caddy_version=2.11.4
 
 case "$driver" in
     pgsql)
@@ -16,7 +14,7 @@ case "$driver" in
         adminer_driver=mongo.php
         ;;
     redis)
-        php_driver="php${php_version}-redis"
+        php_driver=""
         adminer_driver=kvrocks.php
         ;;
     *)
@@ -25,12 +23,22 @@ case "$driver" in
         ;;
 esac
 
-curl -fsSL https://packages.sury.org/php/apt.gpg \
-    -o /usr/share/keyrings/deb.sury.org-php.gpg
-echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ trixie main" \
+curl -fsSL --retry 3 https://packages.sury.org/debsuryorg-archive-keyring.deb \
+    -o /tmp/debsuryorg-archive-keyring.deb
+dpkg -i /tmp/debsuryorg-archive-keyring.deb
+rm /tmp/debsuryorg-archive-keyring.deb
+echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ trixie main" \
     > /etc/apt/sources.list.d/php.list
+curl -fsSL --retry 3 https://dl.cloudsmith.io/public/caddy/stable/gpg.key \
+    -o /usr/share/keyrings/caddy-stable.asc
+echo "deb [signed-by=/usr/share/keyrings/caddy-stable.asc] https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main" \
+    > /etc/apt/sources.list.d/caddy-stable.list
 apt-get update
-apt-get install -y --no-install-recommends "php${php_version}-fpm" "$php_driver"
+php_packages=("php${php_version}-fpm")
+if [[ -n "$php_driver" ]]; then
+    php_packages+=("$php_driver")
+fi
+apt-get install -y --no-install-recommends caddy "${php_packages[@]}"
 
 install -d -m 0755 /var/www/adminer/public/plugins-enabled /etc/caddy
 install -m 0644 /usr/share/doc/adminer/vendor/adminer.php \
@@ -41,22 +49,7 @@ install -D -m 0644 /usr/share/doc/adminer/vendor/functions.js \
 install -m 0644 /usr/share/doc/adminer/themes/hydra-dark/adminer.css \
     /var/www/adminer/public/adminer.css
 
-install -m 0644 /usr/share/doc/adminer/vendor/plugins/login-reverse-proxy.php \
-    /var/www/adminer/public/plugins-enabled/login-reverse-proxy.php
-
 if [[ "$driver" != pgsql ]]; then
     install -m 0644 "/usr/share/doc/adminer/vendor/plugins/${adminer_driver}" \
         "/var/www/adminer/public/plugins-enabled/${driver}.php"
 fi
-
-curl -fsSL \
-    "https://github.com/caddyserver/caddy/releases/download/v${caddy_version}/caddy_${caddy_version}_linux_amd64.tar.gz" \
-    -o /tmp/caddy.tar.gz
-curl -fsSL \
-    "https://github.com/caddyserver/caddy/releases/download/v${caddy_version}/caddy_${caddy_version}_checksums.txt" \
-    -o /tmp/caddy-checksums.txt
-grep " caddy_${caddy_version}_linux_amd64.tar.gz$" /tmp/caddy-checksums.txt \
-    | awk '{ print $1 "  /tmp/caddy.tar.gz" }' | sha512sum -c -
-tar -xzf /tmp/caddy.tar.gz -C /usr/bin caddy
-chmod 0755 /usr/bin/caddy
-rm /tmp/caddy.tar.gz /tmp/caddy-checksums.txt
