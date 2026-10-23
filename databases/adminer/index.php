@@ -7,9 +7,7 @@ namespace apollo {
             require __DIR__.'/plugins-enabled/'.$driver.'.php';
         }
 
-        require_once __DIR__.'/plugins-enabled/login-reverse-proxy.php';
         $plugins = [
-            new \AdminerLoginReverseProxy(),
             require __DIR__.'/plugins-enabled/login-servers.php',
         ];
 

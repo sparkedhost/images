@@ -11,7 +11,7 @@
 	file_server
 
 	request_body {
-		max_size 50GB
+		max_size 512MB
 	}
 
 	header {
@@ -25,5 +25,7 @@
 	@directPhp path *.php
 	respond @directPhp 404
 
-	php_fastcgi 127.0.0.1:9999
+	php_fastcgi 127.0.0.1:9999 {
+		env REMOTE_ADDR {client_ip}
+	}
 }

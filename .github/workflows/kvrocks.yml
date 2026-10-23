@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { series: "2", release: "2.16.0" }
+          - { series: "2", release: "2.17.0" }
     uses: ./.github/workflows/docker-build.yml
     with:
       context: ./databases

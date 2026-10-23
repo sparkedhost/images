@@ -35,11 +35,9 @@ if ! getent passwd "$(id -u)" >/dev/null; then
 fi
 
 if [[ ! -f "$PGDATA/PG_VERSION" ]]; then
-    password_file="$(mktemp)"
-    chmod 0600 "$password_file"
-    printf '%s' "$ADMIN_PASSWORD" > "$password_file"
-    initdb --pgdata="$PGDATA" --username="$ADMIN_USER" --pwfile="$password_file" --auth-host=scram-sha-256 --auth-local=scram-sha-256
-    rm -f "$password_file"
+    initdb --pgdata="$PGDATA" --username="$ADMIN_USER" \
+        --pwfile=<(printf '%s\n' "$ADMIN_PASSWORD") \
+        --auth-host=scram-sha-256 --auth-local=scram-sha-256
     cat >> "$PGDATA/postgresql.conf" <<EOF
 listen_addresses = '*'
 port = ${SERVER_PORT}

@@ -35,6 +35,27 @@ sed -i \
     -e "s/^requirepass .*/requirepass ${ADMIN_PASSWORD}/" \
     "$config"
 
+# Enforce namespace-hosting policy for new and existing installations.
+# These commands expose shared server state or channels across namespaces.
+sed -i -E \
+    -e '/^[[:space:]]*slowlog-log-slower-than[[:space:]]/d' \
+    -e '/^[[:space:]]*rename-command[[:space:]]+(client|monitor|slowlog|publish|mpublish|subscribe|psubscribe|unsubscribe|punsubscribe|pubsub)[[:space:]]/Id' \
+    "$config"
+cat >> "$config" <<'EOF'
+
+slowlog-log-slower-than -1
+rename-command CLIENT ""
+rename-command MONITOR ""
+rename-command SLOWLOG ""
+rename-command PUBLISH ""
+rename-command MPUBLISH ""
+rename-command SUBSCRIBE ""
+rename-command PSUBSCRIBE ""
+rename-command UNSUBSCRIBE ""
+rename-command PUNSUBSCRIBE ""
+rename-command PUBSUB ""
+EOF
+
 supervisor_pid=""
 bash_pid=""
 
