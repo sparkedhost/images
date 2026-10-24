@@ -1,4 +1,4 @@
-Always update README with the changed images.
+Always update README with the image changes (versions, name)
 Keep images simple and up to date.
 Use latest stable debian as base image where possible.
 If possible build on image layers instead of bespoke solutions.
