@@ -70,6 +70,7 @@
 - [`python-3.12`](https://github.com/sparkedhost/images/blob/main/python/python-3.12/Dockerfile)
 - [`python-3.13`](https://github.com/sparkedhost/images/blob/main/python/python-3.13/Dockerfile)
 - [`python-3.14`](https://github.com/sparkedhost/images/blob/main/python/python-3.14/Dockerfile)
+- [`python-3.15`](https://github.com/sparkedhost/images/blob/main/python/python-3.15/Dockerfile)
 
 ### Game Hosting images
 
