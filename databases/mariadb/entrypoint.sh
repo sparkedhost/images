@@ -107,6 +107,7 @@ initialize_database() {
     --defaults-file="$MARIADB_CONFIG"
     --basedir=/opt/mariadb
     --datadir="$MARIADB_DATADIR"
+    --skip-test-db
   )
   if { /opt/mariadb/scripts/mariadb-install-db --help 2>&1 || true; } \
       | grep -q -- '--auth-root-authentication-method'; then

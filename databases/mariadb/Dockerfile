@@ -1,8 +1,6 @@
 FROM debian:trixie-slim
 
 ARG PHP_VERSION=8.5
-ARG CADDY_VERSION=2.11.4
-ARG PHPMYADMIN_VERSION=5.2.3
 ARG DEBIAN_FRONTEND=noninteractive
 
 ENV MARIADB_BASEDIR=/opt/mariadb \
@@ -12,13 +10,19 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates curl iproute2 libaio1t64 libncurses6 libnuma1 \
         libstdc++6 liburing2 openssl perl procps supervisor tar unzip \
-    && curl -fsSL https://packages.sury.org/php/apt.gpg \
-        -o /usr/share/keyrings/deb.sury.org-php.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ trixie main" \
+    && curl -fsSL --retry 3 https://packages.sury.org/debsuryorg-archive-keyring.deb \
+        -o /tmp/debsuryorg-archive-keyring.deb \
+    && dpkg -i /tmp/debsuryorg-archive-keyring.deb \
+    && rm /tmp/debsuryorg-archive-keyring.deb \
+    && echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ trixie main" \
         > /etc/apt/sources.list.d/php.list \
+    && curl -fsSL --retry 3 https://dl.cloudsmith.io/public/caddy/stable/gpg.key \
+        -o /usr/share/keyrings/caddy-stable.asc \
+    && echo "deb [signed-by=/usr/share/keyrings/caddy-stable.asc] https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main" \
+        > /etc/apt/sources.list.d/caddy-stable.list \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-        php${PHP_VERSION}-bcmath \
+        caddy php${PHP_VERSION}-bcmath \
         php${PHP_VERSION}-curl php${PHP_VERSION}-fpm php${PHP_VERSION}-gd \
         php${PHP_VERSION}-mbstring php${PHP_VERSION}-mysql \
         php${PHP_VERSION}-xml php${PHP_VERSION}-zip \
@@ -28,31 +32,18 @@ RUN useradd --create-home --home-dir /home/container --shell /bin/bash container
 
 RUN mkdir -p /var/www/phpmyadmin \
     && curl -fsSL \
-        "https://files.phpmyadmin.net/phpMyAdmin/${PHPMYADMIN_VERSION}/phpMyAdmin-${PHPMYADMIN_VERSION}-all-languages.zip" \
+        "https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-all-languages.zip" \
         -o /tmp/phpmyadmin.zip \
     && curl -fsSL \
-        "https://files.phpmyadmin.net/phpMyAdmin/${PHPMYADMIN_VERSION}/phpMyAdmin-${PHPMYADMIN_VERSION}-all-languages.zip.sha256" \
+        "https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-all-languages.zip.sha256" \
         -o /tmp/phpmyadmin.sha256 \
-    && sed "s#phpMyAdmin-${PHPMYADMIN_VERSION}-all-languages.zip#/tmp/phpmyadmin.zip#" \
-        /tmp/phpmyadmin.sha256 | sha256sum -c - \
-    && unzip -q /tmp/phpmyadmin.zip -d /tmp \
-    && cp -a "/tmp/phpMyAdmin-${PHPMYADMIN_VERSION}-all-languages/." /var/www/phpmyadmin/ \
+    && awk '{print $1 "  /tmp/phpmyadmin.zip"}' /tmp/phpmyadmin.sha256 | sha256sum -c - \
+    && mkdir -p /tmp/phpmyadmin \
+    && unzip -q /tmp/phpmyadmin.zip -d /tmp/phpmyadmin \
+    && cp -a /tmp/phpmyadmin/phpMyAdmin-*-all-languages/. /var/www/phpmyadmin/ \
     && rm -rf /var/www/phpmyadmin/doc /var/www/phpmyadmin/examples \
         /var/www/phpmyadmin/setup \
-    && rm -rf /tmp/phpmyadmin.zip /tmp/phpmyadmin.sha256 \
-        "/tmp/phpMyAdmin-${PHPMYADMIN_VERSION}-all-languages" \
-    && curl -fsSL \
-        "https://github.com/caddyserver/caddy/releases/download/v${CADDY_VERSION}/caddy_${CADDY_VERSION}_linux_amd64.tar.gz" \
-        -o /tmp/caddy.tar.gz \
-    && curl -fsSL \
-        "https://github.com/caddyserver/caddy/releases/download/v${CADDY_VERSION}/caddy_${CADDY_VERSION}_checksums.txt" \
-        -o /tmp/caddy-checksums.txt \
-    && grep " caddy_${CADDY_VERSION}_linux_amd64.tar.gz$" /tmp/caddy-checksums.txt \
-        | awk '{ print $1 "  /tmp/caddy.tar.gz" }' \
-        | sha512sum -c - \
-    && tar -xzf /tmp/caddy.tar.gz -C /usr/bin caddy \
-    && chmod 0755 /usr/bin/caddy \
-    && rm /tmp/caddy.tar.gz /tmp/caddy-checksums.txt \
+    && rm -rf /tmp/phpmyadmin.zip /tmp/phpmyadmin.sha256 /tmp/phpmyadmin \
     && mkdir -p /home/container/etc/pma \
     && ln -s /home/container/etc/pma/pma.conf /var/www/phpmyadmin/config.inc.php \
     && chown -R container:container /home/container /var/www/phpmyadmin
@@ -152,16 +143,12 @@ RUN mkdir -p ${MARIADB_BASEDIR} \
     && rm -rf /var/lib/apt/lists/*
 
 COPY template/etc/php-fpm.conf /etc/php/${PHP_VERSION}/fpm/php-fpm.conf
-COPY template/etc/php.ini /etc/php/${PHP_VERSION}/fpm/php.ini
-COPY template/etc/php.ini /etc/php/${PHP_VERSION}/cli/php.ini
 COPY template/etc/pma.conf /var/www/phpmyadmin/config.inc.php.template
 COPY template/etc/my.cnf /etc/mariadb/my.cnf.template
 COPY template/etc/root.my.cnf /etc/mariadb/root.my.cnf.template
 COPY template/etc/Caddyfile /etc/caddy/Caddyfile.template
 COPY template/etc/supervisord.conf /supervisord.conf
-COPY entrypoint.sh /entrypoint.sh
-
-RUN chmod 0755 /entrypoint.sh
+COPY --chmod=0755 entrypoint.sh /entrypoint.sh
 
 USER container
 ENV USER=container HOME=/home/container LANG=C.UTF-8
