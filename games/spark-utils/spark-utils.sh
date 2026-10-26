@@ -191,6 +191,49 @@ install_valheim_plus() {
     echo "ValheimPlus installation completed (${version_number})"
 }
 
+install_eml() {
+    local api_response download_url version_number installed_version
+    local version_file=".apollo/eml_version"
+    local dll_file
+
+    if ! api_response=$(curl -fsSL --connect-timeout 10 --max-time 30 -H "Accept: application/vnd.github+json" https://api.github.com/repos/Brabb3l/kfc-parser/releases/latest); then
+        echo "Error: could not retrieve the latest EML release from GitHub"
+        return 1
+    fi
+
+    download_url=$(printf '%s\n' "${api_response}" \
+        | grep -oE '"browser_download_url":[[:space:]]*"[^"]+"' \
+        | sed -E 's/^"browser_download_url":[[:space:]]*"([^"]+)"$/\1/' \
+        | grep -E '/dbghelp\.dll$' \
+        | head -n 1 || true)
+
+    if [[ -z "${download_url}" ]]; then
+        echo "Error: the latest EML release has no dbghelp.dll asset"
+        return 1
+    fi
+
+    version_number="${download_url%/*}"
+    version_number="${version_number##*/}"
+    installed_version=$(cat "${version_file}" 2>/dev/null || true)
+    mkdir -p .apollo mods || return 1
+
+    if [[ -f "dbghelp.dll" && "${installed_version}" == "${version_number}" ]]; then
+        echo "EML is up to date (${version_number})"
+        return 0
+    fi
+
+    echo "Installing EML (${version_number})..."
+    dll_file=$(mktemp ./dbghelp.dll.XXXXXX) || return 1
+    if ! curl -fSL --connect-timeout 10 --max-time 180 --retry 3 --retry-delay 2 -o "${dll_file}" "${download_url}"; then
+        rm -f "${dll_file}"
+        echo "Error: could not download EML"
+        return 1
+    fi
+
+    mv -f "${dll_file}" dbghelp.dll || return 1
+    printf '%s\n' "${version_number}" > "${version_file}"
+}
+
 enable_ue4ss() {
     local api_response download_url archive_name installed_version
     local api_url="https://api.github.com/repos/NullPrism/RE-UE4SS-Linux/releases?per_page=1"
