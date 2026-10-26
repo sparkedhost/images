@@ -1167,6 +1167,69 @@ startup_enshrouded(){
     wait "${server_pid}"
 }
 
+startup_bedrock(){
+    set -eu
+    cd /home/container
+
+    proxy_pid=
+    bedrock_pid=
+    console_pid=
+    console_dir=
+    stop_bedrock() {
+        trap '' TERM INT
+        if [[ -n $console_pid ]]; then
+            kill -TERM "$console_pid" 2>/dev/null || true
+            wait "$console_pid" || true
+        fi
+        # Bedrock does not handle TERM. Use its console command so it saves the world.
+        if [[ -n $bedrock_pid ]] && kill -0 "$bedrock_pid" 2>/dev/null; then
+            printf 'stop\n' >&"$bedrock_input" || true
+            wait "$bedrock_pid" || true
+        fi
+        if [[ -n $proxy_pid ]]; then
+            kill -TERM "$proxy_pid" 2>/dev/null || true
+            wait "$proxy_pid" || true
+        fi
+        if [[ -n ${bedrock_input:-} ]]; then
+            exec {bedrock_input}>&-
+        fi
+        if [[ -n $console_dir ]]; then
+            rm "$console_dir/stdin"
+            rmdir "$console_dir"
+        fi
+    }
+    trap stop_bedrock EXIT
+    trap 'exit 0' TERM INT
+
+    /usr/local/bin/nethernetproxy -backend-lan \
+        -listen ":$SERVER_PORT" -mux ":$SERVER_PORT" \
+        -backend "127.0.0.1:58317" \
+        -advertise-ip "$SERVER_IP" -advertise-port "$SERVER_PORT" &
+    proxy_pid=$!
+
+    export LD_LIBRARY_PATH=".:${LD_LIBRARY_PATH:-}"
+    echo "Starting Bedrock with proxy on TCP/UDP $SERVER_PORT; backend 127.0.0.1:58317"
+    console_dir=$(mktemp -d /tmp/proxybedrock-console.XXXXXX)
+    mkfifo "$console_dir/stdin"
+    exec {bedrock_input}<>"$console_dir/stdin"
+    ./bedrock_server <&"$bedrock_input" &
+    bedrock_pid=$!
+    # Forward complete lines so an unfinished console command cannot absorb stop.
+    while IFS= read -r command; do
+        printf '%s\n' "$command" >&"$bedrock_input"
+    done <&0 &
+    console_pid=$!
+
+    # A failure of either process shuts down its sibling and fails the container.
+    result=0
+    wait -n "$proxy_pid" "$bedrock_pid" || result=$?
+    if kill -0 "$bedrock_pid" 2>/dev/null; then
+        echo 'Proxy exited while Bedrock was running.' >&2
+        exit 1
+    fi
+    exit "$result"
+}
+
 regular_startup(){
     MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
     MODIFIED_STARTUP="${STARTUP_ENVIRONMENT_PREFIX:-}${MODIFIED_STARTUP}"
