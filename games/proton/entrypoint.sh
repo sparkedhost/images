@@ -19,5 +19,10 @@ else
     echo -e "Not updating game server as auto update was set to 0. Starting Server"
 fi
 
+if [[ "${SRCDS_APPID}" == "2278520" && "${INSTALL_EML:-0}" == "1" ]]; then
+    install_eml || exit 1
+    export WINEDLLOVERRIDES="dbghelp=native,builtin${WINEDLLOVERRIDES:+;${WINEDLLOVERRIDES}}"
+fi
+
 game_pre_startup
 startup_game

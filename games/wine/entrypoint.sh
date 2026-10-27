@@ -63,6 +63,11 @@ for trick in $WINETRICKS_RUN; do
 done
 
 [[ $INSTALL_BEPINEX -eq 1 ]] && install_bepinex
+if [[ "${SRCDS_APPID}" == "2278520" && "${INSTALL_EML:-0}" == "1" ]]; then
+        install_eml || exit 1
+        export WINEDLLOVERRIDES="dbghelp=native,builtin${WINEDLLOVERRIDES:+;${WINEDLLOVERRIDES}}"
+fi
+
 game_pre_startup
 
 startup_game
