@@ -1201,7 +1201,7 @@ startup_bedrock(){
     trap stop_bedrock EXIT
     trap 'exit 0' TERM INT
 
-    /usr/local/bin/nethernetproxy -backend-lan \
+    /usr/local/bin/nethernetproxy \
         -listen ":$SERVER_PORT" -mux ":$SERVER_PORT" \
         -backend "127.0.0.1:58317" \
         -advertise-ip "$SERVER_IP" -advertise-port "$SERVER_PORT" &
