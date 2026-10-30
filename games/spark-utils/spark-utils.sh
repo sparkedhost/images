@@ -1230,6 +1230,18 @@ startup_bedrock(){
     exit "$result"
 }
 
+startup_pocketmine(){
+    if [[ "${API_VERSION}" == "API 5 (STABLE)" ]]; then
+        if [[ ! "${NETHERNET_PORT:-}" =~ ^[0-9]+$ ]] || (( 10#${NETHERNET_PORT} < 1 || 10#${NETHERNET_PORT} > 65535 || 10#${NETHERNET_PORT} == SERVER_PORT )); then
+            echo "Set NETHERNET_PORT to a separate UDP allocation for NetherNet." >&2
+            return 1
+        fi
+        yq -i '.transport.name = "nethernet" | .transport.nethernet.ice-udp-mux = true | .transport.nethernet.port-range = [env(NETHERNET_PORT), env(NETHERNET_PORT)] | .transport.nethernet.advertise-addresses = [strenv(SERVER_IP)] | .transport.nethernet.builtin-signaling.port = 0' pocketmine.yml || return 1
+    fi
+
+    regular_startup
+}
+
 regular_startup(){
     MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
     MODIFIED_STARTUP="${STARTUP_ENVIRONMENT_PREFIX:-}${MODIFIED_STARTUP}"
