@@ -1230,6 +1230,17 @@ startup_bedrock(){
     exit "$result"
 }
 
+startup_pocketmine(){
+    if [[ "${API_VERSION}" == "API 5 (STABLE)" ]]; then
+        yq -i '.transport.name = "nethernet" | .transport.nethernet.ice-udp-mux = true | .transport.nethernet.port-range = [env(SERVER_PORT), env(SERVER_PORT)] | .transport.nethernet.advertise-addresses = [strenv(SERVER_IP)] | .transport.nethernet.builtin-signaling.port = 0' pocketmine.yml || return 1
+    fi
+
+    sed -i 's/^enable-query=.*/enable-query=false/' server.properties || return 1
+    grep -q '^enable-query=' server.properties || printf '\nenable-query=false\n' >> server.properties || return 1
+
+    regular_startup
+}
+
 regular_startup(){
     MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
     MODIFIED_STARTUP="${STARTUP_ENVIRONMENT_PREFIX:-}${MODIFIED_STARTUP}"
