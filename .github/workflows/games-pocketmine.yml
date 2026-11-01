@@ -1,0 +1,19 @@
+name: Build games-pocketmine
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "games/pocketmine/*"
+      - "games/spark-utils/spark-utils.sh"
+      - .github/workflows/games-pocketmine.yml
+
+jobs:
+  build:
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      context: ./games
+      file: ./games/pocketmine/Dockerfile
+      tags: ghcr.io/sparkedhost/images:games-pocketmine
