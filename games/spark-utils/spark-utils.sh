@@ -1176,6 +1176,11 @@ startup_windrose(){
 }
 
 startup_enshrouded(){
+    if [[ "${INSTALL_EML:-0}" == "1" ]]; then
+        install_eml || return 1
+        export WINEDLLOVERRIDES="dbghelp=native,builtin${WINEDLLOVERRIDES:+;${WINEDLLOVERRIDES}}"
+    fi
+
     MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
 
     echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
