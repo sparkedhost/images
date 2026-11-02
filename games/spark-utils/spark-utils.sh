@@ -118,7 +118,7 @@ install_bepinex() {
         rm -f "${zip_name}"
         return 1
     fi
-    cp -al "/home/container/${extracted_dir}/"* /home/container
+    cp -alf "/home/container/${extracted_dir}/"* /home/container
 
 
     ##cleanup
