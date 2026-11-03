@@ -14,6 +14,7 @@ RUN dpkg --add-architecture i386 \
     && apt update \
     && apt upgrade -y \
     && apt install -y tar curl gcc g++ lib32gcc-s1 libgcc-s1 libcurl4-gnutls-dev:i386 libssl3:i386 libcurl4:i386 lib32tinfo6 libtinfo6:i386 lib32z1 lib32stdc++6 libncurses6:i386 libcurl3-gnutls:i386 libsdl2-2.0-0:i386 gdb libsdl1.2debian libfontconfig1 telnet net-tools netcat-traditional gcc-multilib jq xz-utils file git imagemagick procps \
+    && apt install -y --no-install-recommends mono-complete \
     && useradd -d /home/container -m container 
 
 USER container
