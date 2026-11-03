@@ -197,7 +197,7 @@ generate_download_link(){
         echo "Download link not found, skipping update." 
         return 0
     fi
-    if curl --output /dev/null --silent --head --fail "${DOWNLOAD_URL}"; then
+    if [[ -n "${DOWNLOAD_URL}" ]] && curl --output /dev/null --silent --head --fail "${DOWNLOAD_URL}"; then
         echo "Overriding download link with DOWNLOAD_URL."
         DOWNLOAD_LINK="${DOWNLOAD_URL}"
     fi
