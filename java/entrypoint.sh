@@ -36,22 +36,59 @@ fi
 # Forge 1.17.1+
 if [ -n "${FORGE_VERSION}" ]; then
     if [ -f "libraries/net/minecraftforge/forge/${FORGE_VERSION}/unix_args.txt" ]; then
-        MODIFIED_STARTUP="java -Xms128M -Xmx${SERVER_MEMORY}M -Dterminal.jline=false -Dterminal.ansi=true @libraries/net/minecraftforge/forge/${FORGE_VERSION}/unix_args.txt"
+        MODIFIED_STARTUP="${MODIFIED_STARTUP/ -jar ${SERVER_JARFILE}/ -Dterminal.jline=false -Dterminal.ansi=true @libraries/net/minecraftforge/forge/${FORGE_VERSION}/unix_args.txt}"
     else 
         echo -e "\033[1;33mNOTE: \033[0mReverting to default startup, unix_args.txt was not found."
     fi
 fi
 
-# Aikar flags
-if [ "${AIKAR_FLAGS}" = 1 ]; then
-    MODIFIED_STARTUP=$(echo "${MODIFIED_STARTUP}" | sed -E 's/-Xmx([0-9]+)[KMG]?/& -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Daikars.new.flags=true/')
-    echo -e "\033[1;33mNOTE: \033[0mEnabled Aikar's Flags"
+# Percentage-based maximum heap; initial heap is expanded by the egg startup.
+if [ -n "${MAXIMUM_RAM}" ]; then
+    if [[ ! "${MAXIMUM_RAM}" =~ ^[0-9]+$ ]] || (( MAXIMUM_RAM < 1 || MAXIMUM_RAM > 100 )); then
+        echo 'MAXIMUM_RAM must be an integer from 1 to 100' >&2
+        exit 1
+    fi
+    HEAP_MEMORY=$((SERVER_MEMORY * MAXIMUM_RAM / 100))
+    MODIFIED_STARTUP=$(printf '%s' "${MODIFIED_STARTUP}" | sed -E "s/(^|[[:space:]])-Xmx[0-9]+[KkMmGg]?([[:space:]]|$)/\1-Xmx${HEAP_MEMORY}M\2/")
 fi
 
-# If Lower Xmx is enabled, then replace Xmx with MaxRAMPercentage
-if [ "${LOWER_XMX}" = 1 ]; then
-    MODIFIED_STARTUP=$(echo "$MODIFIED_STARTUP" | sed 's/-Xmx\([0-9]*\)[KMG]/-XX:MaxRAMPercentage=80.0/g')
-    echo -e "\033[1;33mNOTE: \033[0mEnabled Lower Maximum RAM"
+EXTRA_JAVA_FLAGS=()
+case "${JVM_PRESET:-None}" in
+    Aikar)
+        EXTRA_JAVA_FLAGS+=("-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Daikars.new.flags=true")
+        ;;
+    Velocity)
+        EXTRA_JAVA_FLAGS+=("-XX:+ParallelRefProcEnabled -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1HeapRegionSize=4M -XX:MaxInlineLevel=15")
+        ;;
+esac
+if [ "${REMOVE_UPDATE_WARNING}" = 1 ]; then
+    EXTRA_JAVA_FLAGS+=("-DIReallyKnowWhatIAmDoingISwear")
+fi
+case "${MINEHUT_SUPPORT:-None}" in
+    Velocity)
+        EXTRA_JAVA_FLAGS+=("-Dmojang.sessionserver=https://api.minehut.com/mitm/proxy/session/minecraft/hasJoined")
+        ;;
+    Waterfall)
+        EXTRA_JAVA_FLAGS+=("-Dwaterfall.auth.url=https://api.minehut.com/mitm/proxy/session/minecraft/hasJoined?username=%s&serverId=%s%s")
+        ;;
+    Bukkit)
+        EXTRA_JAVA_FLAGS+=("-Dminecraft.api.auth.host=https://authserver.mojang.com/ -Dminecraft.api.account.host=https://api.mojang.com/ -Dminecraft.api.services.host=https://api.minecraftservices.com/ -Dminecraft.api.session.host=https://api.minehut.com/mitm/proxy -Dminecraft.api.profiles.host=https://api.mojang.com/")
+        ;;
+esac
+if [ -n "${JVM_FLAGS}" ]; then
+    EXTRA_JAVA_FLAGS+=("${JVM_FLAGS}")
+fi
+if (( ${#EXTRA_JAVA_FLAGS[@]} )); then
+    if [[ "${MODIFIED_STARTUP}" == *" -jar "* ]]; then
+        MODIFIED_STARTUP="${MODIFIED_STARTUP%% -jar *} ${EXTRA_JAVA_FLAGS[*]} -jar ${MODIFIED_STARTUP#* -jar }"
+    elif [[ "${MODIFIED_STARTUP}" == java\ * ]]; then
+        MODIFIED_STARTUP="java ${EXTRA_JAVA_FLAGS[*]} ${MODIFIED_STARTUP#java }"
+    fi
+fi
+if [ "${USE_UNIX_ARGS}" = 1 ] && [ -f unix_args.txt ]; then
+    MODIFIED_STARTUP="${MODIFIED_STARTUP/ -jar ${SERVER_JARFILE}/ @unix_args.txt}"
+elif [ "${USE_UNIX_ARGS}" = 0 ] && [[ "${MODIFIED_STARTUP}" =~ (^|[[:space:]])@([.]/)?unix_args[.]txt([[:space:]]|$) ]]; then
+    MODIFIED_STARTUP="${MODIFIED_STARTUP/"${BASH_REMATCH[0]}"/"${BASH_REMATCH[1]}-jar ${SERVER_JARFILE}${BASH_REMATCH[3]}"}"
 fi
 
 # If Auto Update is enabled and Update API URL is set, then update the server
