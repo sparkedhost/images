@@ -189,6 +189,15 @@ if [ -f server.properties ] && [ -n "${SERVER_PORT}" ]; then
     fi
 fi
 
+# Remove JVM options unsuitable for shared hosting.
+JVM_FLAG_SEPARATORS=$' \t\n'
+for BLOCKED_JVM_FLAG in AlwaysPreTouch AlwaysPreTouchStacks UseLargePages UseTransparentHugePages UseHugeTLBFS UseCriticalJavaThreadPriority AggressiveHeap; do
+    BLOCKED_JVM_PATTERN="^(.*[${JVM_FLAG_SEPARATORS}])?-XX:\\+${BLOCKED_JVM_FLAG}([${JVM_FLAG_SEPARATORS}].*)?$"
+    while [[ "${MODIFIED_STARTUP}" =~ ${BLOCKED_JVM_PATTERN} ]]; do
+        MODIFIED_STARTUP="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
+    done
+done
+
 # Print startup command to console
 echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m ${MODIFIED_STARTUP}"
 
