@@ -47,13 +47,6 @@ slowlog-log-slower-than -1
 rename-command CLIENT ""
 rename-command MONITOR ""
 rename-command SLOWLOG ""
-rename-command PUBLISH ""
-rename-command MPUBLISH ""
-rename-command SUBSCRIBE ""
-rename-command PSUBSCRIBE ""
-rename-command UNSUBSCRIBE ""
-rename-command PUNSUBSCRIBE ""
-rename-command PUBSUB ""
 EOF
 
 supervisor_pid=""
