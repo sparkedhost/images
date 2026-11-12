@@ -915,6 +915,8 @@ startup_pzomboid(){
 
         for mod_path in ./steamapps/workshop/content/108600/*/mods/* ./ServerFiles/mods/*; do
             [[ -d "${mod_path}" && ! -L "${mod_path}" ]] || continue
+            # Only XML files using x_extends/x_include hit the lowercase-path animation bug.
+            # Skip other mods to avoid unnecessary links and changes to server checksum checks.
             grep -rqE --include='*.[xX][mM][lL]' 'x_extends|x_include' "${mod_path}" || continue
 
             # Build 42 lowercases animation references; keep Steam's original paths intact.
