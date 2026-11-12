@@ -1,6 +1,8 @@
 #!/bin/bash
 
 STEAM_USER=${STEAM_USER:-anonymous}
+SERVER_HOME=${SERVER_HOME:-/home/container}
+STEAMCMD_ATTEMPTS=${STEAMCMD_ATTEMPTS:-3}
 
 # General Utils
 
@@ -301,8 +303,24 @@ install_arkapi() {
 }
 
 # Steam Utils
+update_game_server(){
+    if [ "${AUTO_UPDATE}" == "1" ]; then
+        local extraFlags validateServer
+        extraFlags="$( [[ -z ${SRCDS_BETAID} ]] || printf %s "-beta ${SRCDS_BETAID}" ) $( [[ -z ${SRCDS_BETAPASS} ]] || printf %s "-betapassword ${SRCDS_BETAPASS}" )"
+        validateServer=$( [[ -z ${VALIDATE} ]] || printf %s "validate" )
+        RunSteamCMD 0 "${SRCDS_APPID}"
+    else
+        echo -e "Not updating game server as auto update was set to 0. Starting Server"
+    fi
+}
+
 RunSteamCMD() { #[Input: int server=0 mod=1; int id]
     local steamcmd_log steamcmd_dir game_id workshop_dir updateAttempt  steamcmdExitCode 
+    local steam_login="+login anonymous"
+    if [[ "${STEAM_USER:-anonymous}" != "anonymous" && -n "${STEAM_PASS:-}" ]]; then
+        steam_login="+login \"${STEAM_USER}\" \"${STEAM_PASS}\""
+    fi
+
     workshop_dir="./Steam/steamapps/workshop"
     steamcmd_dir="$SERVER_HOME/steamcmd"
     steamcmd_log="${steamcmd_dir}/steamcmd.log" 
@@ -323,9 +341,9 @@ RunSteamCMD() { #[Input: int server=0 mod=1; int id]
 
         # Check if updating server or mod
         if [[ $1 == 0 ]]; then # Server
-            ${steamcmd_dir}/steamcmd.sh +force_install_dir /home/container "+login \"${STEAM_USER}\" \"${STEAM_PASS}\"" +app_update $2 $extraFlags $validateServer +quit | tee -a "${steamcmd_log}"
+            ${steamcmd_dir}/steamcmd.sh +force_install_dir /home/container "${steam_login}" +app_update $2 $extraFlags $validateServer +quit | tee -a "${steamcmd_log}"
         else # Mod
-            ${steamcmd_dir}/steamcmd.sh "+login \"${STEAM_USER}\" \"${STEAM_PASS}\"" +workshop_download_item $GAME_ID $2 +quit | tee -a "${steamcmd_log}"
+            ${steamcmd_dir}/steamcmd.sh "${steam_login}" +workshop_download_item $GAME_ID $2 +quit | tee -a "${steamcmd_log}"
         fi
 
         # Error checking for SteamCMD
@@ -335,6 +353,9 @@ RunSteamCMD() { #[Input: int server=0 mod=1; int id]
             if [[ -n $(grep -i "Timeout downloading item" "${steamcmd_log}") ]]; then # Mod download timeout
                 echo -e "[UPDATE]: Timeout downloading Steam Workshop mod: \"${modName}\" (${2})"
                 echo -e "(This is expected for particularly large mods)"
+            elif [[ $1 == 0 ]] && grep -qi 'state is 0x6 after update job' "${steamcmd_log}"; then # Stale game manifest
+                echo -e "[UPDATE]: Game update failed with stale manifest state. Removing cached app manifest and retrying..."
+                rm -f "${SERVER_HOME}/steamapps/appmanifest_${2}.acf"
             elif [[ -n $(grep -i "0x402\|0x6\|0x602" "${steamcmd_log}") ]]; then # Connection issue with Steam
                 echo -e "[UPDATE]: Connection issue with Steam servers."
                 echo -e "(Steam servers may currently be down, or a connection cannot be made reliably)"
