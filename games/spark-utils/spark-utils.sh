@@ -972,6 +972,49 @@ startup_necesse(){
     eval ${modifiedStartup}
 }
 
+startup_pzomboid(){
+    if [[ "${SOFTLINK_MODS:-0}" == "1" ]]; then
+        local mod_path src name dst config
+        local created=0 aliases=0
+
+        for mod_path in ./steamapps/workshop/content/108600/*/mods/* ./ServerFiles/mods/*; do
+            [[ -d "${mod_path}" && ! -L "${mod_path}" ]] || continue
+            # Only XML files using x_extends/x_include hit the lowercase-path animation bug.
+            # Skip other mods to avoid unnecessary links and changes to server checksum checks.
+            grep -rqE --include='*.[xX][mM][lL]' 'x_extends|x_include' "${mod_path}" || continue
+
+            # Build 42 lowercases animation references; keep Steam's original paths intact.
+            while IFS= read -r -d '' src; do
+                name="${src##*/}"
+                dst="${src%/*}/${name,,}"
+                if [[ -e "${dst}" ]]; then
+                    if [[ -L "${dst}" && "${dst}" -ef "${src}" ]]; then
+                        aliases=1
+                    fi
+                    continue
+                fi
+
+                ln -sfn -- "${name}" "${dst}" || return 1
+                created=$((created + 1))
+                aliases=1
+            done < <(find "${mod_path}" -depth \( -type d -o -type f \) -name '*[A-Z]*' -print0)
+        done
+
+        if [[ "${aliases}" == "1" ]]; then
+            config="./ServerFiles/Server/${SERVER_NAME}.ini"
+            mkdir -p "./ServerFiles/Server" || return 1
+            if [[ -f "${config}" ]] && grep -q '^DoLuaChecksum=' "${config}"; then
+                sed -i 's/^DoLuaChecksum=.*/DoLuaChecksum=false/' "${config}" || return 1
+            else
+                printf '\nDoLuaChecksum=false\n' >> "${config}" || return 1
+            fi
+            echo "Project Zomboid: created ${created} lowercase mod aliases; DoLuaChecksum=false prevents client checksum kicks."
+        fi
+    fi
+
+    regular_startup
+}
+
 startup_squad(){
     GAME_ID=393380
     mkdir -p "SquadGame/Plugins/Mods"
@@ -1478,6 +1521,9 @@ startup_game(){
         ;;
         403240)
             startup_squad
+        ;;
+        380870)
+            startup_pzomboid
         ;;
         2394010)
             if [[ "${INSTALL_UE4SS:-0}" == "1" ]]; then
