@@ -384,7 +384,7 @@ RunSteamCMD() { #[Input: int server=0 mod=1; int id]
 
         # Check if updating server or mod
         if [[ $1 == 0 ]]; then # Server
-            ${steamcmd_dir}/steamcmd.sh +force_install_dir /home/container "${steam_login}" +app_update $2 $extraFlags $validateServer +quit | tee -a "${steamcmd_log}"
+            ${steamcmd_dir}/steamcmd.sh $( [[ "${WINDOWS_INSTALL}" == "1" ]] && printf %s '+@sSteamCmdForcePlatformType windows' ) +force_install_dir /home/container "${steam_login}" +app_update $2 $extraFlags $validateServer +quit | tee -a "${steamcmd_log}"
         else # Mod
             ${steamcmd_dir}/steamcmd.sh "${steam_login}" +workshop_download_item $GAME_ID $2 +quit | tee -a "${steamcmd_log}"
         fi
@@ -1071,6 +1071,27 @@ startup_with_signal_forwarding(){
     wait "${server_pid}"
 }
 
+startup_motortown(){
+    local previous_log
+
+    mkdir -p MotorTown/Saved/ServerLog
+    previous_log="$(ls -t MotorTown/Saved/ServerLog/*.log 2>/dev/null | head -n 1)"
+
+    (
+        local log_file
+
+        while true; do
+            log_file="$(ls -t MotorTown/Saved/ServerLog/*.log 2>/dev/null | head -n 1)"
+            if [[ -n "${log_file}" && "${log_file}" != "${previous_log}" ]]; then
+                exec tail -n +1 -F "${log_file}" --pid=$$
+            fi
+            sleep 1
+        done
+    ) &
+
+    startup_with_signal_forwarding
+}
+
 find_console_window(){
     local title_pattern="$1"
     local auth_candidate socket window
@@ -1480,6 +1501,13 @@ startup_ue4ss(){
 
 startup_game(){
     case $SRCDS_APPID in
+        565060)
+            setup_nss_wrapper
+            regular_startup
+        ;;
+        2223650)
+            startup_motortown
+        ;;
         896660)
             startup_valheim
         ;;
