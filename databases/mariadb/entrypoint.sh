@@ -167,13 +167,13 @@ configure_phpmyadmin() {
     -e "s|\$cfg\['Servers'\]\[\$i\]\['port'\] = '[^']*'|\$cfg['Servers'][\$i]['port'] = '${SERVER_PORT}'|" \
     "$config"
 
-  if ! grep -q "\['SignonSession'\]" "$config"; then
-    {
-      printf "\n"
-      printf "\$cfg['Servers'][\$i]['SignonSession'] = 'TokenSession';\n"
-      printf "\$cfg['Servers'][\$i]['SignonURL'] = 'token.php';\n"
-      printf "\$cfg['Servers'][\$i]['LogoutURL'] = 'token-logout.php';\n"
-    } >> "$config"
+  if ! grep -Fq "['SignonSession']" "$config"; then
+    cat >> "$config" <<'PHP'
+
+$cfg['Servers'][$i]['SignonSession'] = 'TokenSession';
+$cfg['Servers'][$i]['SignonURL'] = 'token.php';
+$cfg['Servers'][$i]['LogoutURL'] = 'token-logout.php';
+PHP
   fi
 }
 

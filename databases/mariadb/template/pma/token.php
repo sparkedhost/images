@@ -5,8 +5,6 @@ declare(strict_types=1);
 header('Cache-Control: no-store');
 header('Referrer-Policy: no-referrer');
 
-ini_set('session.use_cookies', 'true');
-
 session_set_cookie_params([
     'lifetime' => 0,
     'path' => '/',
@@ -30,32 +28,26 @@ try {
 
     session_regenerate_id(true);
 
-    $_SESSION['PMA_single_signon_user'] = $payload['username'];
-    $_SESSION['PMA_single_signon_password'] = $payload['password'];
-    $_SESSION['PMA_single_signon_host'] = $payload['host'];
-    $_SESSION['PMA_single_signon_port'] = $payload['port'];
-    $_SESSION['PMA_single_signon_cfgupdate'] = [
-        'only_db' => [$payload['database']],
-        'verbose' => $payload['database'],
+    $_SESSION = [
+        'PMA_single_signon_user' => $payload['username'],
+        'PMA_single_signon_password' => $payload['password'],
+        'PMA_single_signon_cfgupdate' => [
+            'only_db' => [$payload['database']],
+            'verbose' => $payload['database'],
+        ],
     ];
-    $_SESSION['PMA_single_signon_HMAC_secret'] = bin2hex(random_bytes(20));
-    @session_write_close();
+    session_write_close();
 
     header('Location: index.php');
     exit;
 } catch (RuntimeException | JsonException $exception) {
     http_response_code(400);
-    header('Content-Type: text/html; charset=utf-8');
-
-    $message = htmlspecialchars($exception->getMessage(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    echo '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>phpMyAdmin Login</title></head><body>';
-    echo '<h1>Unable to open phpMyAdmin</h1>';
-    echo '<p>'.$message.'</p>';
-    echo '</body></html>';
+    header('Content-Type: text/plain; charset=utf-8');
+    echo $exception->getMessage();
 }
 
 /**
- * @return array{host: string, port: string, database: string, username: string, password: string}
+ * @return array{exp: int, database: string, username: string, password: string}
  */
 function apollo_decrypt_payload(mixed $token): array
 {
@@ -91,12 +83,8 @@ function apollo_decrypt_payload(mixed $token): array
 
     $payload = json_decode($json, true, flags: JSON_THROW_ON_ERROR);
 
-    if (! is_array($payload) || ($payload['aud'] ?? null) !== 'apollo-phpmyadmin') {
-        throw new RuntimeException('Invalid phpMyAdmin login token.');
-    }
-
     if (! is_int($payload['exp'] ?? null) || $payload['exp'] <= time()) {
-        throw new RuntimeException('Expired phpMyAdmin login token.');
+        throw new RuntimeException('Invalid or expired phpMyAdmin login token.');
     }
 
     return $payload;

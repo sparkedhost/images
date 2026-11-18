@@ -41,20 +41,15 @@ namespace {
                 substr($raw, 12, 16),
             );
             $payload = $json === false ? null : json_decode($json, true, flags: JSON_THROW_ON_ERROR);
-            if (
-                !is_array($payload)
-                || ($payload['aud'] ?? null) !== 'apollo-adminer'
-                || ($payload['driver'] ?? null) !== getenv('ADMINER_DRIVER')
-                || !is_int($payload['exp'] ?? null)
-                || $payload['exp'] <= time()
-            ) {
+            if (!is_int($payload['exp'] ?? null) || $payload['exp'] <= time()) {
                 throw new \RuntimeException('Invalid or expired Adminer login token.');
             }
 
-            $isRedis = $payload['driver'] === 'redis';
-            define('APOLLO_SSO_AUTH', true);
+            $driver = getenv('ADMINER_DRIVER');
+            $isRedis = $driver === 'redis';
+            define('APOLLO_SSO_TOKEN_VERIFIED', true);
             $_POST = ['auth' => [
-                'driver' => $payload['driver'],
+                'driver' => $driver,
                 'server' => getenv('ADMINER_SERVER_LABEL') ?: 'Database',
                 'username' => $isRedis ? '' : $payload['username'],
                 'password' => $payload['password'],

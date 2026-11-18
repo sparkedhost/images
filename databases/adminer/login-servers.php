@@ -19,7 +19,8 @@ class AdminerLoginServers extends Adminer\Plugin
 
     public function verifyLoginToken()
     {
-        if (defined('APOLLO_SSO_AUTH')) {
+        // The verified Panel token stands in for Adminer's form CSRF token.
+        if (defined('APOLLO_SSO_TOKEN_VERIFIED')) {
             return false;
         }
     }
