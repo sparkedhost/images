@@ -1304,6 +1304,28 @@ startup_bedrock(){
     set -eu
     cd /home/container
 
+    BEDROCK_PROTOCOL=${BEDROCK_PROTOCOL:-nethernet}
+    case "$BEDROCK_PROTOCOL" in
+        nethernet)
+            bedrock_port=58317
+            bedrock_ip=127.0.0.1
+            ;;
+        raknet)
+            bedrock_port=$SERVER_PORT
+            bedrock_ip=0.0.0.0
+            ;;
+        *)
+            echo "Unsupported Bedrock protocol: $BEDROCK_PROTOCOL" >&2
+            return 1
+            ;;
+    esac
+
+    if [[ -e server.properties ]]; then
+        sed -i '/^\(transport\|server-port\|server-ip\|server-udp-ports\)=/d' server.properties
+    fi
+    printf '\ntransport=%s\nserver-port=%s\nserver-ip=%s\nserver-udp-ports=\n' \
+        "$BEDROCK_PROTOCOL" "$bedrock_port" "$bedrock_ip" >> server.properties
+
     proxy_pid=
     bedrock_pid=
     console_pid=
@@ -1334,14 +1356,18 @@ startup_bedrock(){
     trap stop_bedrock EXIT
     trap 'exit 0' TERM INT
 
-    /usr/local/bin/nethernetproxy \
-        -listen ":$SERVER_PORT" -mux ":$SERVER_PORT" \
-        -backend "127.0.0.1:58317" \
-        -advertise-ip "$SERVER_IP" -advertise-port "$SERVER_PORT" &
-    proxy_pid=$!
+    if [[ "$BEDROCK_PROTOCOL" == "nethernet" ]]; then
+        /usr/local/bin/nethernetproxy \
+            -listen ":$SERVER_PORT" -mux ":$SERVER_PORT" \
+            -backend "127.0.0.1:58317" \
+            -advertise-ip "$SERVER_IP" -advertise-port "$SERVER_PORT" &
+        proxy_pid=$!
+        echo "Starting Bedrock with proxy on TCP/UDP $SERVER_PORT; backend 127.0.0.1:58317"
+    else
+        echo "Starting Bedrock with RakNet on UDP $SERVER_PORT"
+    fi
 
     export LD_LIBRARY_PATH=".:${LD_LIBRARY_PATH:-}"
-    echo "Starting Bedrock with proxy on TCP/UDP $SERVER_PORT; backend 127.0.0.1:58317"
     console_dir=$(mktemp -d /tmp/proxybedrock-console.XXXXXX)
     mkfifo "$console_dir/stdin"
     exec {bedrock_input}<>"$console_dir/stdin"
@@ -1355,7 +1381,11 @@ startup_bedrock(){
 
     # A failure of either process shuts down its sibling and fails the container.
     result=0
-    wait -n "$proxy_pid" "$bedrock_pid" || result=$?
+    if [[ -n $proxy_pid ]]; then
+        wait -n "$proxy_pid" "$bedrock_pid" || result=$?
+    else
+        wait "$bedrock_pid" || result=$?
+    fi
     if kill -0 "$bedrock_pid" 2>/dev/null; then
         echo 'Proxy exited while Bedrock was running.' >&2
         exit 1
