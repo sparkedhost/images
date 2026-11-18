@@ -16,6 +16,59 @@ namespace apollo {
 }
 
 namespace {
+    if (isset($_GET['apollo_db_sso'])) {
+        header('Cache-Control: no-store');
+        header('Referrer-Policy: no-referrer');
+
+        try {
+            $token = $_GET['apollo_db_sso'];
+            $secret = getenv('DATABASE_WEB_UI_SSO_KEY');
+            if (!is_string($token) || !is_string($secret) || $secret === '') {
+                throw new \RuntimeException('Invalid Adminer login token.');
+            }
+
+            $raw = base64_decode($token, true);
+            if ($raw === false || strlen($raw) <= 28) {
+                throw new \RuntimeException('Invalid Adminer login token.');
+            }
+
+            $json = openssl_decrypt(
+                substr($raw, 28),
+                'aes-256-gcm',
+                hash('sha256', $secret, true),
+                OPENSSL_RAW_DATA,
+                substr($raw, 0, 12),
+                substr($raw, 12, 16),
+            );
+            $payload = $json === false ? null : json_decode($json, true, flags: JSON_THROW_ON_ERROR);
+            if (
+                !is_array($payload)
+                || ($payload['aud'] ?? null) !== 'apollo-adminer'
+                || ($payload['driver'] ?? null) !== getenv('ADMINER_DRIVER')
+                || !is_int($payload['exp'] ?? null)
+                || $payload['exp'] <= time()
+            ) {
+                throw new \RuntimeException('Invalid or expired Adminer login token.');
+            }
+
+            $isRedis = $payload['driver'] === 'redis';
+            define('APOLLO_SSO_AUTH', true);
+            $_POST = ['auth' => [
+                'driver' => $payload['driver'],
+                'server' => getenv('ADMINER_SERVER_LABEL') ?: 'Database',
+                'username' => $isRedis ? '' : $payload['username'],
+                'password' => $payload['password'],
+                'db' => $isRedis ? '' : $payload['database'],
+            ]];
+            unset($_GET['apollo_db_sso']);
+            $_SERVER['REQUEST_URI'] = '/';
+        } catch (\RuntimeException | \JsonException) {
+            http_response_code(400);
+            header('Content-Type: text/plain; charset=utf-8');
+            echo 'Invalid or expired Adminer login token.';
+            exit;
+        }
+    }
     if (($_GET['file'] ?? null) === 'functions.js') {
         header('Content-Type: text/javascript; charset=utf-8');
         header('Cache-Control: no-store');

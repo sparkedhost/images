@@ -144,6 +144,8 @@ RUN mkdir -p ${MARIADB_BASEDIR} \
 
 COPY template/etc/php-fpm.conf /etc/php/${PHP_VERSION}/fpm/php-fpm.conf
 COPY template/etc/pma.conf /var/www/phpmyadmin/config.inc.php.template
+COPY template/pma/token.php /var/www/phpmyadmin/token.php
+COPY template/pma/token-logout.php /var/www/phpmyadmin/token-logout.php
 COPY template/etc/my.cnf /etc/mariadb/my.cnf.template
 COPY template/etc/root.my.cnf /etc/mariadb/root.my.cnf.template
 COPY template/etc/Caddyfile /etc/caddy/Caddyfile.template
