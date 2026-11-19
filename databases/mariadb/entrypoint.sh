@@ -163,8 +163,18 @@ configure_phpmyadmin() {
       "$config"
   fi
   sed -i \
-    "s|\$cfg\['Servers'\]\[\$i\]\['port'\] = '[^']*'|\$cfg['Servers'][\$i]['port'] = '${SERVER_PORT}'|" \
+    -e "s|^\$cfg\['Servers'\]\[\$i\]\['auth_type'\] = .*;|\$cfg['Servers'][\$i]['auth_type'] = isset(\$_COOKIE['TokenSession']) ? 'signon' : 'cookie';|" \
+    -e "s|\$cfg\['Servers'\]\[\$i\]\['port'\] = '[^']*'|\$cfg['Servers'][\$i]['port'] = '${SERVER_PORT}'|" \
     "$config"
+
+  if ! grep -Fq "['SignonSession']" "$config"; then
+    cat >> "$config" <<'PHP'
+
+$cfg['Servers'][$i]['SignonSession'] = 'TokenSession';
+$cfg['Servers'][$i]['SignonURL'] = 'token.php';
+$cfg['Servers'][$i]['LogoutURL'] = 'token-logout.php';
+PHP
+  fi
 }
 
 initialize_database

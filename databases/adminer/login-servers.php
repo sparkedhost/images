@@ -17,6 +17,14 @@ class AdminerLoginServers extends Adminer\Plugin
         }
     }
 
+    public function verifyLoginToken()
+    {
+        // The verified Panel token stands in for Adminer's form CSRF token.
+        if (defined('APOLLO_SSO_TOKEN_VERIFIED')) {
+            return false;
+        }
+    }
+
     public function credentials()
     {
         return [Adminer\idx($this->servers[Adminer\SERVER] ?? [], 'server'), $_GET['username'] ?? '', Adminer\get_password()];
