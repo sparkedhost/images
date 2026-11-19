@@ -13,8 +13,8 @@ RUN apt-get update -y \
  && mkdir -p /opt/java
 
 # Download pre-built Temurin JRE binaries
-# Pre-compiled by Sparked Host using https://github.com/adoptium/temurin-build
-ADD https://s3-modpacks.sparkedhost.us/OpenJDK16U-jre_x64_linux_hotspot_16.0.2%2B7.tar.gz /opt/java/java.tar.gz
+# Adoptium publishes the Java 16 JRE through its early-access channel.
+ADD https://api.adoptium.net/v3/binary/latest/16/ea/linux/x64/jre/hotspot/normal/eclipse /opt/java/java.tar.gz
 RUN tar -C /opt/java --strip-components=1 -xzf /opt/java/java.tar.gz \
  && rm -f /opt/java/java.tar.gz
 
