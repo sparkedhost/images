@@ -1071,6 +1071,32 @@ startup_with_signal_forwarding(){
     wait "${server_pid}"
 }
 
+startup_the_forest(){
+    MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
+
+    echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
+
+    stop_the_forest() {
+        local game_pid
+
+        # Keep Xvfb alive while the game handles the interrupt.
+        if game_pid="$(find_process_pid TheForestDedica TheForestDedicatedServer.exe)" &&
+            kill -INT "${game_pid}" 2>/dev/null; then
+            wait "${server_pid}"
+            exit $?
+        fi
+
+        forward_signal "$1"
+    }
+
+    trap 'stop_the_forest INT' INT
+    trap 'stop_the_forest TERM' TERM
+
+    setsid /bin/bash -c "${MODIFIED_STARTUP}" &
+    server_pid=$!
+    wait "${server_pid}"
+}
+
 startup_motortown(){
     local previous_log
 
@@ -1552,6 +1578,9 @@ startup_game(){
         ;;
         2465200)
             startup_with_signal_forwarding
+        ;;
+        556450)
+            startup_the_forest
         ;;
         2857200)
             startup_abiotic_console
