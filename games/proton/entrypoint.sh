@@ -1,5 +1,7 @@
 sleep 1
 
+export WINDOWS_INSTALL="${WINDOWS_INSTALL:-1}"
+
 source /spark-utils.sh
 
 if [[ -f "/usr/local/bin/proton" ]] && ! setup_proton_compatibility; then

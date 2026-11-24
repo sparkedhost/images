@@ -3,6 +3,7 @@ sleep 1
 MOD_FILE=modlist.html
 SERVER_HOME=/home/container
 STEAMCMD_ATTEMPTS=${STEAMCMD_ATTEMPTS:-3} # Default to 3 attempts
+export WINDOWS_INSTALL="${WINDOWS_INSTALL:-1}"
 
 source /spark-utils.sh
 
