@@ -1286,6 +1286,123 @@ startup_windrose(){
     return "${server_status}"
 }
 
+enable_dragonwilds_ue4ss() {
+    local release version installed_version
+    local releases="https://github.com/MichaelRyan2319/RSDragonwilds-UE4SS/releases"
+    local install_dir="RSDragonwilds/Binaries/Win64"
+    local version_file="${install_dir}/ue4ss/.apollo-version"
+    local archive_file="/tmp/rsdragonwilds-ue4ss.zip"
+
+    if [[ ! -f "${install_dir}/version.dll" ]]; then
+        echo "Downloading Dragonwilds UE4SS proxy..."
+        if ! curl -fsSL --connect-timeout 10 --max-time 30 \
+            "https://apollo-assets-s3.sparkedhost.us/runescape/version.dll" -o "${install_dir}/version.dll"; then
+            echo "Error: could not download the Dragonwilds UE4SS proxy" >&2
+            rm -f "${install_dir}/version.dll"
+            return 1
+        fi
+    fi
+
+    if ! release=$(curl -fsSI --connect-timeout 10 --max-time 30 -o /dev/null -w '%{redirect_url}' "${releases}/latest") ||
+        [[ "${release}" != "${releases}/tag/"?* ]]; then
+        echo "Error: could not retrieve the latest Dragonwilds UE4SS release from GitHub" >&2
+        return 1
+    fi
+
+    version="${release##*/}"
+    installed_version=$(cat "${version_file}" 2>/dev/null || true)
+    if [[ -f "${install_dir}/ue4ss/UE4SS.dll" && -f "${install_dir}/dwmapi.dll" && "${installed_version}" == "${version}" ]]; then
+        return 0
+    fi
+
+    echo "Installing Dragonwilds UE4SS (${version})..."
+    if ! curl -fsSL --connect-timeout 10 --max-time 180 \
+        "${releases}/download/${version}/UE4SS-RSDragonwilds.zip" -o "${archive_file}"; then
+        echo "Error: could not download Dragonwilds UE4SS (${version})" >&2
+        rm -f "${archive_file}"
+        return 1
+    fi
+
+    if ! unzip -nq "${archive_file}" Binaries/Win64/ue4ss/UE4SS-settings.ini Binaries/Win64/ue4ss/Mods/mods.txt -d RSDragonwilds ||
+        ! unzip -oq "${archive_file}" Binaries/Win64/dwmapi.dll Binaries/Win64/ue4ss/UE4SS.dll -d RSDragonwilds; then
+        echo "Error: could not extract Dragonwilds UE4SS (${version})" >&2
+        rm -f "${archive_file}"
+        return 1
+    fi
+    rm -f "${archive_file}"
+    printf '%s\n' "${version}" > "${version_file}"
+}
+
+configure_dragonwilds_ue4ss() {
+    local install_dir="RSDragonwilds/Binaries/Win64"
+
+    [[ -f "${install_dir}/version.dll" && -f "${install_dir}/ue4ss/UE4SS.dll" && -f "${install_dir}/dwmapi.dll" ]] || return 1
+
+    export WINEDLLOVERRIDES='dwmapi,version=n,b'
+    export PROTON_NO_FSYNC=1 PROTON_NO_ESYNC=1 PROTON_USE_WINED3D=1
+}
+
+startup_dragonwilds(){
+    local server_pid console_pid command
+    local launcher_pid="$BASHPID" server_status=0
+    local native_executable="./RSDragonwilds/Binaries/Linux/RSDragonwildsServer-Linux-Shipping"
+    local proton_executable="./RSDragonwilds/Binaries/Win64/RSDragonwildsServer-Win64-Shipping.exe"
+
+    if [[ "$ENABLE_UE4SS" != 1 ]]; then
+        regular_startup
+        return
+    fi
+    if ! command -v proton >/dev/null; then
+        echo "UE4SS requires the Proton image."
+        return 1
+    fi
+    if [[ ! -f "$proton_executable" ]]; then
+        echo "Reinstall the server and choose to keep your files to install the Windows game files."
+        return 1
+    fi
+    enable_dragonwilds_ue4ss
+    configure_dragonwilds_ue4ss || return 1
+    STARTUP="${STARTUP/"$native_executable"/"xvfb-run -a proton run $proton_executable RSDragonwilds"}"
+    STARTUP+=' -nullrhi -nosound -stdout -FullStdOutLogOutput'
+    tail_log_file "./RSDragonwilds/Saved/Logs/RSDragonwilds.log" "$$" 2>/dev/null &
+
+    MODIFIED_STARTUP=$(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
+    echo -e "\033[1;33mcustomer@apollopanel:~\$\033[0m :/home/container$ ${MODIFIED_STARTUP}"
+
+    stop_dragonwilds() {
+        local game_pid
+
+        # Keep Xvfb alive while the game handles the interrupt.
+        if game_pid="$(find_process_pid GameThread "${proton_executable##*/}")" &&
+            kill -INT "$game_pid" 2>/dev/null; then
+            wait "$server_pid"
+            exit $?
+        fi
+
+        forward_signal "$1"
+    }
+
+    trap 'stop_dragonwilds INT' INT
+    trap 'stop_dragonwilds TERM' TERM
+    setsid env --default-signal=INT /bin/bash -c "$MODIFIED_STARTUP" </dev/null &
+    server_pid=$!
+
+    (
+        while IFS= read -r command; do
+            if [[ "${command%$'\r'}" == quit ]]; then
+                kill -INT "$launcher_pid"
+                break
+            fi
+        done
+    ) <&0 &
+    console_pid=$!
+
+    wait "$server_pid" || server_status=$?
+    kill "$console_pid" 2>/dev/null || true
+    wait "$console_pid" 2>/dev/null || true
+    return "$server_status"
+}
+
 startup_enshrouded(){
     if [[ "${INSTALL_EML:-0}" == "1" ]]; then
         install_eml || return 1
@@ -1590,6 +1707,9 @@ startup_game(){
         ;;
         4129620)
             startup_windrose
+        ;;
+        4019830)
+            startup_dragonwilds
         ;;
         2278520)
             startup_enshrouded
