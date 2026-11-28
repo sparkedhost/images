@@ -1051,9 +1051,7 @@ game_pre_startup(){
     case $SRCDS_APPID in
         1829350)
             if [[ "${INSTALL_BEPINEX:-0}" -eq 1 ]]; then
-                if [[ -n "${STEAM_COMPAT_DATA_PATH:-}" ]]; then
-                    install_bepinex
-                fi
+                install_bepinex
                 export WINEDLLOVERRIDES="winhttp=n,b${WINEDLLOVERRIDES:+;${WINEDLLOVERRIDES}}"
             fi
         ;;
