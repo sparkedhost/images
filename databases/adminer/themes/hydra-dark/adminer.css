@@ -60,15 +60,29 @@ hr { border: 0; border-top: 1px solid var(--border); }
 }
 #breadcrumb {
     position: static;
+    height: auto;
     margin: 0 0 10px;
     padding: 0;
     background: none;
     color: var(--muted);
     font-size: 12px;
+    line-height: 1.55;
     white-space: normal;
     overflow-wrap: anywhere;
 }
 #breadcrumb a { color: var(--muted); }
+
+#jump { display: inline-block; margin-inline-end: 8px; }
+#jump input[type="search"] { width: 10rem; border-color: var(--border); border-radius: 6px; }
+#jump.fixed { z-index: 20; background: var(--surface); border-radius: 6px; }
+#jump-list {
+    max-width: calc(100vw - 32px);
+    background: var(--surface);
+    border-color: var(--border);
+    border-radius: 6px;
+    box-shadow: 0 8px 24px #0006;
+}
+#jump-list li > small { color: var(--muted); }
 #breadcrumb a:hover { color: var(--accent); }
 #menu {
     position: fixed;

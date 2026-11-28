@@ -123,13 +123,24 @@ if (isset($_GET["redis"])) {
 		function attach(array $server, $username, $password) {
 			$scheme = $server["scheme"];
 			$host = ($scheme ? "$scheme://" : "") . ($server["host"] ?: "127.0.0.1");
-			$this->fp = @fsockopen($host, intval($server["port"] ?: 6379), $errno, $error);
+			$port = intval($server["port"] ?: 6379);
+			// a failed TLS handshake leaves $error empty, its reason is in the first of the warnings
+			$warnings = php_errors(function () use ($host, $port, &$error) {
+				$this->fp = fsockopen($host, $port, $errno, $error);
+			});
 			if (!$this->fp) {
-				return $error;
+				return ($error ?: ($warnings ? $warnings[0] : "Unable to connect"));
 			}
 			// PING verifies that a server without a password really doesn't require one
-			if (!$this->send($password != "" ? array("AUTH", $password) : array("PING"))) {
-				return $this->error;
+			$reply = $this->send($password != "" ? array("AUTH", $password) : array("PING"));
+			if ($reply !== ($password != "" ? "OK" : "PONG")) {
+				$return = $this->error;
+				// any service can listen on the port, only Redis repeats the unknown option in the error
+				$probe = rand_string();
+				return ($reply === false && $this->send(array("HELLO", "2", $probe)) === false && strpos($this->error, $probe) !== false
+					? $return
+					: "The server did not reply as Redis."
+				);
 			}
 			if (DB == "" && preg_match('~redis_version:(.+)~', $this->send(array("INFO", "server")), $match)) {
 				$this->server_info = $match[1];
@@ -177,6 +188,23 @@ if (isset($_GET["redis"])) {
 		* @return list<mixed> replies in the order of the commands
 		*/
 		function sendMulti(array $commands) {
+			$query = array();
+			foreach ($commands as $args) {
+				if (strtoupper($args[0]) == "AUTH") {
+					$args[count($args) - 1] = "***"; // the password
+				}
+				$query[] = format_command($args);
+			}
+			return adminer()->executeQuery(implode("\n", $query), function () use ($commands) {
+				return $this->pipeline($commands);
+			});
+		}
+
+		/** Send the commands and read their replies
+		* @param list<list<string|int>> $commands
+		* @return list<mixed>
+		*/
+		private function pipeline(array $commands) {
 			$cmd = '';
 			foreach ($commands as $args) {
 				$cmd .= "*" . count($args) . "\r\n";
@@ -184,6 +212,7 @@ if (isset($_GET["redis"])) {
 					$cmd .= '$' . strlen($arg) . "\r\n$arg\r\n";
 				}
 			}
+			error_clear_last(); // readError() reports only the errors of this command
 			fwrite($this->fp, $cmd);
 			$return = array();
 			$count = count($commands);
@@ -196,7 +225,7 @@ if (isset($_GET["redis"])) {
 		function read() {
 			$line = fgets($this->fp);
 			if ($line === false) {
-				$this->error = error_get_last()['message'];
+				$this->error = $this->readError();
 				return false;
 			}
 			$type = $line[0];
@@ -216,8 +245,8 @@ if (isset($_GET["redis"])) {
 					$data = '';
 					while (strlen($data) < $len) {
 						$block = fread($this->fp, $len - strlen($data));
-						if ($block === false) {
-							$this->error = error_get_last()['message'];
+						if ($block == "") { // false for an error, "" for a closed connection or a timeout
+							$this->error = $this->readError();
 							return false;
 						}
 						$data .= $block;
@@ -238,6 +267,15 @@ if (isset($_GET["redis"])) {
 					$this->error = "Unknown response type: $type";
 					return false;
 			}
+		}
+
+		/** Get the error of a failed read */
+		private function readError() {
+			$error = error_get_last();
+			return ($error // a closed connection or a timeout emits no PHP error
+				? php_error_text($error['message'])
+				: (stream_get_meta_data($this->fp)['timed_out'] ? "Connection timed out" : "Connection closed")
+			);
 		}
 	}
 
@@ -380,10 +418,6 @@ JS;
 			return '[^\s\S]'; // Redis has no comments
 		}
 
-		function allFields() {
-			return array(); // the parent implementation would send a SQL query
-		}
-
 		function insert($table, array $set) {
 			return queries("SET " . implode(" ", $set)); // the values are quoted by quote()
 		}
@@ -449,7 +483,11 @@ JS;
 	function fields($table) {
 		return array(
 			"key" => array("field" => "key", "privileges" => array("select" => 1, "where" => 1, "insert" => 1)),
-			"type" => array("field" => "type", "privileges" => array("select" => 1)), // the type is determined by the command creating the key
+			"type" => array(
+				"field" => "type",
+				"privileges" => array("select" => 1), // the type is determined by the command creating the key
+				"doc" => "https://redis.io/docs/latest/develop/data-types/",
+			),
 			"value" => array("field" => "value", "privileges" => array("select" => 1, "insert" => 1, "update" => 1)),
 		);
 	}
