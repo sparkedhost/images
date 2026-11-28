@@ -17,11 +17,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { series: "14", release: "14.24" }
-          - { series: "15", release: "15.19" }
-          - { series: "16", release: "16.15" }
-          - { series: "17", release: "17.11" }
-          - { series: "18", release: "18.6" }
+          - { series: "14", release: "14.25" }
+          - { series: "15", release: "15.20" }
+          - { series: "16", release: "16.16" }
+          - { series: "17", release: "17.12" }
+          - { series: "18", release: "18.7" }
     uses: ./.github/workflows/docker-build.yml
     with:
       context: ./databases
