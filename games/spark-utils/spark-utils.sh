@@ -69,7 +69,7 @@ rotate_log() {
 }
 
 install_bepinex() {
-    local api_url zip_prefix extracted_dir zip_name
+    local api_url zip_prefix extracted_dir zip_name preloader
     local version_file=".apollo/bepinex_version"
     local api_response download_url version_number installed_version
 
@@ -79,12 +79,14 @@ install_bepinex() {
             api_url="https://thunderstore.io/api/experimental/package/denikson/BepInExPack_Valheim/"
             zip_prefix="denikson-BepInExPack_Valheim"
             extracted_dir="BepInExPack_Valheim"
+            preloader="BepInEx/core/BepInEx.Preloader.dll"
             ;;
         1829350)
             # V Rising
             api_url="https://thunderstore.io/api/experimental/package/BepInEx/BepInExPack_V_Rising/"
             zip_prefix="BepInEx-BepInExPack_V_Rising"
             extracted_dir="BepInExPack_V_Rising"
+            preloader="BepInEx/core/BepInEx.Unity.IL2CPP.dll"
             ;;
         *)
             return 1
@@ -115,7 +117,7 @@ install_bepinex() {
 
     if ! curl -fL --retry 3 --retry-delay 2 -o "${zip_name}" "${download_url}" \
         || ! unzip -o "${zip_name}" \
-        || [[ ! -f "/home/container/${extracted_dir}/BepInEx/core/BepInEx.Preloader.dll" ]]; then
+        || [[ ! -f "/home/container/${extracted_dir}/${preloader}" ]]; then
         echo "Error: could not install BepInEx"
         rm -f "${zip_name}"
         return 1
@@ -1049,6 +1051,9 @@ game_pre_startup(){
     case $SRCDS_APPID in
         1829350)
             if [[ "${INSTALL_BEPINEX:-0}" -eq 1 ]]; then
+                if [[ -n "${STEAM_COMPAT_DATA_PATH:-}" ]]; then
+                    install_bepinex
+                fi
                 export WINEDLLOVERRIDES="winhttp=n,b${WINEDLLOVERRIDES:+;${WINEDLLOVERRIDES}}"
             fi
         ;;
@@ -1587,6 +1592,9 @@ startup_game(){
         ;;
         3349480)
             startup_moria
+        ;;
+        3937860)
+            startup_with_console_bridge "voyagers-console-bridge" 'Server Console \(BoatGame\)'
         ;;
         4129620)
             startup_windrose
